@@ -1,0 +1,29 @@
+# Entorno virtual de Python
+.venv/
+venv/
+
+# Archivos de dependencias y compilados
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de configuración locales
+*.env
+.env.*
+
+# Logs y cachés
+*.log
+*.sqlite3
+instance/
+.cache/
+*.coverage
+
+# Directorios de Node.js (para frontend)
+node_modules/
+dist/
+build/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
