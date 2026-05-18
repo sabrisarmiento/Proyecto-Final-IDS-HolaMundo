@@ -17,3 +17,11 @@ create table usuarios (
     id_rol INT,
     FOREIGN KEY (id_rol) REFERENCES roles (id_rol)
 )
+
+--ayudantes--
+CREATE TABLE ayudantes (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    id_equipo INT,
+    FOREIGN KEY (id_usuario) REFERENCES (id_usuario)
+    FOREIGN KEY (id_equipo) REFERENCES (id_equipo)
+)
