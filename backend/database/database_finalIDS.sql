@@ -40,6 +40,16 @@ create table usuarios (
     FOREIGN KEY (id_rol) REFERENCES roles (id_rol)
 )
 
+--alumnos--
+CREATE TABLE IF NOT EXISTS alumnos (
+    id_usuario INT PRIMARY KEY,
+    padron INT UNIQUE NOT NULL,
+    estado_alumno ENUM('Activo', 'Baja solicitada', 'Abandono') NOT NULL,
+    id_equipo INT,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
+    FOREIGN KEY (id_equipo) REFERENCES equipos (id_equipo)
+);
+
 --ayudantes--
 CREATE TABLE ayudantes (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
