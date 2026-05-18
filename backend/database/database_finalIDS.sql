@@ -1,3 +1,9 @@
+--roles--
+CREATE TABLE roles {
+    id_roles INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(20) NOT NULL,
+    nivel_administracion INT NOT NULL
+}
 --aviso--
 CREATE TABLE avisos (
     id_aviso INT AUTO_INCREMENT PRIMARY KEY,
