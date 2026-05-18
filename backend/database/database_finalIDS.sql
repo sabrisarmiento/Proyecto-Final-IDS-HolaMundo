@@ -66,6 +66,12 @@ create table profesores (
     FOREIGN KEY (id_equipo) REFERENCES equipo (id_equipo)
 )
 
+--equipos--
+CREATE TABLE equipos (
+    id_equipo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_equipo VARCHAR(20) NOT NULL,
+)
+
 --evaluaciones--
 CREATE TABLE evaluaciones (
     id_evaluacion INT PRIMARY KEY,
