@@ -52,10 +52,10 @@ CREATE TABLE IF NOT EXISTS alumnos (
 
 --ayudantes--
 CREATE TABLE ayudantes (
-    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT PRIMARY KEY,
     id_equipo INT,
-    FOREIGN KEY (id_usuario) REFERENCES (id_usuario)
-    FOREIGN KEY (id_equipo) REFERENCES (id_equipo)
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 )
 
 --profesores--
