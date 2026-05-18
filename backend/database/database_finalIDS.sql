@@ -12,6 +12,14 @@ CREATE TABLE avisos (
     fecha DATE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 )
+--asistencia--
+CREATE TABLE asistencia (
+    id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    fecha DATE,
+    status BOOLEAN,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+)
 --usuarios--
 create table usuarios (
     id_usuario int auto_increment PRIMARY KEY,
