@@ -18,6 +18,8 @@ __pycache__/
 instance/
 .cache/
 *.coverage
+.vscode/
+.idea/
 
 # Directorios de Node.js (para frontend)
 node_modules/

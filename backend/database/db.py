@@ -1,9 +1,16 @@
 import mysql.connector
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+db_password = os.getenv("DB_PASSWORD")
+db_user = os.getenv("DB_USER")
 
 db_config = {
     "host": "localhost",
-    "user": "root",
-    "password": 1234,
+    "user": db_user,
+    "password": db_password,
     "database": "DB_ProyectoFinal_IDS"
 }
 

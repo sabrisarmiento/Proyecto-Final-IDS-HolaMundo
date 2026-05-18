@@ -4,6 +4,14 @@ CREATE TABLE roles {
     nombre VARCHAR(20) NOT NULL,
     nivel_administracion INT NOT NULL
 }
+
+--clases--
+CREATE TABLE clases(
+    id_clase INT PRIMARY KEY,
+    fecha DATE,
+    temas VARCHAR(255)
+)
+
 --aviso--
 CREATE TABLE avisos (
     id_aviso INT AUTO_INCREMENT PRIMARY KEY,
