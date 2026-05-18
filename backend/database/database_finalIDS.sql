@@ -55,3 +55,15 @@ create table profesores (
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
     FOREIGN KEY (id_equipo) REFERENCES equipo (id_equipo)
 )
+
+--evaluaciones--
+CREATE TABLE evaluaciones (
+    id_evaluacion INT PRIMARY KEY,
+    id_tipo INT,
+    id_profesor INT,
+    id_equipo INT,
+    fecha DATE,
+    FOREIGN KEY (id_tipo) REFERENCES tipos_evaluacion(id_tipo),
+    FOREIGN KEY (id_profesor) REFERENCES profesores(id_usuario),
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
+);
