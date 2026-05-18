@@ -6,3 +6,14 @@ CREATE TABLE avisos (
     fecha DATE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 )
+--usuarios--
+create table usuarios (
+    id_usuario int auto_increment PRIMARY KEY,
+    nombre_usuario VARCHAR(100) NOT NULL,
+    apellido_usuario VARCHAR(100) NOT NULL,
+    correo_usuario VARCHAR(255) NOT NULL,
+    contraseña VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT ,
+    id_rol INT,
+    FOREIGN KEY (id_rol) REFERENCES roles (id_rol)
+)
