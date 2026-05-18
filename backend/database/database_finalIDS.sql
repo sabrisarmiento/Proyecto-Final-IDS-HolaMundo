@@ -31,3 +31,11 @@ CREATE TABLE ayudantes (
     FOREIGN KEY (id_usuario) REFERENCES (id_usuario)
     FOREIGN KEY (id_equipo) REFERENCES (id_equipo)
 )
+
+--profesores--
+create table profesores (
+    id_usuario INT PRIMARY KEY
+    id_equipo INT
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
+    FOREIGN KEY (id_equipo) REFERENCES equipo (id_equipo)
+)
