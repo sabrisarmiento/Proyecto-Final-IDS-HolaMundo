@@ -1,4 +1,4 @@
-from .route_advices import advices_bp
+from .route_announcements import advices_bp
 from .route_attendance import attendance_bp
 from .route_exam import exam_bp
 from .route_classes import classes_bp
