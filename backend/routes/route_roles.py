@@ -7,8 +7,8 @@ roles_bp = Blueprint('roles', __name__)
 def list_roles_route():
     try:
         id_roles = request.args.get('id_roles', type = int)
-        name = request.args.get('nombre')
-        admin_level = request.args.get('nivel_administracion', type = int)
+        name = request.args.get('name')
+        admin_level = request.args.get('admin_level', type = int)
 
         if admin_level is not None and (admin_level < 1 or admin_level > 3):
             return jsonify({"error": [{
