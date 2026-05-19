@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from controller.roles_controller import list_roles, create_rol, delete_rol
+from controllers.roles_controller import list_roles, create_rol, delete_rol
 
 roles_bp = Blueprint('roles', __name__)
 
