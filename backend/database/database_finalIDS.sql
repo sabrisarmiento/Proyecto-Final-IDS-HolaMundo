@@ -77,3 +77,13 @@ CREATE TABLE evaluaciones (
     FOREIGN KEY (id_profesor) REFERENCES profesores(id_usuario),
     FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
+
+--notas--
+CREATE TABLE notas (
+    id_nota INT PRIMARY KEY,
+    id_alumno INT,
+    id_evaluacion INT,
+    nota DECIMAL(4, 2),
+    FOREIGN KEY (id_alumno) REFERENCES alumnos (id_usuario),
+    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones (id_evaluacion)
+);
