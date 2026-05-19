@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from controller.students_controller import list_students
+from controller.students_controller import list_students, search_student_by_id
 
 students_bp = Blueprint('students', __name__)
 
@@ -14,5 +14,9 @@ def list_students_route():
     created_at = request.args.get('created_at')
 
     return list_students(id_alumnos, name, surname, mail, password, id_rol, created_at)
+
+@students_bp.route("/students/<int:id>", methods = ["GET"])
+def search_student(id):
+    return search_student_by_id(id)
 
 

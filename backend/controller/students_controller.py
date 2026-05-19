@@ -59,3 +59,34 @@ def list_students(id_alumnos, name, surname, mail, password, id_rol, created_at)
             "level": "errors", 
             "description": str(error)
         }]}), 500
+    
+def search_student_by_id(id):
+    if id <= 0:
+        return jsonify({"errors": [{
+                "code": "BAD_REQUEST",
+                "message": "ID inválido",
+                "level": "error",
+                "description": "El ID debe ser un número entero positivo mayor a cero."
+            }]}), 400
+    
+    try:
+        query_check = "SELECT * FROM roles WHERE id_roles = %s"
+        existance = query_db(query_check, (id, ))
+
+        if not existance:
+            return jsonify({"errors": [{
+                    "code": "NOT_FOUND",
+                    "message": "id_rol no encontrado",
+                    "level": "error",
+                    "description": "No existe un rol con el ID proporcionado."
+                }]}), 404
+
+        return existance
+
+    except Exception as error:
+        return jsonify({"errors": [{
+            "code":  "500", 
+            "message": "Internal Server Error", 
+            "level": "error", 
+            "description": str(error)
+        }]}), 500
