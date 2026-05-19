@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from controllers.students_controller import list_students, search_student_by_id, create_student
+from controllers.students_controller import list_students, search_student_by_id, create_student, import_students
 
 students_bp = Blueprint('students', __name__)
 
@@ -21,5 +21,10 @@ def search_student(id):
 @students_bp.route("/students", methods = ["POST"])
 def create_student_route():
     data = request.get_json()
-    return create_student(data)
+    result, status = create_student(data)
+    return jsonify(result), status
+
+@students_bp.route("/students/import", methods = ["POST"])
+def import_student_csv():
+    return import_students(request.files)
 

@@ -1,5 +1,4 @@
-from xmlrpc.server import resolve_dotted_attribute
-
+import csv, io
 from flask import jsonify
 from database.db import query_db, modify_db
 
@@ -81,83 +80,99 @@ def search_student_by_id(id):
     
 def create_student(data):
     try: 
-        if "nombre" not in data or "apellido" not in data or "correo" not in data or "password" not in data or "id_rol" not in data:
-            return jsonify({"errors": [{
-                "code": "400", 
-                "message": "Bad Request", 
-                "level": "error",
-                "description": "Faltan campos requeridos: nombre, apellido, correo, password e id_rol"
-            }]}), 400
+        if not data:
+            return {"error": "JSON requerido"}, 400
+        
+        required = ["nombre", "apellido", "correo", "password", "id_rol"]
+        missing = [k for k in required if k not in data]
+        if missing:
+            return {"error": f"Faltan campos: {missing}"}, 400
         
         if not isinstance(data["id_rol"], int):
-            return jsonify({"errors": [{
-                "code": "400", 
-                "message": "Bad Request", 
-                "level": "error",
-                "description": "id_rol debe ser un entero"
-            }]}), 400
-        
-        if not data:
-            return jsonify({ "errors": [{
-                "code": "400", 
-                "message": "Bad Request", 
-                "level": "error", 
-                "description": "JSON requerido"
-            }]}), 400
+            return {"error": "id_rol debe ser un entero"}, 400
         
         if data["id_rol"] < 0:
-            return jsonify({ "errors": [{
-                "code": "400", 
-                "message": "Bad Request", 
-                "level": "error", 
-                "description": "El nivel_administracion debe ser entre 1 y 3"}]}), 400
+            return {"error": "id_rol debe ser mayor a 0"}, 400
         
         query_check = """
-            SELECT id_alumno FROM alumnos 
-            WHERE 1 = 1 
-            AND nombre=%s 
-            AND apellido=%s
-            AND correo=%s
-            AND password=%s
-            AND id_rol=%s
+            SELECT id_alumno FROM alumnos
+            WHERE correo = %s
         """
-
-        existance = query_db(query_check, (
-            data["nombre"],
-            data["apellido"],
-            data["correo"],
-            data["password"],
-            data["id_rol"]))
-        
-        if existance:
-            return jsonify({ "errors": [{
-                "code": "409", 
-                "message": "Conflict", 
-                "level": "error", 
-                "description": "El alumno ya existe"}]}), 409
+        if query_db(query_check, (data["correo"],)):
+            return {"error": "El alumno ya existe (correo duplicado)"}, 409
 
         query_insert = """
             INSERT INTO alumnos (nombre, apellido, correo, password, id_rol)
             VALUES (%s, %s, %s, %s, %s)
         """
-
         id_alumno = modify_db(query_insert, (
-            data["nombre"],
-            data["apellido"],
+            data["nombre"], 
+            data["apellido"], 
             data["correo"],
-            data["password"],
+            data["password"], 
             data["id_rol"]
         ))
 
-        return jsonify({
-            "mensaje": "El alumno ha sido creado exitosamente",
-            "id": id_alumno
-        }), 201
+        return {"id": id_alumno, "mensaje": "creado"}, 201
 
     except Exception as error:
+        return {"error": str(error)}, 500
+    
+def import_students(files):
+    if 'file' not in files:
         return jsonify({"errors": [{
-            "code":  "500", 
-            "message": "Internal Server Error", 
-            "level": "error", 
-            "description": str(error)
-        }]}), 500
+            "code": "400", 
+            "message": "Bad Request", 
+            "level": "error",
+            "description": "No se envió archivo (campo 'file' requerido)"
+        }]}), 400
+    
+    file = files['file']
+
+    if not file.filename.lower().endswith('.csv'):
+        return jsonify({"errors": [{
+            "code": "400", "message": "Bad Request", "level": "error",
+            "description": "El archivo debe ser .csv"
+        }]}), 400
+    
+    try: 
+        stream = io.StringIO(file.stream.read().decode("utf-8-sig"), newline=None)
+        reader = csv.DictReader(stream)
+        rows = list(reader)
+
+    except Exception as e:
+        return jsonify({"errors": [{
+            "code": "400", "message": "Bad Request", "level": "error",
+            "description": f"No se pudo leer el CSV: {e}"
+        }]}), 400
+
+    if not rows:
+        return jsonify({"errors": [{
+            "code": "400", "message": "Bad Request", "level": "error",
+            "description": "El CSV está vacío"
+        }]}), 400
+    
+    creados = []
+    errores = []
+
+    for i, row in enumerate(rows, start=2):
+        try:
+            row["id_rol"] = int(row["id_rol"])
+        except (KeyError, ValueError, TypeError):
+            errores.append({"fila": i, "error": "id_rol inválido o ausente"})
+            continue
+
+        result, status = create_student(row)
+
+        if status == 201:
+            creados.append({"fila": i, "id": result["id"]})
+        else:
+            errores.append({"fila": i, "status": status, "error": result.get("error")})
+
+    status_final = 201 if not errores else (207 if creados else 400)
+    return jsonify({
+        "creados": len(creados),
+        "errores": len(errores),
+        "detalle_creados": creados,
+        "detalle_errores": errores
+    }), status_final
