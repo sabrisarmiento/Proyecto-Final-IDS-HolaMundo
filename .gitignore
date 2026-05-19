@@ -29,3 +29,7 @@ build/
 # Archivos de sistema
 .DS_Store
 Thumbs.db
+
+# Claude Code
+CLAUDE.md
+.claude/
