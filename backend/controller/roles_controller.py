@@ -1,20 +1,20 @@
 from flask import jsonify
 from database.db import query_db, modify_db
 def list_roles(id_roles, name, admin_level):
-    sql = "SELECT * FROM partidos"
-    condition = "WHERE 1 = 1"
+    sql = "SELECT * FROM roles"
+    condition = " WHERE 1 = 1"
     params = []
 
     if id_roles:
-        condition += " AND fecha %s"
+        condition += " AND id_roles = %s"
         params.append(id_roles)
 
     if name:
-        condition += " AND nombre %s"
+        condition += " AND nombre = %s"
         params.append(name)
     
     if admin_level:
-        condition += " AND nivel_administracion %s"
+        condition += " AND nivel_administracion = %s"
         params.append(admin_level)
     
     return query_db(sql + condition, params)
@@ -74,3 +74,21 @@ def create_rol(data):
             "message": "Internal Server Error", 
             "level": "error", 
             "description": str(e)}]}), 500
+    
+def delete_rol(id):
+    query_check = "SELECT * FROM roles WHERE id_roles = %s"
+    existance = query_db(query_check, (id, ))
+
+    if not existance:
+        return jsonify({"errors": [{
+                    "code": "NOT_FOUND",
+                    "message": "id_rol no encontrado",
+                    "level": "error",
+                    "description": "No existe un rol con el ID proporcionado."
+                }]}), 404
+    
+    query_delete = "DELETE FROM roles WHERE id_roles = %s"
+
+    modify_db(query_delete, (id, ))
+
+    return '', 204
