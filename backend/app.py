@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from routes import advices_bp, attendance_bp, exam_bp, classes_bp, exam_types_bp, marks_bp, roles_bp, professor_bp, students_bp, users_bp, teams_bp
+from routes import advices_bp, attendance_bp, exam_bp, classes_bp, exam_types_bp, marks_bp, roles_bp, professor_bp, students_bp, users_bp, teams_bp, assistant_bp
 app = Flask(__name__)
 
 @app.route('/')
@@ -17,6 +17,7 @@ app.register_blueprint(professor_bp)
 app.register_blueprint(students_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(teams_bp)
+app.register_blueprint(assistant_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)
