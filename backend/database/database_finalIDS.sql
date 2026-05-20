@@ -15,6 +15,7 @@ CREATE TABLE clases(
 --aviso--
 CREATE TABLE avisos (
     id_aviso INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL, 
     id_usuario INT NOT NULL,
     mensaje TEXT NOT NULL,
     fecha DATE,
