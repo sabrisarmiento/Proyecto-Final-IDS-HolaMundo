@@ -1,96 +1,129 @@
---roles--
-CREATE TABLE roles {
+CREATE DATABASE IF NOT EXISTS dbproyectofinal;
+USE dbproyectofinal;
+
+-- roles --
+CREATE TABLE roles (
     id_roles INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(20) NOT NULL,
     nivel_administracion INT NOT NULL
-}
-
---clases--
-CREATE TABLE clases(
-    id_clase INT PRIMARY KEY,
-    fecha DATE,
-    temas VARCHAR(255)
-)
-
---aviso--
-CREATE TABLE avisos (
-    id_aviso INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(100) NOT NULL, 
-    id_usuario INT NOT NULL,
-    mensaje TEXT NOT NULL,
-    fecha DATE,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-)
---asistencia--
-CREATE TABLE asistencia (
-    id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT,
-    fecha DATE,
-    status BOOLEAN,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-)
---usuarios--
-create table usuarios (
-    id_usuario int auto_increment PRIMARY KEY,
-    nombre_usuario VARCHAR(100) NOT NULL,
-    apellido_usuario VARCHAR(100) NOT NULL,
-    correo_usuario VARCHAR(255) NOT NULL,
-    contraseña VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    id_rol INT,
-    FOREIGN KEY (id_rol) REFERENCES roles (id_rol)
-)
-
---alumnos--
-CREATE TABLE IF NOT EXISTS alumnos (
-    id_usuario INT PRIMARY KEY,
-    padron INT UNIQUE NOT NULL,
-    estado_alumno ENUM('Activo', 'Baja solicitada', 'Abandono') NOT NULL,
-    id_equipo INT,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
-    FOREIGN KEY (id_equipo) REFERENCES equipos (id_equipo)
 );
 
---ayudantes--
-CREATE TABLE ayudantes (
-    id_usuario INT PRIMARY KEY,
-    id_equipo INT,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
-)
+-- cursos --
+CREATE TABLE cursos (
+    id_curso INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    cuatrimestre VARCHAR(20) NOT NULL,
+    anio INT NOT NULL
+);
 
---profesores--
-create table profesores (
-    id_usuario INT PRIMARY KEY
-    id_equipo INT
-    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
-    FOREIGN KEY (id_equipo) REFERENCES equipo (id_equipo)
-)
+-- tipos_evaluacion --
+CREATE TABLE tipos_evaluacion (
+    id_tipo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL,
+    descripcion TEXT
+);
 
---equipos--
+-- usuarios --
+CREATE TABLE usuarios (
+    id_usuario int AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    correo VARCHAR(255) UNIQUE NOT NULL,
+    contraseña VARCHAR(255) NOT NULL,
+    id_rol INT NOT NULL,
+    creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
+);
+
+-- alumnos --
+CREATE TABLE alumnos (
+    id_alumno INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    padron INT UNIQUE NOT NULL,
+    correo VARCHAR(255) NOT NULL,
+    estado_alumno BOOLEAN DEFAULT FALSE,
+    id_curso INT NOT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+);
+
+-- equipos --
 CREATE TABLE equipos (
     id_equipo INT AUTO_INCREMENT PRIMARY KEY,
     nombre_equipo VARCHAR(20) NOT NULL,
-)
-
---evaluaciones--
-CREATE TABLE evaluaciones (
-    id_evaluacion INT PRIMARY KEY,
-    id_tipo INT,
-    id_profesor INT,
-    id_equipo INT,
-    fecha DATE,
-    FOREIGN KEY (id_tipo) REFERENCES tipos_evaluacion(id_tipo),
-    FOREIGN KEY (id_profesor) REFERENCES profesores(id_usuario),
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
+    id_curso INT NOT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
 );
 
---notas--
+-- clases --
+CREATE TABLE clases (
+    id_clase INT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    temas VARCHAR(255),
+    id_curso INT NOT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+);
+
+-- materiales --
+CREATE TABLE materiales (
+    id_material INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(150) NOT NULL,
+    descripcion TEXT,
+    url_externo VARCHAR(500) NOT NULL,
+    id_curso INT NOT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+);
+
+-- equipo_alumno -- tabla intermedia
+CREATE TABLE equipo_alumno (
+    id_equipo INT NOT NULL,
+    id_alumno INT NOT NULL,
+    PRIMARY KEY (id_equipo, id_alumno),
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE,
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno) ON DELETE CASCADE
+);
+
+-- asistencia --
+CREATE TABLE asistencia (
+    id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
+    id_alumno INT NOT NULL,
+    id_clase INT NOT NULL,
+    presente BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_usuario),
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) 
+);
+
+-- aviso --
+CREATE TABLE avisos (
+    id_aviso INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    titulo VARCHAR(100) NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
+-- evaluaciones --
+CREATE TABLE evaluaciones (
+    id_evaluacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_tipo INT NOT NULL,
+    id_usuario INT NOT NULL,
+    fecha DATE,
+    asociacion ENUM('Individual', 'Equipo') NOT NULL,
+    FOREIGN KEY (id_tipo) REFERENCES tipos_evaluacion(id_tipo),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+);
+
+-- notas --
 CREATE TABLE notas (
-    id_nota INT PRIMARY KEY,
+    id_nota INT AUTO_INCREMENT PRIMARY KEY,
     id_alumno INT,
-    id_evaluacion INT,
-    nota DECIMAL(4, 2),
-    FOREIGN KEY (id_alumno) REFERENCES alumnos (id_usuario),
-    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones (id_evaluacion)
+    id_evaluacion INT NOT NULL,
+    id_equipo INT,
+    nota DECIMAL(4, 2) NOT NULL,
+    id_corrector INT NOT NULL,
+    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion),
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+    FOREIGN KEY (id_corrector) REFERENCES usuarios(id_usuario)
 );
