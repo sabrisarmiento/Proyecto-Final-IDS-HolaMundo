@@ -13,10 +13,10 @@ def get_all_users(filters):
     sql = """
       SELECT
         id_usuario,
-        nombre_usuario,
-        apellido_usuario,
-        correo_usuario,
-        created_at,
+        nombre,
+        apellido,
+        correo,
+        creado,
         id_rol
         FROM usuarios
         """
