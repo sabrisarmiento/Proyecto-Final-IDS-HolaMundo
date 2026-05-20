@@ -1,9 +1,9 @@
-CREATE DATABASE IF NOT EXISTS dbproyectofinal;
-USE dbproyectofinal;
+CREATE DATABASE IF NOT EXISTS DB_ProyectoFinal_IDS;
+USE DB_ProyectoFinal_IDS;
 
 -- roles --
 CREATE TABLE roles (
-    id_roles INT AUTO_INCREMENT PRIMARY KEY,
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(20) NOT NULL,
     nivel_administracion INT NOT NULL
 );
@@ -89,7 +89,7 @@ CREATE TABLE asistencia (
     id_alumno INT NOT NULL,
     id_clase INT NOT NULL,
     presente BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_usuario),
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
     FOREIGN KEY (id_clase) REFERENCES clases(id_clase) 
 );
 
@@ -111,7 +111,7 @@ CREATE TABLE evaluaciones (
     fecha DATE,
     asociacion ENUM('Individual', 'Equipo') NOT NULL,
     FOREIGN KEY (id_tipo) REFERENCES tipos_evaluacion(id_tipo),
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
 -- notas --
@@ -127,3 +127,4 @@ CREATE TABLE notas (
     FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
     FOREIGN KEY (id_corrector) REFERENCES usuarios(id_usuario)
 );
+
