@@ -15,6 +15,7 @@ CREATE TABLE clases(
 --aviso--
 CREATE TABLE avisos (
     id_aviso INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL, 
     id_usuario INT NOT NULL,
     mensaje TEXT NOT NULL,
     fecha DATE,
@@ -35,7 +36,7 @@ create table usuarios (
     apellido_usuario VARCHAR(100) NOT NULL,
     correo_usuario VARCHAR(255) NOT NULL,
     contraseña VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT ,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_rol INT,
     FOREIGN KEY (id_rol) REFERENCES roles (id_rol)
 )
