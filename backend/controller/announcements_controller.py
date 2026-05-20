@@ -1,5 +1,5 @@
 from flask import Blueprint, app, request, jsonify
-from db import get_connection 
+from database.db import get_connection 
 announcements_bp = Blueprint('announcements', __name__)
 
 @announcements_bp.route('/announcements', methods=['GET'])
