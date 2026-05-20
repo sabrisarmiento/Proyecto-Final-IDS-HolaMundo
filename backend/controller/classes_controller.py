@@ -3,11 +3,11 @@ from database.db import query_db, modify_db
 def get_classes(filters):
     try:
         fecha = filters.get('fecha')
-        query = "SELECT * FROM CLASES WHERE fecha = %s"
-        condition = "WHERE 1=1"
+        query = "SELECT id_clase, fecha, temas, id_curso FROM CLASES"
+        condition = " WHERE 1=1"
         params = []
         if fecha is not None:
-            condition += "AND fecha = %s"
+            condition += " AND fecha = %s"
             params.append(fecha)
         
         result = query_db(query + condition, params)
