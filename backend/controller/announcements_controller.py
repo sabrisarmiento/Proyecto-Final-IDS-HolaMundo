@@ -1,14 +1,13 @@
-from flask import Blueprint, app, request, jsonify
+from flask import Blueprint, request, jsonify
 from database.db import get_connection 
 announcements_bp = Blueprint('announcements', __name__)
 
-@announcements_bp.route('/announcements', methods=['GET'])
 def  get_announcements():
         try:
                 fecha = request.args.get('fecha')
                 titulo = request.args.get('titulo')
         
-                query = "SELECT * FROM announcements WHERE 1=1"
+                query = "SELECT * FROM avisos WHERE 1=1"
                 params = []
         
                 if fecha:
@@ -35,12 +34,11 @@ def  get_announcements():
                 cursor.close()
                 conn.close()
 
-@announcements_bp.route('/announcements/<id>', methods=['GET'])
 def get_announcement_by_id(id):
         try:
                 conn = get_connection()
                 cursor = conn.cursor(dictionary=True)
-                cursor.execute("SELECT * FROM announcements WHERE id = %s", (id,))
+                cursor.execute("SELECT * FROM avisos WHERE id_aviso = %s", (id,))
                 announcement = cursor.fetchone()
         
                 if not announcement:
@@ -53,7 +51,6 @@ def get_announcement_by_id(id):
                 cursor.close()
                 conn.close()
 
-@announcements_bp.route('/announcements', methods=['POST'])
 def create_announcement():
         try:
                 data = request.get_json()
@@ -66,7 +63,7 @@ def create_announcement():
         
                 conn = get_connection()
                 cursor = conn.cursor()
-                cursor.execute("INSERT INTO announcements (titulo, descripcion, fecha) VALUES (%s, %s, %s)", (titulo, descripcion, fecha))
+                cursor.execute("INSERT INTO avisos (titulo, descripcion, fecha) VALUES (%s, %s, %s)", (titulo, descripcion, fecha))
                 conn.commit()
         
                 return jsonify({"message": "Announcement created successfully"}), 201
@@ -77,7 +74,6 @@ def create_announcement():
                 conn.close()
                 
 
-@announcements_bp.route('/announcements/<id>', methods=['PATCH'])
 def update_announcement(id):
         try:
                 data = request.get_json()
@@ -85,7 +81,7 @@ def update_announcement(id):
                 campos = []
                 params = []
                 
-                if 'titulos' in data:
+                if 'titulo' in data:
                         campos.append("titulo = %s")
                         params.append(data['titulo'])
                 if 'mensaje' in data:
@@ -98,7 +94,7 @@ def update_announcement(id):
                         return jsonify({"error": "No fields to update"}), 400
                         
                 params.append(id)
-                query = f"UPDATE announcements SET {', '.join(campos)} WHERE id = %s"
+                query = f"UPDATE avisos SET {', '.join(campos)} WHERE id = %s"
                 
                 conn = get_connection()
                 cursor = conn.cursor()
@@ -115,12 +111,11 @@ def update_announcement(id):
                 cursor.close()
                 conn.close()
 
-@announcements_bp.route('/announcements/<id>', methods=['DELETE'])
 def delete_announcement(id):
         try:
                 conn = get_connection()
                 cursor = conn.cursor()
-                cursor.execute("DELETE FROM announcements WHERE id = %s", (id,))
+                cursor.execute("DELETE FROM avisos WHERE id = %s", (id,))
                 conn.commit()
         
                 if cursor.rowcount == 0:

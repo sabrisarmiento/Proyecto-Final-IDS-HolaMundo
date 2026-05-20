@@ -1,4 +1,4 @@
-from flask import Blueprint, app, request
+from flask import Blueprint, request
 from backend.controller.announcements_controller import get_announcement_by_id, get_announcements
 
 announcements_bp = Blueprint('announcements', __name__)
