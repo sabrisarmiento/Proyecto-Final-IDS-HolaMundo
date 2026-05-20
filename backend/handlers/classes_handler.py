@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from controller.classes_controller import get_classes, get_class_id, create_class, update_class
+from controller.classes_controller import get_classes, get_class_id, create_class, update_class, delete_class
 
 def classes_handler():
     filters = request.args
@@ -59,3 +59,25 @@ def class_patch_handler(id_clase):
     return jsonify({
         "classes": result["data"]
     }), 200
+
+def delete_class_handler(id):
+    try:
+        if id <= 0:
+            return jsonify({
+                "errors": [{
+                    "code": 400,
+                    "message": "ID inválido"
+                }]
+            }), 400
+        delete_class(id)
+        return jsonify({
+            "message": "Clase eliminada correctamente"
+        }), 200
+    except Exception as error:
+        return jsonify({
+            "errors": [{
+                "code": 500,
+                "message": "Error al eliminar clase",
+                "description": str(error)
+            }]
+        }), 500

@@ -120,3 +120,9 @@ def update_class(id_clase, data):
             "message": "Internal Server Error",
             "description": str(e)
         }
+
+def delete_class(id):
+    query = """DELETE FROM clases WHERE id_clase = %s;"""
+    params = (id,)
+    result = modify_db(query, params)
+    return result
