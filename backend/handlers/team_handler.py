@@ -1,6 +1,6 @@
 from flask import jsonify, request
 
-from controller.teams_controller import get_all_teams, team_by_id, get_team_by_members, create_team, update_team, delete_team
+from controller.teams_controller import get_all_teams, get_team_by_id, get_team_by_members, create_team, update_team, delete_team
 
 def get_teams_handler():
     try:
