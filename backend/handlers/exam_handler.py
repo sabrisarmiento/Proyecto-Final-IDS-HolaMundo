@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from controller.exam_controller import get_all_exams, create_exam, get_exam_by_id, patch_exam_by_id, delete_exam_by_id
 
-def exam_handler():
+def exams_handler():
 
     filters = request.args
 
