@@ -86,7 +86,8 @@ def create_mark(data):
         """
         modify_db(sql, (id_student, id_evaluation, float(mark_value), id_team, id_grader))
         return {
-            "ok": True
+            "ok": True,
+            "message": "nota creada correctamente"
             }
     except Exception as e:
         return {
