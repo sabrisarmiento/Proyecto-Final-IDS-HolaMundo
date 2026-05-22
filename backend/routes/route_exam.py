@@ -1,7 +1,6 @@
 from flask import Blueprint,request
 from services.exam_service import (
     exam_service,
-    exam_service,
     create_exam_service,
     patch_exam_service,
     delete_exam_service
