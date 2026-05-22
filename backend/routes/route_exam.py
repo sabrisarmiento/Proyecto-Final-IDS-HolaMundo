@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint,request
 from services.exam_service import (
     exams_service,
     exam_service,
@@ -12,7 +12,12 @@ exam_bp = Blueprint('exam', __name__)
 #GET GENERAL y GET TIPO Y FECHA------------------------------
 @exam_bp.route("/evaluaciones", methods=["GET"])
 def obtain_exams_params():
-    return exams_service()
+    filters = {
+        "id_tipo": request.args.get('id_tipo'),
+        "id_usuario": request.args.get('id_usuario'),
+        "fecha": request.args.get('fecha'),
+    }
+    return exam_service(filters)
 
 #GET ID------------------------------------------------------
 @exam_bp.route("/examenes/<int:id>",methods=["GET"])
