@@ -1,6 +1,6 @@
 from flask import Blueprint,request
 from services.exam_service import (
-    exams_service,
+    exam_service,
     exam_service,
     create_exam_service,
     patch_exam_service,
@@ -27,13 +27,14 @@ def obtain_exam_id(id_exam):
 #POST--------------------------------------------------------
 @exam_bp.route("/examenes", methods=["POST"]) 
 def add_exam():
-    return create_exam_service()
+    data=request.get_json()
+    return create_exam_service(data)
 
 #PATCH ID----------------------------------------------------
 @exam_bp.route("/examenes/<int:id>", methods=["PATCH"])
 def modify_exam(id_exam):
-    return patch_exam_service(id_exam)
- 
+    data=request.get_json()
+    return patch_exam_service(id_exam,data)
 
 #DELETE ID---------------------------------------------------
 @exam_bp.route("/examenes/<int:id>", methods=["DELETE"])
