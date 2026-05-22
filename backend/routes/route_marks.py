@@ -1,10 +1,10 @@
 from flask import Blueprint, request
 from services.mark_service import (
-    marks_handler,
-    mark_handler,
-    create_mark_handler,
-    patch_mark_handler,
-    delete_mark_handler
+    marks_service,
+    mark_service,
+    create_mark_service,
+    patch_mark_service,
+    delete_mark_service
 )
 
 marks_bp = Blueprint('marks', __name__)
@@ -19,26 +19,26 @@ def get_marks():
         "id_corrector": request.args.get('id_corrector'),
         "nota": request.args.get('nota')
     }
-    return marks_handler(filters)
+    return marks_service(filters)
 
 
 @marks_bp.route('/marks/<int:id_mark>', methods=['GET'])
 def get_mark(id_mark):
-    return mark_handler(id_mark)
+    return mark_service(id_mark)
 
 
 @marks_bp.route('/marks', methods=['POST'])
 def create_mark():
     data = request.get_json()
-    return create_mark_handler(data)
+    return create_mark_service(data)
 
 
 @marks_bp.route('/marks/<int:id_mark>', methods=['PATCH'])
 def patch_mark(id_mark):
     data = request.get_json()
-    return patch_mark_handler(id_mark, data)
+    return patch_mark_service(id_mark, data)
 
 
 @marks_bp.route('/marks/<int:id_mark>', methods=['DELETE'])
 def delete_mark(id_mark):
-    return delete_mark_handler(id_mark)
+    return delete_mark_service(id_mark)
