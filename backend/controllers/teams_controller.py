@@ -1,51 +1,123 @@
 from database.db import query_db, modify_db
 
-# GET GENERAL
-def get_all_teams():
-    query = """SELECT * FROM equipos;"""
-    params = ()
-    result = query_db(query, params)
-    return result
+def get_all_teams(filters):
+    try:
+        id_student = filters.get("id_alumno")
+        id_course = filters.get("id_curso")
+        sql = """SELECT e.id_equipo, e.nombre_equipo, e.id_curso FROM equipos e"""
+        condition = " WHERE 1=1 "
+        params = []
+        if id_student is not None:
+            sql += """INNER JOIN equipo_alumno ea ON e.id_equipo = ea.id_equipo"""
+            condition += " AND ea.id_alumno = %s "
+            params.append(int(id_student))
+        if id_course is not None:
+            condition += " AND e.id_curso = %s"
+            params.append(int(id_course))
+        result = query_db(sql + condition, params)
+        return {
+            "ok": True,
+            "data": result
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
 
-# GET POR ID
 def get_team_by_id(id):
-    query = """SELECT * FROM equipos WHERE id_equipo = %s;"""
-    params = (id,)
-    result = query_db(query, params)
-    return result
+    try:
+        sql = """SELECT id_equipo, nombre_equipo, id_curso FROM equipos WHERE id_equipo = %s;"""
+        result = query_db(sql, (id,))
+        if not result:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Team not found",
+                "description": f"No existe un equipo con id {id}"
+            }
+        return {
+            "ok": True,
+            "data": result
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
 
-# GET POR INTEGRANTES
-def get_team_by_members(id_usuario):
-    query = """
-        SELECT
-            e.id_equipo,
-            e.nombre_equipo
-        FROM equipos e
-        JOIN alumnos a
-            ON e.id_equipo = a.id_equipo
-        WHERE a.id_usuario = %s;
-    """
-    params = (id_usuario,)
-    result = query_db(query, params)
-    return result
+def create_team(data):
+    try:
+        name = data.get("nombre_equipo")
+        id_course = data.get("id_curso")
+        sql = """INSERT INTO equipos(nombre_equipo, id_curso) VALUES (%s, %s);"""
+        id_team = modify_db(sql, (name, id_course))
+        return {
+            "ok": True,
+            "data": {
+                "id_equipo": id_team,
+                "nombre_equipo": name,
+                "id_curso": id_course
+            }
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
 
-# POST
-def create_team(nombre_equipo):
-    query = """INSERT INTO equipos(nombre_equipo) VALUES (%s);"""
-    params = (nombre_equipo,)
-    result = modify_db(query, params)
-    return result
+def patch_team_by_id(id_team, data):
+    try:
+        name = data.get('nombre_equipo')
+        id_course = data.get('id_curso')
+        updates = []
+        params = []
+        if name is not None:
+            updates.append("nombre_equipo = %s")
+            params.append(name)
+        if id_course is not None:
+            updates.append("id_curso = %s")
+            params.append(int(id_course))
+        if not updates:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": "No se enviaron campos para actualizar"
+            }
+        sql = f"""UPDATE equipos SET {', '.join(updates)} WHERE id_equipo = %s"""
+        params.append(id_team)
+        modify_db(sql, params)
+        return {
+            "ok": True,
+            "message": "Equipo actualizado correctamente"
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 400,
+            "message": "Bad Request",
+            "description": str(e)
+        }
 
-# PATCH
-def update_team(id, nombre_equipo):
-    query = """UPDATE equipos SET nombre_equipo = %s WHERE id_equipo = %s;"""
-    params = (nombre_equipo, id)
-    result = modify_db(query, params)
-    return result
-
-# DELETE
-def delete_team(id):
-    query = """DELETE FROM equipos WHERE id_equipo = %s;"""
-    params = (id,)
-    result = modify_db(query, params)
-    return result
+def delete_team_by_id(id_team):
+    try:
+        sql = """DELETE FROM equipos WHERE id_equipo = %s"""
+        modify_db(sql, (id_team,))
+        return {
+            "ok": True,
+            "message": f"Equipo con ID {id_team} eliminado correctamente"
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
