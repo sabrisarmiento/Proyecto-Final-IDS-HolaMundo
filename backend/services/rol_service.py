@@ -6,7 +6,7 @@ def roles_service(filters):
     if not result["ok"]:
         return error_response(result)
     if not result["data"]:
-        return "", 204
+        return success_response("", 204)
     return success_response({"roles encontrados": result["data"]})
 
 def create_rol_service(data):
@@ -23,4 +23,4 @@ def delete_rol_service(id):
     result = delete_rol_by_id(id)
     if not result["ok"]:
         return error_response(result)
-    return "", 204
+    return success_response("", 204)
