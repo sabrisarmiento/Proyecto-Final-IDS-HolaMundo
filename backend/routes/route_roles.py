@@ -1,5 +1,9 @@
 from flask import Blueprint, request, jsonify
-from services.rol_service import handle_list_roles, handle_create_rol, handle_delete_rol
+from services.rol_service import (
+    roles_service,
+    create_rol_service,
+    delete_rol_service,
+)
 
 roles_bp = Blueprint('roles', __name__)
 
@@ -10,12 +14,12 @@ def list_roles_route():
         "name": request.args.get("name"),
         "admin_level": request.args.get("admin_level", type=int),
     }
-    return handle_list_roles(filters)
+    return roles_service(filters)
 
 @roles_bp.route("/roles", methods=["POST"])
 def create_rol_route():
-    return handle_create_rol(request.get_json(silent=True))
+    return create_rol_service(request.get_json(silent=True))
 
 @roles_bp.route("/roles/<int:id>", methods=["DELETE"])
 def delete_rol_route(id):
-    return handle_delete_rol(id)
+    return delete_rol_service(id)
