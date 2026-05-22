@@ -7,18 +7,18 @@ _FILTER_COLUMNS = {
 }
 
 def get_all_roles(filters):
-    admin_level = filters.get("admin_level")
-    id_roles = filters.get("id_roles")
-
-    if admin_level is not None and not (1 <= admin_level <= 3):
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "El nivel de administracion tiene que ser de 1 a 3"}
-
-    if id_roles is not None and id_roles <= 0:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "El id_roles debe ser mayor a 0"}
-
     try:
+        admin_level = filters.get("admin_level")
+        id_roles = filters.get("id_roles")
+
+        if admin_level is not None and not (1 <= admin_level <= 3):
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "El nivel de administracion tiene que ser de 1 a 3"}
+
+        if id_roles is not None and id_roles <= 0:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "El id_roles debe ser mayor a 0"}
+
         sql = "SELECT * FROM roles WHERE 1 = 1"
         params = []
         for key, column in _FILTER_COLUMNS.items():
@@ -32,25 +32,26 @@ def get_all_roles(filters):
                 "description": str(e)}
 
 def create_rol(data):
-    if not data:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "JSON requerido"}
-
-    required = ["nombre", "nivel_administracion"]
-    missing = [k for k in required if k not in data]
-    if missing:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": f"Faltan campos requeridos: {', '.join(missing)}"}
-
-    if not isinstance(data["nivel_administracion"], int):
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "nivel_administracion debe ser un entero"}
-
-    if not (1 <= data["nivel_administracion"] <= 3):
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "El nivel_administracion debe ser entre 1 y 3"}
-
     try:
+        if not data:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "JSON requerido"}
+
+        required = ["nombre", "nivel_administracion"]
+        missing = [k for k in required if k not in data]
+        if missing:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": f"Faltan campos requeridos: {', '.join(missing)}"}
+
+        if not isinstance(data["nivel_administracion"], int):
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "nivel_administracion debe ser un entero"}
+
+        if not (1 <= data["nivel_administracion"] <= 3):
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "El nivel_administracion debe ser entre 1 y 3"}
+
+    
         exists = query_db(
             "SELECT id_roles FROM roles WHERE nombre = %s AND nivel_administracion = %s",
             (data["nombre"], data["nivel_administracion"]),
@@ -70,11 +71,11 @@ def create_rol(data):
                 "description": str(e)}
 
 def delete_rol_by_id(id):
-    if id <= 0:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "El ID debe ser un entero positivo mayor a cero."}
-
     try:
+        if id <= 0:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "El ID debe ser un entero positivo mayor a cero."}
+
         exists = query_db("SELECT id_roles FROM roles WHERE id_roles = %s", (id,))
         if not exists:
             return {"ok": False, "code": 404, "message": "Not Found",
