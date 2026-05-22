@@ -1,7 +1,7 @@
 from helpers.responses import error_response, success_response
 from controllers.marks_controller import get_all_marks, create_mark, get_mark_by_id, patch_mark_by_id, delete_mark_by_id
 
-def marks_handler(filters):
+def marks_service(filters):
     result = get_all_marks(filters)
     if not result["ok"]:
         return error_response(result)
@@ -9,7 +9,7 @@ def marks_handler(filters):
         "marks": result["data"]
     })
 
-def create_mark_handler(data):
+def create_mark_service(data):
     result = create_mark(data)
     if not result["ok"]:
         return error_response(result)
@@ -17,7 +17,7 @@ def create_mark_handler(data):
         "message": result["message"]
     }, 201)
 
-def mark_handler(id_mark):
+def mark_service(id_mark):
     result = get_mark_by_id(id_mark)
     if not result["ok"]:
         return error_response(result)
@@ -26,7 +26,7 @@ def mark_handler(id_mark):
     })
 
 
-def patch_mark_handler(id_mark, data):
+def patch_mark_service(id_mark, data):
     result = patch_mark_by_id(id_mark, data)
     if not result["ok"]:
         return error_response(result)
@@ -34,7 +34,7 @@ def patch_mark_handler(id_mark, data):
         "message": result["message"]
     })
 
-def delete_mark_handler(id_mark):
+def delete_mark_service(id_mark):
     result = delete_mark_by_id(id_mark)
     if not result["ok"]:
         return error_response(result)
