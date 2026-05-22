@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from handlers.marks_handler import (
+from services.mark_service import (
     marks_handler,
     mark_handler,
     create_mark_handler,

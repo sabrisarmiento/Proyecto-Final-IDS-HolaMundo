@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from controller.users_controller import get_all_users, create_user, get_user_by_id, update_user_by_id, delete_user_by_id
+from controllers.users_controller import get_all_users, create_user, get_user_by_id, update_user_by_id, delete_user_by_id
 
 def users_handler():
   filters = request.args

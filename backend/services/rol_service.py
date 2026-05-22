@@ -1,5 +1,5 @@
 from flask import jsonify
-from controller.roles_controller import (
+from controllers.roles_controller import (
     fetch_roles,
     fetch_rol_by_id,
     rol_exists,

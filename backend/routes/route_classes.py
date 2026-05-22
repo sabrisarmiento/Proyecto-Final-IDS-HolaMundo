@@ -1,5 +1,5 @@
 from flask import Blueprint
-from handlers.classes_handler import classes_handler, class_get_handler, class_post_handler, class_patch_handler, delete_class_handler
+from services.class_service import classes_handler, class_get_handler, class_post_handler, class_patch_handler, delete_class_handler
 
 classes_bp = Blueprint('classes', __name__)
 

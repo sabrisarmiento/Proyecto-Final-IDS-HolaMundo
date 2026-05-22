@@ -1,5 +1,5 @@
 from flask import Blueprint, app, request
-from backend.controller.announcements_controller import get_announcement_by_id, get_announcements
+from controllers.announcements_controller import get_announcement_by_id, get_announcements
 
 announcements_bp = Blueprint('announcements', __name__)
 

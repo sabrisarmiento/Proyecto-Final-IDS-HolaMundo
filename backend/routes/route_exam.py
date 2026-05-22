@@ -1,5 +1,5 @@
 from flask import Blueprint
-from handlers.exam_handler import (
+from services.exam_service import (
     exams_handler,
     exam_handler,
     create_exam_handler,

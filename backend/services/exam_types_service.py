@@ -1,19 +1,18 @@
 from flask import jsonify, request
-from controller.attendance_controller import (
-    get_attendance,
-    create_attendance,
-    update_attendance,
-    delete_attendance,
+from controllers.exam_types_controller import (
+    get_all_exam_types,
+    get_exam_type_by_id,
+    create_exam_type,
+    update_exam_type,
+    delete_exam_type,
 )
 
-def attendance_get_handler():
+def exam_types_get_handler():
     try:
-        id_clase = request.args.get("id_clase")
-        id_alumno = request.args.get("id_alumno")
-        result = get_attendance(id_clase, id_alumno)
+        result = get_all_exam_types()
         if not result:
-            return jsonify({"attendance": []}), 204
-        return jsonify({"attendance": result}), 200
+            return jsonify({"exam_types": []}), 204
+        return jsonify({"exam_types": result}), 200
     except Exception as error:
         return jsonify({"errors": [{
             "code": "500",
@@ -22,18 +21,24 @@ def attendance_get_handler():
             "description": str(error)
         }]}), 500
 
-def attendance_post_handler():
+def exam_type_get_handler(id):
     try:
-        data = request.get_json()
-        if not data or "id_alumno" not in data or "id_clase" not in data:
+        if id <= 0:
             return jsonify({"errors": [{
                 "code": "400",
                 "message": "Bad Request",
                 "level": "error",
-                "description": "Los campos 'id_alumno' e 'id_clase' son obligatorios"
+                "description": "El ID debe ser un número entero positivo"
             }]}), 400
-        new_id = create_attendance(data)
-        return jsonify({"id_asistencia": new_id}), 201
+        result = get_exam_type_by_id(id)
+        if not result:
+            return jsonify({"errors": [{
+                "code": "404",
+                "message": "Not Found",
+                "level": "error",
+                "description": f"No existe un tipo de evaluación con ID {id}"
+            }]}), 404
+        return jsonify({"exam_type": result}), 200
     except Exception as error:
         return jsonify({"errors": [{
             "code": "500",
@@ -42,7 +47,27 @@ def attendance_post_handler():
             "description": str(error)
         }]}), 500
 
-def attendance_patch_handler(id):
+def exam_type_post_handler():
+    try:
+        data = request.get_json()
+        if not data or "nombre" not in data:
+            return jsonify({"errors": [{
+                "code": "400",
+                "message": "Bad Request",
+                "level": "error",
+                "description": "El campo 'nombre' es obligatorio"
+            }]}), 400
+        new_id = create_exam_type(data)
+        return jsonify({"id_tipo": new_id}), 201
+    except Exception as error:
+        return jsonify({"errors": [{
+            "code": "500",
+            "message": "Internal Server Error",
+            "level": "error",
+            "description": str(error)
+        }]}), 500
+
+def exam_type_patch_handler(id):
     try:
         if id <= 0:
             return jsonify({"errors": [{
@@ -52,27 +77,30 @@ def attendance_patch_handler(id):
                 "description": "El ID debe ser un número entero positivo"
             }]}), 400
         data = request.get_json()
-        if not data or "presente" not in data:
+        if not data:
             return jsonify({"errors": [{
                 "code": "400",
                 "message": "Bad Request",
                 "level": "error",
-                "description": "El campo 'presente' es obligatorio"
+                "description": "Debe enviar al menos un campo para actualizar"
             }]}), 400
-        if not isinstance(data["presente"], bool):
-            return jsonify({"errors": [{
-                "code": "400",
-                "message": "Bad Request",
-                "level": "error",
-                "description": "El campo 'presente' debe ser un booleano"
-            }]}), 400
-        if not update_attendance(id, data["presente"]):
+        campos_validos = {"nombre", "descripcion"}
+        for campo in data:
+            if campo not in campos_validos:
+                return jsonify({"errors": [{
+                    "code": "400",
+                    "message": "Bad Request",
+                    "level": "error",
+                    "description": f"El campo '{campo}' no es válido"
+                }]}), 400
+        if not get_exam_type_by_id(id):
             return jsonify({"errors": [{
                 "code": "404",
                 "message": "Not Found",
                 "level": "error",
-                "description": f"No existe un registro de asistencia con ID {id}"
+                "description": f"No existe un tipo de evaluación con ID {id}"
             }]}), 404
+        update_exam_type(id, data)
         return "", 204
     except Exception as error:
         return jsonify({"errors": [{
@@ -82,7 +110,7 @@ def attendance_patch_handler(id):
             "description": str(error)
         }]}), 500
 
-def attendance_delete_handler(id):
+def exam_type_delete_handler(id):
     try:
         if id <= 0:
             return jsonify({"errors": [{
@@ -91,12 +119,12 @@ def attendance_delete_handler(id):
                 "level": "error",
                 "description": "El ID debe ser un número entero positivo"
             }]}), 400
-        if not delete_attendance(id):
+        if not delete_exam_type(id):
             return jsonify({"errors": [{
                 "code": "404",
                 "message": "Not Found",
                 "level": "error",
-                "description": f"No existe un registro de asistencia con ID {id}"
+                "description": f"No existe un tipo de evaluación con ID {id}"
             }]}), 404
         return "", 204
     except Exception as error:

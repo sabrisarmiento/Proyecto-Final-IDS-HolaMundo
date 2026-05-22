@@ -1,6 +1,6 @@
 import csv, io
 from flask import jsonify
-from controller.students_controller import (
+from controllers.students_controller import (
     fetch_students,
     fetch_student_by_id,
     insert_student,

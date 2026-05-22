@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from handlers.students_handler import (
+from services.student_service import (
     handle_list_students,
     handle_search_student_by_id,
     handle_create_student,
