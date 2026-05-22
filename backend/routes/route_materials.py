@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from handlers.materials_handler import (
+from services.material_service import (
     materials_handler,
     create_material_handler,
     delete_material_handler

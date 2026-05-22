@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from controller.exam_controller import get_all_exams, create_exam, get_exam_by_id, patch_exam_by_id, delete_exam_by_id
+from controllers.exam_controller import get_all_exams, create_exam, get_exam_by_id, patch_exam_by_id, delete_exam_by_id
 
 def exams_handler():
 

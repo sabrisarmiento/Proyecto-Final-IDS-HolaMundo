@@ -1,5 +1,5 @@
 from helpers.responses import error_response, success_response
-from controller.marks_controller import get_all_marks, create_mark, get_mark_by_id, patch_mark_by_id, delete_mark_by_id
+from controllers.marks_controller import get_all_marks, create_mark, get_mark_by_id, patch_mark_by_id, delete_mark_by_id
 
 def marks_handler(filters):
     result = get_all_marks(filters)

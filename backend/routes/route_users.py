@@ -1,6 +1,6 @@
 from flask import Blueprint
 # from controller.users_controller import (list_users, get_user, create_user, update_user, delete_user)
-from handlers.users_handler import (
+from services.user_service import (
     users_handler,
     user_handler,
     create_user_handler,

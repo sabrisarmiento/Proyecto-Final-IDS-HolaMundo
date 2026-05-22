@@ -1,5 +1,5 @@
 from flask import Blueprint
-from handlers.attendance_handler import (
+from services.attendance_service import (
     attendance_get_handler,
     attendance_post_handler,
     attendance_patch_handler,

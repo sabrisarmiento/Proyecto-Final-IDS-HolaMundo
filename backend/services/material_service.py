@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from controller.materials_controller import get_all_materials, create_material, delete_material_by_id
+from controllers.materials_controller import get_all_materials, create_material, delete_material_by_id
 
 
 

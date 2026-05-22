@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from controller.classes_controller import get_classes, get_class_id, create_class, update_class, delete_class
+from controllers.classes_controller import get_classes, get_class_id, create_class, update_class, delete_class
 
 def classes_handler():
     filters = request.args
