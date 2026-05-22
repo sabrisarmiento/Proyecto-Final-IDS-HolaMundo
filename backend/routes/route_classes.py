@@ -1,24 +1,35 @@
-from flask import Blueprint
-from services.class_service import classes_handler, class_get_handler, class_post_handler, class_patch_handler, delete_class_handler
+from flask import Blueprint, request
+from services.class_service import (
+    class_service, 
+    class_get_service, 
+    create_class_service, 
+    update_class_service, 
+    delete_class_service
+)
 
 classes_bp = Blueprint('classes', __name__)
 
 @classes_bp.route('/clases', methods=['GET'])
-def get_classes():
-    return classes_handler()
+def get_classes_route():
+    filters = {
+        "date": request.args.get("fecha")
+    }
+    return class_service(filters)
   
-@classes_bp.route('/clases/<int:id>', methods=['GET'])
-def get_class_id(id_clase):
-    return class_get_handler(id_clase)
+@classes_bp.route('/clases/<int:id_clase>', methods=['GET'])
+def get_class_id_route(id_clase):
+    return class_get_service(id_clase)
 
 @classes_bp.route('/clases', methods=['POST'])
-def add_class():
-    return class_post_handler()
+def create_class_route():
+    data = request.get_json()
+    return create_class_service(data)
 
-@classes_bp.route('/clases/<int:id>', methods=['PATCH'])
-def edit_class(id_clase):
-    return class_patch_handler(id_clase)
+@classes_bp.route('/clases/<int:id_clase>', methods=['PATCH'])
+def update_class_route(id_clase):
+    data = request.get_json()
+    return update_class_service(id_clase, data)
 
-@classes_bp.route('/clases/<int:id>', methods=['DELETE'])
-def remove_class(id):
-    return delete_class_handler(id)
+@classes_bp.route('/clases/<int:id_clase>', methods=['DELETE'])
+def delete_class_route(id_clase):
+    return delete_class_service(id_clase)

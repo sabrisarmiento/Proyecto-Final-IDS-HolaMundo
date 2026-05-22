@@ -1,83 +1,42 @@
-from flask import jsonify, request
+from helpers.responses import error_response, success_response
 from controllers.classes_controller import get_classes, get_class_id, create_class, update_class, delete_class
 
-def classes_handler():
-    filters = request.args
+def class_service(filters):
     result = get_classes(filters)
+    
     if not result["ok"]:
-        return jsonify({"errors": [{
-            "code": result["code"],
-            "message": result["message"],
-            "level": "error",
-            "description": result["description"]
-            }]}), result["code"]
+        return error_response(result)
 
-    return jsonify({
-        "classes": result["data"]
-    }), 200
+    return success_response({"classes": result["data"]})
 
-def class_get_handler(id_clase):
+def class_get_service(id_clase):
     result = get_class_id(id_clase)
-    if not result["ok"]:
-        return jsonify({"errors": [{
-            "code": result["code"],
-            "message": result["message"],
-            "level": "error",
-            "description": result["description"]
-            }]}), result["code"]
     
-    return jsonify({
-        "classes": result["data"]
-    }), 200            
+    if not result["ok"]:
+        return error_response(result)
 
-def class_post_handler():
-    data = request.get_json()
+    return success_response({"class": result["data"]})   
+
+def create_class_service(data):
     result = create_class(data)
-    if not result["ok"]:
-        return jsonify({"errors": [{
-            "code": result["code"],
-            "message": result["message"],
-            "level": "error",
-            "description": result["description"]
-            }]}), result["code"]
     
-    return jsonify({
-        "classes": result["data"]
-    }), 201
+    if not result["ok"]:
+        return error_response(result)
 
-def class_patch_handler(id_clase):
-    data = request.get_json()
+    return success_response({"message": result["message"]}, 201)
+
+def update_class_service(id_clase, data):
     result = update_class(id_clase, data)
-    if not result["ok"]:
-        return jsonify({"errors": [{
-            "code": result["code"],
-            "message": result["message"],
-            "level": "error",
-            "description": result["description"]
-            }]}), result["code"]
     
-    return jsonify({
-        "classes": result["data"]
-    }), 200
+    if not result["ok"]:
+        return error_response(result)
+        
+    return success_response({"message": result["message"]})
 
-def delete_class_handler(id):
-    try:
-        if id <= 0:
-            return jsonify({
-                "errors": [{
-                    "code": 400,
-                    "message": "ID inválido"
-                }]
-            }), 400
-        delete_class(id)
-        return jsonify({
-            "message": "Clase eliminada correctamente"
-        }), 200
-    except Exception as error:
-        return jsonify({
-            "errors": [{
-                "code": 500,
-                "message": "Error al eliminar clase",
-                "description": str(error)
-            }]
-        }), 500
+def delete_class_service(id_clase):
+    result = delete_class(id_clase)
+    
+    if not result["ok"]:
+        return error_response(result)
+        
+    return success_response({"message": result["message"]})
