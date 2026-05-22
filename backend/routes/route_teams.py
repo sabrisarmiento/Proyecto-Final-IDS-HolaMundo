@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 
 from services.team_service import teams_service, team_service, create_team_service, patch_team_service, delete_team_service
 
