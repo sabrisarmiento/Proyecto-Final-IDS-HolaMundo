@@ -1,12 +1,12 @@
 from flask import Flask, render_template
-from routes import announcements_bp, attendance_bp, exam_bp, classes_bp, exam_types_bp, marks_bp, roles_bp, students_bp, users_bp, teams_bp, materials_bp
+from routes import advertisements_bp, attendance_bp, exam_bp, classes_bp, exam_types_bp, marks_bp, roles_bp, students_bp, users_bp, teams_bp, materials_bp
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return "API Backend de ProDe levantada correctamente."
 
-app.register_blueprint(announcements_bp)
+app.register_blueprint(advertisements_bp)
 app.register_blueprint(attendance_bp)
 app.register_blueprint(exam_bp)
 app.register_blueprint(exam_types_bp)
