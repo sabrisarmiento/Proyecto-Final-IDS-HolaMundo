@@ -1,21 +1,27 @@
-from flask import Blueprint
-
+from flask import Blueprint, request
 from services.material_service import (
-    materials_handler,
-    create_material_handler,
-    delete_material_handler
+    materials_service,
+    create_material_service,
+    delete_material_service
 )
 
 materials_bp = Blueprint('materials', __name__)
 
 @materials_bp.route('/materials', methods=['GET'])
 def get_materials_route():
-    return materials_handler()
+
+    filters = {
+        "id_curso": request.args.get('id_curso'),
+        "titulo": request.args.get('titulo')
+    }
+
+    return materials_service(filters)
 
 @materials_bp.route('/materials', methods=['POST'])
 def create_material_route():
-    return create_material_handler()
+    data = request.get_json()
+    return create_material_service(data)
 
 @materials_bp.route('/materials/<int:id_material>', methods=['DELETE'])
 def delete_material_route(id_material):
-    return delete_material_handler(id_material)
+    return delete_material_service(id_material)

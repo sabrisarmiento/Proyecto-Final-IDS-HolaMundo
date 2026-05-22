@@ -1,52 +1,26 @@
-from flask import jsonify, request
+from helpers.responses import error_response, success_response
 from controllers.materials_controller import get_all_materials, create_material, delete_material_by_id
 
-
-
-def materials_handler():
-    filters = request.args
+def materials_service(filters):
     result = get_all_materials(filters)
     if not result["ok"]:
-        return jsonify({
-            "errors": [{
-                "code": result["code"],
-                "message": result["message"],
-                "level": "error",
-                "description": result["description"]
-            }]
-        }), result["code"]
-
-    return jsonify({
+        return error_response(result)
+    return success_response({
         "materials": result["data"]
-    }), 200
+    })
 
-def create_material_handler():
-    data = request.get_json()
+def create_material_service(data):
     result = create_material(data)
     if not result["ok"]:
-        return jsonify({
-            "errors": [{
-                "code": result["code"],
-                "message": result["message"],
-                "level": "error",
-                "description": result["description"]
-            }]
-        }), result["code"]
-    return jsonify({
+        return error_response(result)
+    return success_response({
         "message": result["message"]
-    }), 201
+    }, 201)
 
-def delete_material_handler(id_material):
+def delete_material_service(id_material):
     result = delete_material_by_id(id_material)
     if not result["ok"]:
-        return jsonify({
-            "errors": [{
-                "code": result["code"],
-                "message": result["message"],
-                "level": "error",
-                "description": result["description"]
-            }]
-        }), result["code"]
-    return jsonify({
+        return error_response(result)
+    return success_response({
         "message": result["message"]
-    }), 200
+    })
