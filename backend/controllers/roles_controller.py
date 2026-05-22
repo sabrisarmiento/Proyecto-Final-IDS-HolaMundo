@@ -82,7 +82,7 @@ def delete_rol_by_id(id):
                     "description": "No existe un rol con el ID proporcionado."}
 
         modify_db("DELETE FROM roles WHERE id_roles = %s", (id,))
-        return {"ok": True, "message": f"Rol con ID {id} eliminado correctamente"}
+        return {"ok": True}
     except Exception as e:
         return {"ok": False, "code": 500, "message": "Internal Server Error",
                 "description": str(e)}
