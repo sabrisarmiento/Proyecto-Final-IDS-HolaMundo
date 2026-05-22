@@ -27,10 +27,11 @@ def get_all_students(filters):
 
 
 def get_student_by_id(id):
-    if id <= 0:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "El ID debe ser un entero positivo mayor a cero."}
     try:
+        if id <= 0:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "El ID debe ser un entero positivo mayor a cero."}
+
         result = query_db("SELECT * FROM alumnos WHERE id_alumno = %s", (id,))
         if not result:
             return {"ok": False, "code": 404, "message": "Not Found",
@@ -42,24 +43,24 @@ def get_student_by_id(id):
 
 
 def create_student(data):
-    if not data:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "JSON requerido"}
-
-    required = ["nombre", "apellido", "correo", "password", "id_rol"]
-    missing = [k for k in required if k not in data]
-    if missing:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": f"Faltan campos: {missing}"}
-
-    if not isinstance(data["id_rol"], int):
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "id_rol debe ser un entero"}
-    if data["id_rol"] < 0:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "id_rol debe ser mayor a 0"}
-
     try:
+        if not data:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "JSON requerido"}
+
+        required = ["nombre", "apellido", "correo", "password", "id_rol"]
+        missing = [k for k in required if k not in data]
+        if missing:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": f"Faltan campos: {missing}"}
+
+        if not isinstance(data["id_rol"], int):
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "id_rol debe ser un entero"}
+        if data["id_rol"] < 0:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "id_rol debe ser mayor a 0"}
+
         exists = query_db(
             "SELECT id_alumno FROM alumnos WHERE correo = %s",
             (data["correo"],),

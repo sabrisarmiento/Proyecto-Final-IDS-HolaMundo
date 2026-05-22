@@ -11,7 +11,7 @@ def fetch_students_service(filters):
     if not result["ok"]:
         return error_response(result)
     if not result["data"]:
-        return "", 204
+        return success_response("", 204)
     return success_response({"students": result["data"]})
 
 
