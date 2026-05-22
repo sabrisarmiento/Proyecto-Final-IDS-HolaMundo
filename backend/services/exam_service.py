@@ -1,7 +1,7 @@
 from helpers.responses import error_response, success_response
 from controllers.exam_controller import get_all_exams, create_exam, get_exam_by_id, patch_exam_by_id, delete_exam_by_id
 
-def exam_service(filters):
+def exams_service(filters):
     result = get_all_exams(filters)
 
     if not result["ok"]:

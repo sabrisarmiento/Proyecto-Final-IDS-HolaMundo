@@ -1,6 +1,6 @@
 from flask import Blueprint,request
 from services.exam_service import (
-    exam_service,
+    exams_service,
     exam_service,
     create_exam_service,
     patch_exam_service,
@@ -17,7 +17,7 @@ def obtain_exams_params():
         "id_usuario": request.args.get('id_usuario'),
         "fecha": request.args.get('fecha'),
     }
-    return exam_service(filters)
+    return exams_service(filters)
 
 #GET ID------------------------------------------------------
 @exam_bp.route("/examenes/<int:id>",methods=["GET"])
