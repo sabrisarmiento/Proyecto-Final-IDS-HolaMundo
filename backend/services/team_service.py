@@ -1,11 +1,11 @@
-from helpers.responses import error_response, succes_response
-from controllers.teams_controller import get_all_teams, get_team_by_id, create_team, patch_team_by_id_team, delete_team_by_id
+from helpers.responses import error_response, success_response
+from controllers.teams_controller import get_all_teams, get_team_by_id, create_team, patch_team_by_id, delete_team_by_id
 
 def teams_service(filters):
     result = get_all_teams(filters)
     if not result["ok"]:
         return error_response(result)
-    return succcces_response({
+    return success_response({
         "teams": result["data"]
     })
 
@@ -27,7 +27,7 @@ def create_team_service(data):
     }, 201)
 
 def patch_team_service(id_team, data):
-    result = patch_team_by_id_team(id_team, data)
+    result = patch_team_by_id(id_team, data)
     if not result["ok"]:
         return error_response(result)
     return success_response({
