@@ -1,10 +1,12 @@
-from flask import Flask, render_template
+from flask import Flask
+from routes import landing_bp, advertisements_bp, materials_bp, dashboard_bp
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return render_template('index.html', name="Hola Mundo")
+app.register_blueprint(landing_bp)
+app.register_blueprint(advertisements_bp)
+app.register_blueprint(materials_bp)
+app.register_blueprint(dashboard_bp)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
