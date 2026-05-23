@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from services.rol_service import handle_list_roles, handle_create_rol, handle_delete_rol
 
 roles_bp = Blueprint('roles', __name__)
