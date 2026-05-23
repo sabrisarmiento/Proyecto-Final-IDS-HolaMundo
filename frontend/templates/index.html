@@ -1,12 +1,14 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Web Catedra</title>
-</head>
-<body>
-  {{ init }}
-  <p>Estamos en LANDING</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}IDS Lanzillota - Inicio{% endblock %}
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section>
+  <h1>Introducción al Desarrollo de Software</h1>
+</section>
+
+{% endblock %}
