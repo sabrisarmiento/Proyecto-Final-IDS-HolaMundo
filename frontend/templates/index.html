@@ -7,8 +7,31 @@
 
 {% block content %}
 
-<section>
-  <h1>Introducción al Desarrollo de Software</h1>
+<section class="s1" >
+  <h2>Introducción al Desarrollo de Software</h2>
+  <p>FIUBA - Catedra Bruno Lanzillota</p>
 </section>
-
+<section class="space" >
+  Puedes ver las ultimas clases y avisos publicados aqui abajo.
+</section>
+<section class="s2">
+  <div class="s2-a" >
+    {% for clase in clases %}
+      <article class="clase">
+        <h3>{{ clase.nombre }}</h3>
+        <p>{{ clase.tema }}</p>
+        <p>{{ clase.tipo }}</p>
+      </article>
+    {% endfor %}
+  </div>
+  <div class="s2-b">
+    {% for aviso in avisos %}
+      <article class="aviso">
+        <h3>{{ aviso.titulo }}</h3>
+        <p>ID: {{ aviso.id_aviso }}</p>
+      </article>
+    {% endfor %}
+    <button type="button">Ver todos los avisos</button>
+  </div>
+</section>
 {% endblock %}
