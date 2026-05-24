@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block header %}
+
+<header class="header-private">
+    <a href="{{ url_for('dashboard.dashboard') }}" class="header-private-logo">IDS Lanzillota</a>
+    <nav class="header-private-nav">
+        <a href="{{ url_for('dashboard.dashboard') }}">Inicio</a>
+        <a href="{{ url_for('materials.materials') }}">Materiales</a>
+        <a href="{{ url_for('advertisements.public_advertisements') }}">Avisos</a>
+    </nav>
+    <a href="#" class="header-private-logout">Salir</a>
+</header>
+{% endblock %}
