@@ -1,23 +1,18 @@
 from flask import Blueprint, render_template
+import requests
 
 landing_bp = Blueprint('landing', __name__)
 
-@landing_bp.route('/')
+@landing_bp.route('/', methods=["GET"])
 def landing():
-  avisos = [
-    {
-      'titulo': 'Aviso 1',
-      "id_aviso": 1,
-    },
-    {
-      'titulo': 'Aviso 2',
-      "id_aviso": 2,
-    },
-    {
-      'titulo': 'Aviso 3',
-      "id_aviso": 3,
-    }
-  ]
+  try:
+    response = requests.get('http://127.0.0.1:5000/advertisements')
+    data = response.json()
+    advertisements = data.get("advertisements") or data.get("data") or []
+    advertisements = advertisements[-3:][::-1]
+
+  except Exception as e:
+    advertisements = []
 
   clases = [
     {
@@ -57,4 +52,4 @@ def landing():
       "tema": "Algoritmos"
     }
   ]
-  return render_template('index.html', avisos=avisos, clases=clases)
+  return render_template('index.html', avisos=advertisements, clases=clases)
