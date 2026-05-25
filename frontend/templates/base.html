@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=PT+Sans:wght@400;700&family=Prompt:wght@400;500;700&family=Red+Hat+Display:wght@400;500;700&display=swap" rel="stylesheet">
   {% block extra_styles %}{% endblock %}
 </head>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <body>
   <header class="header-private">
     <a href="{{ url_for('landing.landing') }}" class="header-private-logo">IDS Lanzillota</a>
@@ -16,7 +17,15 @@
         <a href="{{ url_for('materials.materials') }}">Materiales</a>
         <a href="{{ url_for('advertisements.public_advertisements') }}">Avisos</a>
     </nav>
-    <a href="#" class="header-private-logout">Iniciar Sesion</a>
+    {% from "components/modal.html" import modal %}
+    <button onclick="openModal('login-modal')">Iniciar Sesion</button>
+    {% call modal("login-modal", "iniciar Sesion") %}
+      <form>
+        
+      </form>
+
+    {% endcall %}
+    <!-- <a href="#" class="header-private-logout">Iniciar Sesion</a> -->
 	</header>
   {% block content %}{% endblock %}
   <footer>

@@ -50,3 +50,17 @@ font-weight: 500;
 .header-private-nav a:hover {
 color: black;
 }
+
+.modal-container {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container.active {
+    display: flex;
+}
