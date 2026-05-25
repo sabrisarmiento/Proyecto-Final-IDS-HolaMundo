@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-</head>
-<body>
-  {{ init }}
-  <p>Estamos en el Dashboard</p>
-</body>
-</html>
+{% extends "base_private.html" %}
+
+{% block title %}Dashboard - IDS Lanzillota{% endblock %}
+
+{% block content %}
+<p>Estas en el Dashboard</p>
+{% endblock %}
