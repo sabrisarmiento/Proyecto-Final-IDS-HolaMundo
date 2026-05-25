@@ -17,4 +17,4 @@ def public_advertisements():
     except Exception as e:
         advertisements = []
 
-    return render_template('advertisements.html', advertisements=advertisements)
+    return render_template('advertisements.html', advertisements=advertisements, active_page='advertisements')

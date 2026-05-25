@@ -42,11 +42,18 @@ gap: 1.5rem;
 }
 
 .header-private-nav a {
-color: grey;
+color: var(--color-8);
 text-decoration: none;
 font-weight: 500;
+padding: 0.5rem 0.75rem;
+border-radius: 0.5rem;
 }
 
 .header-private-nav a:hover {
-color: black;
+color: var(--color-2);
+}
+
+.header-private-nav a.is-active {
+background-color: var(--color-6);
+color: var(--color-2);
 }
