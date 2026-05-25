@@ -6,7 +6,7 @@ def get_all_users(filters):
     nombre = filters.get('nombre')
     apellido = filters.get('apellido')
     correo = filters.get('correo')
-    created_at = filters.get('created_at')
+    creado = filters.get('creado')
     id_rol = filters.get('id_rol')
 
     sql = """
@@ -15,6 +15,7 @@ def get_all_users(filters):
         nombre,
         apellido,
         correo,
+        contraseña,
         creado,
         id_rol
         FROM usuarios
@@ -27,20 +28,20 @@ def get_all_users(filters):
       params.append(int(id_usuario))
 
     if nombre is not None:
-      condition += " AND nombre_usuario = %s"
+      condition += " AND nombre = %s"
       params.append(nombre)
 
     if apellido is not None:
-      condition += " AND apellido_usuario = %s"
+      condition += " AND apellido = %s"
       params.append(apellido)
 
     if correo is not None:
-      condition += " AND correo_usuario = %s"
+      condition += " AND correo = %s"
       params.append(correo)
 
-    if created_at is not None:
-      condition += " AND created_at = %s"
-      params.append(created_at)
+    if creado is not None:
+      condition += " AND creado = %s"
+      params.append(creado)
 
     if id_rol is not None:
       condition += " AND id_rol = %s"
@@ -64,10 +65,11 @@ def get_user_by_id(id_user):
     sql = """
       SELECT
         id_usuario,
-        nombre_usuario,
-        apellido_usuario,
-        correo_usuario,
-        created_at,
+        nombre,
+        apellido,
+        correo,
+        contraseña,
+        creado,
         id_rol
       FROM usuarios
       WHERE id_usuario = %s
@@ -104,7 +106,7 @@ def create_user(data):
     sql_check = """
             SELECT id_usuario
             FROM usuarios
-            WHERE correo_usuario = %s
+            WHERE correo = %s
         """
     
     existing = query_db(sql_check, (correo,))
@@ -152,15 +154,15 @@ def update_user_by_id(id_user, data):
     params = []
 
     if nombre is not None:
-      update.append("nombre_usuario = %s")
+      update.append("nombre = %s")
       params.append(nombre)
 
     if apellido is not None:
-      update.append("apellido_usuario = %s")
+      update.append("apellido = %s")
       params.append(apellido)
 
     if correo is not None:
-      update.append("correo_usuario = %s")
+      update.append("correo = %s")
       params.append(correo)
 
     if contraseña is not None:
