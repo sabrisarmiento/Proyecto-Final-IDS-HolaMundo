@@ -7,8 +7,40 @@
 
 {% block content %}
 
-<section>
-  <h1>Introducción al Desarrollo de Software</h1>
+<section class="s1" >
+  <h2>Introducción al Desarrollo de Software</h2>
+  <p>FIUBA - Catedra Bruno Lanzillota</p>
 </section>
-
+<a href="https://intro-desa-software.slack.com/" class="slack">
+  <div class="slack-text-container" >
+    <h3>Únete a nuestro Slack</h3>
+    <p>Consulta con tus profesores y enterate de novedades</p>
+  </div>
+</a>
+<section class="s2">
+  <div class="s2-a" >
+    <h3>Proximas Clases</h3>
+    <div class="classes-container">
+      {% for clase in clases %}
+        <article class="clase">
+          <h4>{{ clase.nombre }}</h3>
+          <p>{{ clase.tema }}</p>
+          <p>{{ clase.tipo }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="s2-b">
+    <h3>Ultimos Avisos</h3>
+    <div class="advertisments-container">
+      {% for aviso in avisos %}
+        <article class="aviso">
+          <h4>{{ aviso.titulo }}</h3>
+          <p>ID: {{ aviso.id_usuario }}</p>
+        </article>
+      {% endfor %}
+      <button type="button">Ver todos los avisos</button>
+    </div>
+  </div>
+</section>
 {% endblock %}

@@ -53,7 +53,7 @@ def create_rol(data):
 
     
         exists = query_db(
-            "SELECT id_roles FROM roles WHERE nombre = %s AND nivel_administracion = %s",
+            "SELECT id_rol FROM roles WHERE nombre = %s AND nivel_administracion = %s",
             (data["nombre"], data["nivel_administracion"]),
         )
         if exists:
@@ -76,12 +76,12 @@ def delete_rol_by_id(id):
             return {"ok": False, "code": 400, "message": "Bad Request",
                     "description": "El ID debe ser un entero positivo mayor a cero."}
 
-        exists = query_db("SELECT id_roles FROM roles WHERE id_roles = %s", (id,))
+        exists = query_db("SELECT id_rol FROM roles WHERE id_rol = %s", (id,))
         if not exists:
             return {"ok": False, "code": 404, "message": "Not Found",
                     "description": "No existe un rol con el ID proporcionado."}
 
-        modify_db("DELETE FROM roles WHERE id_roles = %s", (id,))
+        modify_db("DELETE FROM roles WHERE id_rol = %s", (id,))
         return {"ok": True}
     except Exception as e:
         return {"ok": False, "code": 500, "message": "Internal Server Error",

@@ -14,7 +14,7 @@ def create_advertisement_service(data):
   if not result["ok"]:
       return error_response(result)
   return success_response({
-      "message": result["message"]
+      "message": result["data"]
   }, 201)
 
 def advertisement_service(id_advertisement):
