@@ -34,4 +34,4 @@ def landing():
       "tema": "Algoritmos"
     }
   ]
-  return render_template('index.html', avisos=advertisements, clases=clases)
+  return render_template('index.html', avisos=advertisements, clases=clases, active_page='landing')
