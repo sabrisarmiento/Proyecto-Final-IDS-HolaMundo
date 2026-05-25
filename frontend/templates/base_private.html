@@ -1,14 +1,26 @@
-{% extends "base.html" %}
-
-{% block header %}
-
-<header class="header-private">
-    <a href="{{ url_for('dashboard.dashboard') }}" class="header-private-logo">IDS Lanzillota</a>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}IDS Lanzillota{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=PT+Sans:wght@400;700&family=Prompt:wght@400;500;700&family=Red+Hat+Display:wght@400;500;700&display=swap" rel="stylesheet">
+  {% block extra_styles %}{% endblock %}
+</head>
+<body>
+  <header class="header-private">
+    <a href="{{ url_for('landing.landing') }}" class="header-private-logo">IDS Lanzillota</a>
     <nav class="header-private-nav">
-        <a href="{{ url_for('dashboard.dashboard') }}">Inicio</a>
-        <a href="{{ url_for('materials.materials') }}">Materiales</a>
-        <a href="{{ url_for('advertisements.public_advertisements') }}">Avisos</a>
+        <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+        <a href="#">Cursos</a>
+        <a href="#">Usuarios</a>
     </nav>
-    <a href="#" class="header-private-logout">Salir</a>
-</header>
-{% endblock %}
+    <a href="#" class="header-private-logout">Perfil</a>
+	</header>
+  {% block content %}{% endblock %}
+  <footer>
+    HOLA SOY UN FOOTER
+  </footer>
+</body>
+</html>
