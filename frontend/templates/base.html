@@ -13,9 +13,11 @@
   <header class="header-private">
     <a href="{{ url_for('landing.landing') }}" class="header-private-logo">IDS Lanzillota</a>
     <nav class="header-private-nav">
-        <a href="{{ url_for('landing.landing') }}">Inicio</a>
+        <a href="{{ url_for('landing.landing') }}"
+          class="{% if active_page == 'landing' %}is-active{% endif %}">Inicio</a>
         <a href="{{ url_for('materials.materials') }}">Materiales</a>
-        <a href="{{ url_for('advertisements.public_advertisements') }}">Avisos</a>
+        <a href="{{ url_for('advertisements.public_advertisements') }}"
+          class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
     </nav>
     {% from "components/modal.html" import modal %}
     <button onclick="openModal('login-modal')">Iniciar Sesion</button>
