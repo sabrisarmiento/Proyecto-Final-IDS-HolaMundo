@@ -16,24 +16,6 @@ def landing():
 
   clases = [
     {
-      'nombre': 'Clase 1',
-      "id_clase": 1,
-      "tipo": "Teórica",
-      "tema": "Introducción a la programación"
-    },
-    {
-      'nombre': 'Clase 2',
-      "id_clase": 2,
-      "tipo": "Práctica",
-      "tema": "Ejercicios de programación"
-    },
-    {
-      'nombre': 'Clase 3',
-      "id_clase": 3,
-      "tipo": "Teórica",
-      "tema": "Estructuras de datos"
-    },
-    {
       'nombre': 'Clase 4',
       "id_clase": 4,
       "tipo": "Práctica",
