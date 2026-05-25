@@ -50,3 +50,25 @@ font-weight: 500;
 .header-private-nav a:hover {
 color: black;
 }
+
+.footer-private {
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    padding: 24px 40px;
+    width: 100%;
+}
+
+.footer-private-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-private-info p {
+    margin: 2px 0;
+    font-size: 13px;
+    color: #999;
+    font-family: 'Poppins', sans-serif;
+}
