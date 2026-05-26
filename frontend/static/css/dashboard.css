@@ -190,23 +190,3 @@ table td {
 .team-item p {
     color: #666;
 }
-
-@media (max-width: 1000px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 600px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-}
