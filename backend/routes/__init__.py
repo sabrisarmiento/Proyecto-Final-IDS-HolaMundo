@@ -9,6 +9,7 @@ from .route_students import students_bp
 from .route_users import users_bp
 from .route_teams import teams_bp
 from .route_materials import materials_bp
+from .route_auth import auth_bp
 from .route_calendar import calendar_bp
 
 __all__ = ["advertisements_bp", 
@@ -22,5 +23,6 @@ __all__ = ["advertisements_bp",
            "users_bp", 
            "teams_bp", 
            "materials_bp",
-           "calendar_bp"
+           "calendar_bp",
+           "auth_bp"
 ]

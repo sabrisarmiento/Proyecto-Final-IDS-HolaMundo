@@ -18,14 +18,20 @@
         <a href="{{ url_for('materials.materials') }}">Materiales</a>
         <a href="{{ url_for('advertisements.public_advertisements') }}"
           class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
+          {% if session.get('user') %}
+    <p>Bienvenido, {{ session['user']['nombre'] }}</p>
+{% else %}
+    <p>No has iniciado sesión</p>
+{% endif %}
     </nav>
     {% from "components/modal.html" import modal %}
-    <button onclick="openModal('login-modal')">Iniciar Sesion</button>
+    <button type="button" onclick="openModal('login-modal')">Iniciar Sesion</button>
     {% call modal("login-modal", "iniciar Sesion") %}
-      <form>
-        
+      <form action="{{ url_for("login.login") }}" method="POST">
+        <input type="email" name="correo" placeholder="Ingresar correo ..." required>
+        <input type="password" name="contraseña" placeholder="Ingresar contraseña ...">
+        <button type="submit">Iniciar Sesion</button>
       </form>
-
     {% endcall %}
     <!-- <a href="#" class="header-private-logout">Iniciar Sesion</a> -->
 	</header>

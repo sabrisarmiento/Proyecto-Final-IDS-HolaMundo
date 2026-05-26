@@ -3,6 +3,9 @@ from flask import request
 from helpers.responses import error_response
 import jwt
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def require_auth(function):
     @wraps(function)
