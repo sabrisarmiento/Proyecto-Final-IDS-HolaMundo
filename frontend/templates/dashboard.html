@@ -15,7 +15,7 @@
             <h1>Dashboard</h1>
             <p>Panel de consultas para profesores y ayudantes</p>
         </div>
-        <button class="dashboard-button">
+        <button class="dashboard-button" id="btnExportar">
             Exportar informes
         </button>
     </section>
@@ -152,6 +152,57 @@
 
     </section>
 
+    <div id="modalExportar" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configurar Reporte PDF</h3>
+                <span id="closeModal" class="modal-close">&times;</span>
+            </div>
+            
+            <form id="formExportar" action="http://localhost:5000/informes/alumnos" method="GET" target="_blank">
+                <p class="modal-instruction">Selecciona las columnas que deseas incluir en el documento:</p>
+                
+                <div class="modal-checkboxes">
+                    <label><input type="checkbox" name="inc_asistencia" value="1" checked> Columna Asistencia</label>
+                    <label><input type="checkbox" name="inc_parcial1" value="1" checked> Nota 1er Parcial</label>
+                    <label><input type="checkbox" name="inc_parcial2" value="1" checked> Nota 2do Parcial</label>
+                    <label><input type="checkbox" name="inc_tp" value="1" checked> Nota Trabajo Práctico</label>
+                    <label><input type="checkbox" name="inc_condicion" value="1" checked> Condición (Activo/Baja)</label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" id="btnCancelar" class="btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn-primary">Generar PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </main>
+
+<script>
+    const modal = document.getElementById('modalExportar');
+    const btnOpen = document.getElementById('btnExportar');
+    const btnClose = document.getElementById('closeModal');
+    const btnCancel = document.getElementById('btnCancelar');
+
+    const openModalFunc = () => {
+        modal.classList.add('modal-active');
+    };
+
+    const closeModalFunc = () => {
+        modal.classList.remove('modal-active');
+    };
+
+    btnOpen.addEventListener('click', openModalFunc);
+    btnClose.addEventListener('click', closeModalFunc);
+    btnCancel.addEventListener('click', closeModalFunc);
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModalFunc();
+        }
+    });
+</script>
 
 {% endblock %}
