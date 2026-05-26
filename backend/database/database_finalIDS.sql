@@ -128,3 +128,14 @@ CREATE TABLE notas (
     FOREIGN KEY (id_corrector) REFERENCES usuarios(id_usuario)
 );
 
+CREATE TABLE calendario (
+    id_evento INT AUTO_INCREMENT PRIMARY KEY, 
+    titulo VARCHAR(100) NOT NULL,
+    tipo_clase VARCHAR(50) NOT NULL,
+    descripcion TEXT,
+    modalidad VARCHAR(100)
+    hipervinculo VARCHAR(255),
+    fecha_evento DATETIME NOT NULL,
+    id_profesor INT NOT NULL,
+    FOREIGN KEY (id_profesor) REFERENCES usuarios (id_usuario)
+);

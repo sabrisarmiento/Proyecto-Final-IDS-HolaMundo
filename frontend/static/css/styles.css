@@ -57,3 +57,18 @@ color: var(--color-2);
 background-color: var(--color-6);
 color: var(--color-2);
 }
+
+.modal-container {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container.active {
+    display: flex;
+color: var(--color-2);
+}
