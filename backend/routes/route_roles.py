@@ -4,6 +4,7 @@ from services.rol_service import (
     create_rol_service,
     delete_rol_service,
 )
+from middleware.auth_middleware import require_auth
 
 roles_bp = Blueprint('roles', __name__)
 
@@ -16,10 +17,14 @@ def list_roles_route():
     }
     return roles_service(filters)
 
+
 @roles_bp.route("/roles", methods=["POST"])
+@requiere_auth
 def create_rol_route():
     return create_rol_service(request.get_json(silent=True))
 
+
 @roles_bp.route("/roles/<int:id>", methods=["DELETE"])
+@requiere_auth
 def delete_rol_route(id):
     return delete_rol_service(id)
