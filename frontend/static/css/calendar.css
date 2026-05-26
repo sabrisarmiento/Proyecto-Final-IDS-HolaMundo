@@ -1,0 +1,80 @@
+.calendar-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Encabezado calendario */
+.calendar-header {
+    margin-bottom: 2rem;
+}
+
+.calendar-header h1 {
+    color: var(--color-9);
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.calendar-header p {
+    color: var(--color-9);
+    font-size: 1.25rem;
+}
+
+/* Cronograma dinámico */
+.calendar-schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.calendar-week-block {
+    background-color: white;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.calendar-week-title {
+    color: var(--color-9);
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--color-3);
+    padding-bottom: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.calendar-classes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+}
+
+.calendar-class-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-class-title {
+    color: var(--color-9);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.calendar-class-topics {
+    color: var(--color-9);
+    list-style-type: disc;
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+    min-height: 50px;
+}
+
+.calendar-class-badge {
+    align-self: flex-start;
+    background-color: var(--color-9);
+    color: white;
+    padding: 0.35rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}

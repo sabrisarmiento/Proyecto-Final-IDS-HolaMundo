@@ -42,9 +42,11 @@ gap: 1.5rem;
 }
 
 .header-private-nav a {
-color: grey;
+color: var(--color-8);
 text-decoration: none;
 font-weight: 500;
+padding: 0.5rem 0.75rem;
+border-radius: 0.5rem;
 }
 
 .header-private-nav a:hover {
@@ -71,4 +73,25 @@ color: black;
     font-size: 13px;
     color: #999;
     font-family: 'Poppins', sans-serif;
+color: var(--color-2);
+}
+
+.header-private-nav a.is-active {
+background-color: var(--color-6);
+color: var(--color-2);
+}
+
+.modal-container {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container.active {
+    display: flex;
+color: var(--color-2);
 }

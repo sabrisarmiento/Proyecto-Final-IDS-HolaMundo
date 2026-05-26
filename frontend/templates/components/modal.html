@@ -1,0 +1,11 @@
+{% macro modal(id, titulo) %}
+<div class="modal-container" id="{{ id }}">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('{{ id }}')">✕</button>
+    <h3>{{ titulo }}</h3>
+    <div class="modal-content">
+      {{ caller() }}
+    </div>
+  </div>
+</div>
+{% endmacro %}

@@ -12,7 +12,8 @@
     <header class="header-private">
     <a href="{{ url_for('landing.landing') }}" class="header-private-logo">IDS Lanzillota</a>
     <nav class="header-private-nav">
-        <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('dashboard.dashboard') }}"
+            class="{% if active_page == 'dashboard' %}is-active{% endif %}">Dashboard</a>
         <a href="#">Cursos</a>
         <a href="#">Usuarios</a>
     </nav>
