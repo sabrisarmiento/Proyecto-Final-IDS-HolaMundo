@@ -24,3 +24,8 @@ def login():
 
   except Exception:
     return redirect(url_for('landing.landing') + '?error=Error de conexión')
+  
+@login_bp.route('/logout')
+def logout():
+  session.clear()
+  return redirect(url_for('landing.landing'))
