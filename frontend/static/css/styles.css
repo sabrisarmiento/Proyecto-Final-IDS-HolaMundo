@@ -3,6 +3,7 @@
   --color-2: #581918;
   --color-3: #92140C;
   --color-4: #C9867E;
+  --color-45: #ffffff;
   --color-5: #FFF8F0;
   --color-6: #FFE4C5;
   --color-65: #FFDAAF;
@@ -25,14 +26,14 @@ display: flex;
 align-items: center;
 justify-content: space-between;
 padding: 1rem 2rem;
-background-color: white;
+background: var(--color-45);
 border-bottom: 1px solid #e2e8f0;
 }
 
 .header-private-logo {
 font-size: 1.25rem;
 font-weight: 700;
-color: black;
+color: var(--color-9);
 text-decoration: none;
 }
 
@@ -50,35 +51,38 @@ border-radius: 0.5rem;
 }
 
 .header-private-nav a:hover {
-color: black;
+  color: var(--color-2);
+}
+
+.header-private p {
+  margin: 0;
+  color: var(--color-9);
 }
 
 .footer-private {
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
-    padding: 24px 40px;
-    width: 100%;
+  background: var(--color-45);
+  border-top: 1px solid var(--color-6);
+  padding: 24px 40px;
 }
 
 .footer-private-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .footer-private-info p {
-    margin: 2px 0;
-    font-size: 13px;
-    color: #999;
-    font-family: 'Poppins', sans-serif;
-color: var(--color-2);
+  margin: 2px 0;
+  font-size: 13px;
+  color: #999;
+  color: var(--color-2);
 }
 
 .header-private-nav a.is-active {
-background-color: var(--color-6);
-color: var(--color-2);
+  background-color: var(--color-6);
+  color: var(--color-2);
 }
 
 .modal-container {

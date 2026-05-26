@@ -20,19 +20,19 @@ def get_calendar():
 def get_event(id_event):
     return get_calendar_event_service(id_event)
 
-@requiere_auth
+@require_auth
 @calendar_bp.route('/calendario', methods=['POST'])
 def create_event_route():
     data = request.get_json()
     return create_calendar_service(data)
     
-@requiere_auth
+@require_auth
 @calendar_bp.route('/calendario/<int:id_event>', methods=['PATCH'])
 def patch_event_route(id_event):
     data = request.get_json()
     return patch_calendar_service(id_event, data)
 
-@requiere_auth
+@require_auth
 @calendar_bp.route('/calendario/<int:id_event>', methods=['DELETE'])
 def delete_event_route(id_event):
     return delete_calendar_service(id_event)

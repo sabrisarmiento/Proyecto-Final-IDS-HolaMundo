@@ -150,7 +150,7 @@
   background-color: #4A1B1B;
 }
 
-.slack-banner h3, p{
+.slack-banner h3, .slack-banner p{
   text-decoration: none;
   margin: 0;
 }
