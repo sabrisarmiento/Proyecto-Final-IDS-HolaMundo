@@ -11,7 +11,7 @@ students_bp = Blueprint('students', __name__)
 
 
 @students_bp.route("/students", methods=["GET"])
-@requiere_auth
+@require_auth
 def get_students():
     filters = {
         "nombre": request.args.get('nombre'),
@@ -25,18 +25,18 @@ def get_students():
 
 
 @students_bp.route("/students/<int:id>", methods=["GET"])
-@requiere_auth
+@require_auth
 def get_student(id):
     return fetch_student_id_service(id)
 
 
 @students_bp.route("/students", methods=["POST"])
-@requiere_auth
+@require_auth
 def create_student_route():
     return create_student_service(request.get_json(silent=True))
 
 
 @students_bp.route("/students/import", methods=["POST"])
-@requiere_auth
+@require_auth
 def import_students_route():
     return import_students_service(request.files)
