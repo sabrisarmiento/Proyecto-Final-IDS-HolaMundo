@@ -8,7 +8,7 @@ teams_bp = Blueprint("teams", __name__)
 
 
 @teams_bp.route("/equipos", methods=["GET"])
-@requiere_auth
+@require_auth
 def get_teams():
     filters = {
         "id_alumno": request.args.get("id_alumno"),
@@ -18,26 +18,26 @@ def get_teams():
 
 
 @teams_bp.route("/equipos/<int:id_team>", methods=["GET"])
-@requiere_auth
+@require_auth
 def get_team(id_team):
     return team_service(id_team)
 
 
 @teams_bp.route("/equipos", methods=["POST"])
-@requiere_auth
+@require_auth
 def create_team():
     data = request.get_json()
     return create_team_service(data)
 
 
 @teams_bp.route("/equipos/<int:id_team>", methods=["PATCH"])
-@requiere_auth
+@require_auth
 def update_team(id_team):
     data = request.get_json()
     return patch_team_service(id_team, data)
 
 
 @teams_bp.route("/equipos/<int:id_team>", methods=["DELETE"])
-@requiere_auth
+@require_auth
 def delete_team(id_team):
     return delete_team_service(id_team)
