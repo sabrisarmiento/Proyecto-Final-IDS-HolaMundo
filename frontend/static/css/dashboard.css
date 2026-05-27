@@ -288,3 +288,54 @@ table td {
     color: white;
     border: none;
 }
+
+.dashboard-card .qr-container {
+    background-color: white;
+    margin-top: 1.5rem;
+}
+
+.qr-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.qr-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.qr-form .form-group label {
+    color:var(--color-9);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.qr-form input[type="date"] {
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+    background-color: #f7f7f7;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+.qr-form .btn-primary {
+    background-color: var(--color-9);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 100%;
+    text-align: center;
+}
+
+.qr-form .btn-primary:hover {
+    opacity: 0.9;
+}
