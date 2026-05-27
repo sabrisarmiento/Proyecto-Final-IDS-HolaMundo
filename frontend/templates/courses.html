@@ -1,0 +1,27 @@
+{% extends "base_private.html" %}
+
+{% block title %}IDS Lanzillota - Cursos{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}">
+{% endblock %}
+
+{% block content %}
+  <section class="courses" >
+    <h2>Cursos</h2>
+    <div class="courses-container">
+      {% for course in courses %}
+        <article class="course">
+          <div class="course-header">
+            <span class="course-id">#{{ course.id_curso }}</span>
+            <span class="course-cuatrimestre">{{ course.cuatrimestre }}</span>
+          </div>
+          <h3 class="course-nombre">{{ course.nombre }}</h3>
+          <div class="course-footer">
+            <span class="course-anio">📅 {{ course.anio }}</span>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
