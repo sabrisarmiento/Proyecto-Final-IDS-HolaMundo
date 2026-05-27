@@ -139,3 +139,11 @@ CREATE TABLE calendario (
     id_profesor INT NOT NULL,
     FOREIGN KEY (id_profesor) REFERENCES usuarios (id_usuario)
 );
+
+INSERT INTO ROLES (nombre, nivel_administracion) VALUES ('Profesor', 1);
+
+INSERT INTO USUARIOS (nombre, apellido, correo, contraseña, id_rol)
+VALUES ('Bruno', 'Profe', 'bruno@fiuba.com', '123456', 1);
+
+SELECT * FROM usuarios;
+SELECT * FROM roles;
