@@ -15,15 +15,15 @@
         </div>
         
         <div class="advertisements-list">
-            {% if advertisements %}
-                {% for advertisement in advertisements %}
+            {% if avisos %}
+                {% for aviso in avisos %}
                 <article class="advertisement-card">
                     <div class="advertisement-card-header">
-                        <span class="advertisement-date">{{ advertisement.fecha }}</span>
-                        <span class="advertisement-issuer">Publicado por: {{ advertisement.emisor }}</span>
+                        <span class="advertisement-date">{{ aviso.fecha }}</span>
+                        <span class="advertisement-issuer">Publicado por: {{ aviso.emisor }}</span>
                     </div>
-                    <h2 class="advertisement-card-title">{{ advertisement.titulo }}</h2>
-                    <p class="advertisement-card-message">{{ advertisement.mensaje }}</p>
+                    <h2 class="advertisement-card-title">{{ aviso.titulo }}</h2>
+                    <p class="advertisement-card-message">{{ aviso.mensaje }}</p>
                 </article>
                 {% endfor %}
             {% else %}

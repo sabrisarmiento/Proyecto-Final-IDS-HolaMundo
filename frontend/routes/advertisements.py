@@ -1,20 +1,10 @@
 from flask import Blueprint, render_template
+from services.advertisement_frontend_service import AdvertisementFrontendService
 import requests 
 
 advertisements_bp = Blueprint('advertisements', __name__)
 
-@advertisements_bp.route('/avisos', methods=['GET'])
+@advertisements_bp.route('/avisos')
 def public_advertisements():
-    try:
-        response = requests.get('http://localhost:5000/advertisements')
-        data = response.json()
-        
-        if data.get('ok'):
-            advertisements = data.get('data') 
-        else:
-            advertisements = []
-            
-    except Exception as e:
-        advertisements = []
-
-    return render_template('advertisements.html', advertisements=advertisements, active_page='advertisements')
+    avisos = AdvertisementFrontendService.get_all()
+    return render_template("advertisements.html", avisos=avisos)
