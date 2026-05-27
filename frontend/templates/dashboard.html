@@ -150,6 +150,38 @@
             </div>
         </section>
 
+        <section class="dashboard-card qr-card"> 
+            <div class="card_header">
+                <div>
+                    <h3>
+                        Control de asistencia
+                    </h3>
+                    <p>
+                        Genere un QR dinámico para registrar la asistencia de los alumnos
+                    </p>
+                </div>
+                <div class="qr-container">
+                    <form class="qr-form" onsubmit="event.preventDefault();">
+                        <div>
+                            <label for="fecha-clase">
+                                Seleccione la fecha de la clase
+                            </label>
+                            <input 
+                            type="date" 
+                            id="fecha-clase" 
+                            name="fecha_clase"
+                            >
+                        </div>
+                        <div>
+                            <button type="submit" class="btn-primary">
+                                Generar QR dinámico y Enviar por Mail
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
     </section>
 
     <div id="modalExportar" class="modal-overlay">
