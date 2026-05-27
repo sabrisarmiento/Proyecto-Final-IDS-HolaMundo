@@ -8,16 +8,20 @@ def get_all_advertisements(filters):
 
     sql = """
       SELECT
-        id_usuario,
-        titulo,
-        fecha
-      FROM avisos
+        a.id_aviso,
+        a.id_usuario,
+        a.titulo,
+        a.mensaje,
+        a.fecha,
+        CONCAT(u.nombre, ' ', u.apellido) as emisor
+      FROM avisos a
+      JOIN usuarios u ON a.id_usuario = u.id_usuario
       """
     condition = "WHERE 1=1"
     params = []
 
-    if id_user is not None:
-      condition += " AND id_usuario = %s"
+    if id_user:
+      condition += " AND a.id_usuario = %s"
       params.append(int(id_user))
 
     if title is not None:
