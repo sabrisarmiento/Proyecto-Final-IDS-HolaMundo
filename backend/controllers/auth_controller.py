@@ -33,8 +33,6 @@ def login_user(data):
                 "description": "Credenciales inválidas"
             }
         
-        print("usuario_hasheado",  generate_password_hash(123456))    
-        
         user = result[0]
         if not check_password_hash(user["contraseña"], contrasenia):
             return {
