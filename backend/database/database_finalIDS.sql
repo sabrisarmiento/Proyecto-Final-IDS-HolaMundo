@@ -57,11 +57,14 @@ CREATE TABLE equipos (
 
 -- clases --
 CREATE TABLE clases (
-    id_clase INT PRIMARY KEY,
-    fecha DATE NOT NULL,
-    temas VARCHAR(255),
+    id_clase INT AUTO_INCREMENT PRIMARY KEY,
+    fecha VARCHAR(10) NOT NULL,
+    temas TEXT,
+    semana INT NOT NULL,
+    tipo VARCHAR(50),
+    modalidad VARCHAR(50)
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 -- materiales --
@@ -71,7 +74,7 @@ CREATE TABLE materiales (
     descripcion TEXT,
     url_externo VARCHAR(500) NOT NULL,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 -- equipo_alumno -- tabla intermedia
@@ -139,3 +142,11 @@ CREATE TABLE calendario (
     id_profesor INT NOT NULL,
     FOREIGN KEY (id_profesor) REFERENCES usuarios (id_usuario)
 );
+
+INSERT INTO ROLES (nombre, nivel_administracion) VALUES ('Profesor', 1);
+
+INSERT INTO USUARIOS (nombre, apellido, correo, contraseña, id_rol)
+VALUES ('Bruno', 'Profe', 'bruno@fiuba.com', '123456', 1);
+
+SELECT * FROM usuarios;
+SELECT * FROM roles;

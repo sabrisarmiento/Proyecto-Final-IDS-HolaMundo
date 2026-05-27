@@ -31,6 +31,7 @@
         <a href="{{ url_for('courses.courses') }}"
           class="{% if active_page == 'courses' %}is-active{% endif %}">Cursos</a>
         <a href="#">Usuarios</a>
+        <a href="#">Asistencia</a>
       </nav>
       {% from "components/dropdown.html" import dropdown_profile %}
       {% if session.get('user') %}
