@@ -6,6 +6,7 @@ from services.exam_service import (
     patch_exam_service,
     delete_exam_service
 )
+from middleware.auth_middleware import require_auth
 
 exam_bp = Blueprint('exam', __name__)
 
@@ -25,18 +26,24 @@ def obtain_exam_id(id_exam):
     return exam_service(id_exam)
 
 #POST--------------------------------------------------------
+
 @exam_bp.route("/examenes", methods=["POST"]) 
+@require_auth
 def add_exam():
     data=request.get_json()
     return create_exam_service(data)
 
+
 #PATCH ID----------------------------------------------------
 @exam_bp.route("/examenes/<int:id>", methods=["PATCH"])
+@require_auth
 def modify_exam(id_exam):
     data=request.get_json()
     return patch_exam_service(id_exam,data)
 
+
 #DELETE ID---------------------------------------------------
 @exam_bp.route("/examenes/<int:id>", methods=["DELETE"])
+@require_auth
 def delete_exam(id_exam):
     return delete_exam_service(id_exam)

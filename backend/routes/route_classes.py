@@ -6,6 +6,7 @@ from services.class_service import (
     update_class_service, 
     delete_class_service
 )
+from middleware.auth_middleware import require_auth
 
 classes_bp = Blueprint('classes', __name__)
 
@@ -20,16 +21,21 @@ def get_classes_route():
 def get_class_id_route(id_clase):
     return class_get_service(id_clase)
 
+
 @classes_bp.route('/clases', methods=['POST'])
+@require_auth
 def create_class_route():
     data = request.get_json()
     return create_class_service(data)
 
 @classes_bp.route('/clases/<int:id_clase>', methods=['PATCH'])
+@require_auth
 def update_class_route(id_clase):
     data = request.get_json()
     return update_class_service(id_clase, data)
 
+
 @classes_bp.route('/clases/<int:id_clase>', methods=['DELETE'])
+@require_auth
 def delete_class_route(id_clase):
     return delete_class_service(id_clase)

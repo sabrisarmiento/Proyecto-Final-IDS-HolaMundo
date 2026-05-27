@@ -7,6 +7,8 @@ from services.user_service import (
     delete_user_service
 )
 
+from middleware.auth_middleware import require_auth
+
 users_bp = Blueprint('users', __name__)
 
 @users_bp.route("/users",methods=["GET"])
@@ -27,16 +29,22 @@ def get_users():
 def get_user(id_user):
     return user_service(id_user)
 
+
 @users_bp.route("/users",methods=["POST"])
+@requiere_auth
 def create_user():
     data = request.get_json()
     return create_user_service(data)
 
+
 @users_bp.route("/users/<int:id_user>",methods=["PATCH"])
+@requiere_auth
 def patch_user(id_user):
     data = request.get_json()
     return patch_user_service(id_user, data)
 
+
 @users_bp.route("/users/<int:id_user>",methods=["DELETE"])
+@requiere_auth
 def delete_user(id_user):
     return delete_user_service(id_user)

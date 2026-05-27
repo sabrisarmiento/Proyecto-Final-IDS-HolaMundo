@@ -6,6 +6,7 @@ from services.attendance_service import (
     attendance_delete_handler,
     generate_qr_service, 
 )
+from middleware.auth_middleware import require_auth
 
 attendance_bp = Blueprint('attendance', __name__)
 
@@ -23,9 +24,12 @@ def post_generate_qr():
     return generate_qr_service(data.get("id_clase"))
 
 @attendance_bp.route("/asistencia/<int:id>", methods=["PATCH"])
+@require_auth
 def patch_attendance(id):
     return attendance_patch_handler(id)
 
+
 @attendance_bp.route("/asistencia/<int:id>", methods=["DELETE"])
+@require_auth
 def delete_attendance(id):
     return attendance_delete_handler(id)
