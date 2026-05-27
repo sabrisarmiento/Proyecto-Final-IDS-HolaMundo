@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}IDS Lanzillota - Avisos{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/advertisements.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="advertisements-section">
+    <div class="advertisements-container">
+        <div class="advertisements-header">
+            <h1 class="advertisements-title">Avisos de la Cátedra</h1>
+            <p class="advertisements-subtitle">Enterate al instante sobre novedades de la materia, cambios de aula, publicaciones de notas y recordatorios importantes</p>
+        </div>
+        
+        <div class="advertisements-list">
+            {% if avisos %}
+                {% for aviso in avisos %}
+                <article class="advertisement-card">
+                    <div class="advertisement-card-header">
+                        <span class="advertisement-date">{{ aviso.fecha }}</span>
+                        <span class="advertisement-issuer">Publicado por: {{ aviso.emisor }}</span>
+                    </div>
+                    <h2 class="advertisement-card-title">{{ aviso.titulo }}</h2>
+                    <p class="advertisement-card-message">{{ aviso.mensaje }}</p>
+                </article>
+                {% endfor %}
+            {% else %}
+                <div class="advertisement-empty">
+                    <p>No hay avisos publicados en este momento</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

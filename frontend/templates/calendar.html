@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}IDS Lanzillota - Cronograma{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="calendar-container">
+    <section class="calendar-header">
+        <h1>Cronograma</h1>
+        <p>Fechas, temas y modalidades de cada clase del cuatrimestre actual</p>
+    </section>
+
+    <section class="calendar-schedule">
+        {% if schedule %}
+            {% for week in schedule %}
+            <div class="calendar-week-block">
+                <h2 class="calendar-week-title">Semana: {{ week.week }}</h2>
+
+                <div class="calendar-classes-grid">
+                    {% for class in week.classes %}
+                    <article class="calendar-class-card">
+                        <h3 class="calendar-class-title">
+                            {{ class.tipo }} ({{ class.fecha }})
+                        </h3>
+                        
+                        <div class="calendar-class-content">
+                            <ul class="calendar-class-topics">
+                                <li>{{ class.temas }}</li>
+                            </ul>
+                        </div>
+
+                        <span class="calendar-class-badge">
+                            {{ class.modalidad }}
+                        </span>
+                    </article>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="calendar-empty">
+                <p>El cronograma de clases todavia no fue publicado para este curso</p>
+                <i class="fas fa-calendar-times"></i>
+            </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

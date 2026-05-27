@@ -1,0 +1,123 @@
+.courses {
+  padding: 2rem;
+}
+
+.courses h2 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--color-9);
+  text-align: center;
+}
+
+.courses-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.course {
+  background-color: var(--color-45);
+  border: 1px solid var(--color-6);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 2px 6px rgba(30, 30, 36, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.course:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(30, 30, 36, 0.15);
+}
+
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.course-id {
+  font-size: 0.75rem;
+  color: var(--color-8);
+  font-weight: 600;
+}
+
+.course-cuatrimestre {
+  color: var(--color-8);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+}
+
+.course-nombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-9);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.course-footer {
+  margin-top: auto;
+}
+
+.course-anio {
+  font-size: 0.8rem;
+  color: var(--color-8);
+}
+
+.hidden {
+    display: none;
+}
+
+.tab-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tab-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    color: var(--color-8);
+    font-size: 0.9rem;
+    border-bottom: 2px solid var(--color-6);
+}
+
+.tab-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-6);
+    color: var(--color-1);
+    font-size: 0.95rem;
+}
+
+.tab-table tbody tr:hover {
+    background-color: var(--color-6);
+}
+
+.status-active {
+    background-color: var(--color-6);
+    color: var(--color-9);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-inactive {
+    background-color: var(--color-4);
+    color: var(--color-45);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.tab-empty {
+    color: var(--color-8);
+    padding: 2rem 0;
+    text-align: center;
+}

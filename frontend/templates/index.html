@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}IDS Lanzillota - Inicio{% endblock %}
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="hero" >
+  <h2>Introducción al Desarrollo de Software</h2>
+  <p>FIUBA - Catedra Bruno Lanzillota</p>
+</section>
+<a href="https://intro-desa-software.slack.com/" class="slack-banner">
+    <h3>Únete a nuestro Slack</h3>
+    <p>Consulta con tus profesores y enterate de novedades</p>
+</a>
+<section class="info-panel">
+  <div class="info-panel-classes" >
+    <h3>Proximas Clases</h3>
+    <div class="classes-container">
+      {% for clase in clases %}
+        <article class="class">
+          <h4>{{ clase.nombre }}</h4>
+          <p>{{ clase.tema }}</p>
+          <p>{{ clase.tipo }}</p>
+        </article>
+      {% endfor %}
+      <button type="button">Ver el Calendario</button>
+    </div>
+  </div>
+  <div class="info-panel-advertisments">
+    <h3>Ultimos Avisos</h3>
+    <div class="advertisments-container">
+      {% for aviso in avisos %}
+        <article class="advertisment">
+          <h4>{{ aviso.titulo }}</h3>
+          <p>ID: {{ aviso.id_usuario }}</p>
+        </article>
+      {% endfor %}
+      <button type="button">Ver todos los avisos</button>
+    </div>
+  </div>
+</section>
+{% endblock %}

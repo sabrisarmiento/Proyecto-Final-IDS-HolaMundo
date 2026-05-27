@@ -1,0 +1,156 @@
+.hero {
+  width: 100dvw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0 1rem 0;
+  color: var(--color-9);
+  background: linear-gradient(180deg, var(--color-6) 0%, var(--color-65) 100%);
+}
+
+.hero H2{
+  font-size: 4dvw;
+  margin: 0;
+  padding: 1rem 1rem .5rem 1rem;
+}
+
+.hero p{
+  margin: 0;
+  padding: 0 1rem 1rem 1rem;
+  font-size: 1.3rem;
+}
+
+.info-panel{
+  width: 80dvw;
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  padding: .5rem 0 1.5rem 0;
+  margin: auto;
+}
+
+.info-panel-classes{
+  width: 65%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.info-panel h3{
+  color: var(--color-9);
+  margin: 0;
+  margin-bottom: .6rem;
+  width: fit-content;
+}
+
+.class{
+  background: var(--color-6);
+  width: 12%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 0.1rem 1rem 0.1rem 1rem;
+  border-radius: 0.8rem;
+  align-items: center;
+  height: 100%;
+  color: var(--color-9);
+}
+
+.class p {
+  text-align: center;
+  margin: 0;
+}
+
+.class h4 {
+  margin: 0;
+}
+
+.info-panel-advertisments{
+  width: 35%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.advertisment{
+  background-color: rgb(187, 178, 178);
+  box-shadow: 4px 4px 8px gray;
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.1rem 1rem 0.1rem 1rem;
+  border-radius: 0.8rem;
+  align-items: center;
+}
+
+.advertisment h4{
+  margin: 0;
+}
+
+.info-panel-advertisments button{
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  color: gray;
+}
+
+
+.advertisments-container, .classes-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .9rem;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+
+.classes-container {
+  height: 100%;
+}
+
+.classes-container button{
+  height: fit-content;
+  margin: auto 0;
+  background: var(--color-6);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.8rem;
+}
+
+.classes-container button:hover, .class:hover{
+  background: var(--color-65);
+  cursor: pointer;
+}
+
+.slack-banner{
+  text-decoration: none;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: var(--color-2);
+  padding: 1rem 0 1.5rem 10rem;
+}
+
+.slack-banner-text{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: var(--color-2);
+  padding: 1rem 0 1.5rem 10rem;
+}
+
+.slack-banner:hover{
+  background-color: #4A1B1B;
+}
+
+.slack-banner h3, .slack-banner p{
+  text-decoration: none;
+  margin: 0;
+}

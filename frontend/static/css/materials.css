@@ -1,0 +1,124 @@
+.materials-section {
+    padding: 4rem 1.5rem;
+    background-color: var(--color-5);
+    min-height: 85vh;
+}
+
+.materials-container {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.materials-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.materials-title {
+    color: var(--color-9);
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.materials-subtitle {
+    color: var(--color-8);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.materials-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.material-card {
+    background-color: #ffffff;
+    border: 1px solid var(--color-8);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+                border-color 0.3s ease;
+}
+
+.material-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-9);
+    transform: translateY(-5px);
+    border-color: var(--color-9);
+}
+
+.material-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.material-icon {
+    font-size: 2rem;
+    color: var(--color-3);
+}
+
+.material-text h3 {
+    margin: 0;
+    color: var(--color-1);
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.material-text p {
+    margin: 0.2rem 0 0 0;
+    color: var(--color-8);
+    font-size: 0.95rem;
+}
+
+.btn-material {
+    background-color: var(--color-3);
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-material:active {
+    transform: scale(0.95);
+}
+
+.btn-material:hover {
+    background-color: var(--color-2);
+}
+
+.material-empty {
+    text-align: center;
+    padding: 5rem;
+    background-color: white;
+    border: 2px dashed var(--color-3);
+    border-radius: 20px;
+    color: var(--color-8);
+}
+
+.material-empty i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--color-6);
+}
+
+.btn-drive {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: var(--color-3);
+    text-decoration: underline;
+    font-weight: 700;
+}

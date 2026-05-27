@@ -1,0 +1,12 @@
+{% macro dropdown_profile(user) %}
+<div class="dropdown">
+  <button type="button" class="dropdown-btn" onclick="toggleDropdown()">
+    {{ user["nombre"] }}
+  </button>
+  <div class="dropdown-menu" id="dropdown-menu">
+    <a href="#">Perfil</a>
+    <a href="#">Configuracion</a>
+    <a href="{{ url_for('login.logout') }}">Cerrar sesion</a>
+  </div>
+</div>
+{% endmacro %}

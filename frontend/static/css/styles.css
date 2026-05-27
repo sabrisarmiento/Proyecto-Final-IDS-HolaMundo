@@ -1,0 +1,87 @@
+:root {
+  --color-1: #1E1E24;
+  --color-2: #581918;
+  --color-3: #92140C;
+  --color-4: #C9867E;
+  --color-45: #ffffff;
+  --color-5: #FFF8F0;
+  --color-6: #FFE4C5;
+  --color-65: #FFDAAF;
+  --color-7: #FFCF99;
+  --color-8: #887672;
+  --color-9: #111D4A;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-5);
+  font-family: 'Poppins', sans-serif;
+  /* font-family: 'PT Sans', sans-serif;
+  font-family: 'Prompt', sans-serif;
+  font-family: 'Red Hat Display', sans-serif; */
+}
+
+.header-private {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 1rem 2rem;
+background: var(--color-45);
+border-bottom: 1px solid #e2e8f0;
+}
+
+.header-private-logo {
+font-size: 1.25rem;
+font-weight: 700;
+color: var(--color-9);
+text-decoration: none;
+}
+
+.header-private-nav {
+display: flex;
+gap: 1.5rem;
+}
+
+.header-private-nav a {
+color: var(--color-8);
+text-decoration: none;
+font-weight: 500;
+padding: 0.5rem 0.75rem;
+border-radius: 0.5rem;
+}
+
+.header-private-nav a:hover {
+  color: var(--color-2);
+}
+
+.header-private p {
+  margin: 0;
+  color: var(--color-9);
+}
+
+.footer-private {
+  background: var(--color-45);
+  border-top: 1px solid var(--color-6);
+  padding: 24px 40px;
+}
+
+.footer-private-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.footer-private-info p {
+  margin: 2px 0;
+  font-size: 13px;
+  color: #999;
+  color: var(--color-2);
+}
+
+.header-private-nav a.is-active {
+  background-color: var(--color-6);
+  color: var(--color-2);
+}
+

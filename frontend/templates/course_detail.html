@@ -1,0 +1,80 @@
+{% extends "base_private.html" %}
+
+{% block title %}IDS Lanzillota - {{ course[0].id_curso }}{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="course-detail">
+
+    <div class="course-detail-header">
+        <h1>{{ course[0].nombre }}</h1>
+        <span class="course-cuatrimestre">{{ course[0].cuatrimestre }} — {{ course[0].anio }}</span>
+    </div>
+
+    <nav class="course-subnav">
+        <button class="subnav-btn active" onclick="switchTab('general', this)">General</button>
+        <button class="subnav-btn" onclick="switchTab('students', this)">Alumnos</button>
+        <button class="subnav-btn" onclick="switchTab('teams', this)">Equipos</button>
+        <button class="subnav-btn" onclick="switchTab('calendar', this)">Calendario</button>
+        <button class="subnav-btn" onclick="switchTab('ads', this)">Avisos</button>
+    </nav>
+
+    <div class="tab-content">
+
+        <div id="tab-general" class="tab-panel">
+            <p><strong>Nombre:</strong> {{ course[0].nombre }}</p>
+            <p><strong>Cuatrimestre:</strong> {{ course[0].cuatrimestre }}</p>
+            <p><strong>Año:</strong> {{ course[0].anio }}</p>
+        </div>
+
+        <div id="tab-students" class="tab-panel hidden">
+            {% if students %}
+                <table class="tab-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Padrón</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr>
+                            <td>{{ s.nombre }}</td>
+                            <td>{{ s.apellido }}</td>
+                            <td>{{ s.padron }}</td>
+                            <td>
+                                <span class="{% if s.estado_alumno %}status-active{% else %}status-inactive{% endif %}">
+                                    {% if s.estado_alumno %}Activo{% else %}Baja{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="tab-empty">No hay alumnos en este curso.</p>
+            {% endif %}
+        </div>
+
+        <div id="tab-teams" class="tab-panel hidden">
+            <p class="tab-empty">Próximamente.</p>
+        </div>
+
+        <div id="tab-calendar" class="tab-panel hidden">
+            <p class="tab-empty">Próximamente.</p>
+        </div>
+
+        <div id="tab-ads" class="tab-panel hidden">
+            <p class="tab-empty">Próximamente.</p>
+        </div>
+
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/course_detail.js') }}"></script>
+{% endblock %}
