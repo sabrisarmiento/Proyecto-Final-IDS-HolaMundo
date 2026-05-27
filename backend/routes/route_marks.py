@@ -29,20 +29,20 @@ def get_mark(id_mark):
 
 
 @marks_bp.route('/marks', methods=['POST'])
-@requiere_auth
+@require_auth
 def create_mark():
     data = request.get_json()
     return create_mark_service(data)
 
 
 @marks_bp.route('/marks/<int:id_mark>', methods=['PATCH'])
-@requiere_auth
+@require_auth
 def patch_mark(id_mark):
     data = request.get_json()
     return patch_mark_service(id_mark, data)
 
 
 @marks_bp.route('/marks/<int:id_mark>', methods=['DELETE'])
-@requiere_auth
+@require_auth
 def delete_mark(id_mark):
     return delete_mark_service(id_mark)

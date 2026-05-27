@@ -20,13 +20,13 @@ def get_materials_route():
 
 
 @materials_bp.route('/materials', methods=['POST'])
-@requiere_auth
+@require_auth
 def create_material_route():
     data = request.get_json()
     return create_material_service(data)
 
 
 @materials_bp.route('/materials/<int:id_material>', methods=['DELETE'])
-@requiere_auth
+@require_auth
 def delete_material_route(id_material):
     return delete_material_service(id_material)

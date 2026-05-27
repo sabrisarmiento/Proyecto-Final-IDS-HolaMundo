@@ -31,20 +31,20 @@ def get_user(id_user):
 
 
 @users_bp.route("/users",methods=["POST"])
-@requiere_auth
+@require_auth
 def create_user():
     data = request.get_json()
     return create_user_service(data)
 
 
 @users_bp.route("/users/<int:id_user>",methods=["PATCH"])
-@requiere_auth
+@require_auth
 def patch_user(id_user):
     data = request.get_json()
     return patch_user_service(id_user, data)
 
 
 @users_bp.route("/users/<int:id_user>",methods=["DELETE"])
-@requiere_auth
+@require_auth
 def delete_user(id_user):
     return delete_user_service(id_user)
