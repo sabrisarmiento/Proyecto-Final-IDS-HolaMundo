@@ -1,20 +1,21 @@
 from database.db import query_db, modify_db
 from werkzeug.security import generate_password_hash, check_password_hash
 from helpers.validators import validate_login_data, validate_change_password_data
+from dotenv import load_dotenv
 import jwt
 import os
 from datetime import datetime, timedelta, timezone
 
+load_dotenv()
+
 def login_user(data):
     try:
         validation = validate_login_data(data)
-
         if not validation["ok"]:
             return validation
         
         correo = data.get("correo")
         contrasenia = data.get("contraseña")
-
         result = query_db(
             """
             SELECT id_usuario, nombre, apellido, correo, contraseña, id_rol
@@ -33,7 +34,6 @@ def login_user(data):
             }
 
         user = result[0]
-
         if not check_password_hash(user["contraseña"], contrasenia):
             return {
                 "ok": False,

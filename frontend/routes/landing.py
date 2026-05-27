@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session
 import requests
 
 landing_bp = Blueprint('landing', __name__)
 
 @landing_bp.route('/', methods=["GET"])
 def landing():
+  print("SESION INCIADA" ,session.get('user'))
   try:
     response = requests.get('http://127.0.0.1:5000/advertisements')
     data = response.json()

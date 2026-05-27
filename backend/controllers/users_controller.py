@@ -1,4 +1,5 @@
 from database.db import query_db, modify_db
+from werkzeug.security import generate_password_hash
 
 def get_all_users(filters):
   try:
@@ -118,6 +119,8 @@ def create_user(data):
         "message": "Conflict",
         "description": "El correo ya está registrado"
       }
+    
+    password_hash = generate_password_hash(contraseña)
 
     sql = """
       INSERT INTO usuarios(
@@ -129,7 +132,7 @@ def create_user(data):
       ) VALUES (%s, %s, %s, %s, %s)
     """
 
-    modify_db(sql, (nombre, apellido, correo, contraseña, int(id_rol)))
+    modify_db(sql, (nombre, apellido, correo, password_hash, int(id_rol)))
     return {
       "ok": True,
       "message": "usuario creado correctamente"

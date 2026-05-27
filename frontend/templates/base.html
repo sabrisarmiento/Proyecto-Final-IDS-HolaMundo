@@ -7,31 +7,45 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=PT+Sans:wght@400;700&family=Prompt:wght@400;500;700&family=Red+Hat+Display:wght@400;500;700&display=swap" rel="stylesheet">
   {% block extra_styles %}{% endblock %}
+  
 </head>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <body>
   <header class="header-private">
     <a href="{{ url_for('landing.landing') }}" class="header-private-logo">IDS Lanzillota</a>
     <nav class="header-private-nav">
-        <a href="{{ url_for('landing.landing') }}"
-          class="{% if active_page == 'landing' %}is-active{% endif %}">Inicio</a>
-        <a href="{{ url_for('materials.materials') }}">Materiales</a>
-        <a href="{{ url_for('advertisements.public_advertisements') }}"
-          class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
-    </nav>
-    {% from "components/modal.html" import modal %}
-    <button onclick="openModal('login-modal')">Iniciar Sesion</button>
-    {% call modal("login-modal", "iniciar Sesion") %}
-      <form>
-        
-      </form>
-
-    {% endcall %}
+      <a href="{{ url_for('landing.landing') }}"
+        class="{% if active_page == 'landing' %}is-active{% endif %}">Inicio</a>
+      <a href="{{ url_for('materials.materials') }}">Materiales</a>
+      <a href="{{ url_for('advertisements.public_advertisements') }}"
+        class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
+      {% if session.get('user') %}
+        <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+      {% endif %}
+      </nav>
+      {% if session.get('user') %}
+        <p>Bienvenido, {{ session['user']['nombre'] }}</p>
+      {% else %}
+        {% from "components/modal.html" import modal %}
+          <button type="button" onclick="openModal('login-modal')">Iniciar Sesion</button>
+        {% call modal("login-modal", "iniciar Sesion") %}
+          <form action="{{ url_for("login.login") }}" method="POST">
+            <input type="email" name="correo" placeholder="Ingresar correo ..." required>
+            <input type="password" name="contraseña" placeholder="Ingresar contraseña ...">
+            <button type="submit">Iniciar Sesion</button>
+          </form>
+        {% endcall %}
+      {% endif %}
     <!-- <a href="#" class="header-private-logout">Iniciar Sesion</a> -->
 	</header>
   {% block content %}{% endblock %}
-  <footer>
-    HOLA SOY UN FOOTER
+  <footer class ="footer-private">
+      <div class="footer-private-container">
+          <div class="footer-private-info">
+              <p>Correo de contacto: contacto@universidad.edu.ar</p>
+              <p>Introducción al Desarrollo de Software, Cátedra Lanzillota © 2026</p>
+          </div>
+      </div>
   </footer>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

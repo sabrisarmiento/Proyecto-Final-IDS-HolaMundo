@@ -2,6 +2,156 @@
 
 {% block title %}IDS Lanzillota - Dashboard{% endblock %}
 
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
-<p>Estas en el Dashboard</p>
+
+<main class="dashboard-container">
+
+    <section class="dashboard-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Panel de consultas para profesores y ayudantes</p>
+        </div>
+        <button class="dashboard-button">
+            Exportar informes
+        </button>
+    </section>
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <span>Total alumnos</span>
+            <h2>{{ stats.total_alumnos }}</h2>
+        </div>
+        <div class="stat-card">
+            <span>Equipos</span>
+            <h2>{{ stats.equipos }}</h2>
+        </div>
+        <div class="stat-card">
+            <span>Asistencia promedio</span>
+            <h2>{{ stats.asistencia_promedio }}</h2>
+        </div>
+        <div class="stat-card">
+            <span>Aprobados</span>
+            <h2>{{ stats.aprobados }}</h2>
+        </div>
+        <div class="stat-card">
+            <span>Desaprobados</span>
+            <h2>{{ stats.desaprobados }}</h2>
+        </div>
+        <div class="stat-card">
+            <span>Promedio general</span>
+            <h2>{{ stats.promedio_general }}</h2>
+        </div>
+    </section>
+
+    <section class="dashboard-grid">
+
+        <section class="dashboard-card">
+            <div class="card-header">
+                <div>
+                    <h3>Informe de alumnos</h3>
+                    <p>Listado completo de estudiantes</p>
+                </div>
+            </div>
+
+            <div class="filters-container">
+                <input type="text" placeholder="Buscar alumno...">
+                <select>
+                    <option>Todos</option>
+                    <option>Aprobados</option>
+                    <option>Desaprobados</option>
+                </select>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Padrón</th>
+                        <th>Asistencia</th>
+                        <th>Parcial 1</th>
+                        <th>Parcial 2</th>
+                        <th>TP</th>
+                        <th>Condición</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alumno in alumnos %}
+                    <tr>
+                        <td>{{ alumno.nombre }}</td>
+                        <td>{{ alumno.apellido }}</td>
+                        <td>{{ alumno.padron }}</td>
+                        <td>
+                            <span class="
+                                {% if alumno.asistencia|replace('%', '')|int >= 75 %}
+                                    status-approved
+                                {% else %}
+                                    status-failed
+                                {% endif %}
+                            ">
+                                {{ alumno.asistencia }}
+                            </span>
+                        </td>
+                        <td>{{ alumno.parcial1 }}</td>
+                        <td>{{ alumno.parcial2 }}</td>
+                        <td>{{ alumno.tp }}</td>
+                        <td>
+                        <span class="
+                            {% if alumno.activo %}
+                                status-active
+                            {% else %}
+                                status-inactive
+                            {% endif %}
+                        ">
+                            {% if alumno.activo %}
+                                Activo
+                            {% else %}
+                                Baja
+                            {% endif %}
+                        </span>
+                    </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="dashboard-card">
+            <div class="card-header">
+                <div>
+                    <h3>Informe de equipos</h3>
+                    <p>Equipos registrados en la cursada</p>
+                </div>
+            </div>
+            <div class="filters-container">
+                <input
+                    type="text"
+                    id="teamSearch"
+                    placeholder="Buscar equipo o integrante..."
+                >
+            </div>
+            <div class="teams-list" id="teamsList">
+                {% for equipo in equipos %}
+                <div
+                    class="team-item"
+                    data-search="{{ equipo.nombre }} {{ equipo.integrantes }}"
+                >
+                    <div class="team-top">
+                        <h4>{{ equipo.nombre }}</h4>
+                        <span>3 integrantes</span>
+                    </div>
+                    <p>{{ equipo.integrantes }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </section>
+
+</main>
+
 {% endblock %}
