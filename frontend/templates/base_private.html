@@ -28,7 +28,7 @@
           class="{% if active_page == 'dashboard' %}is-active{% endif %}"
           >Dashboard</a
         >
-        <a href="#">Cursos</a>
+        <a href="{{ url_for('courses.courses') }}">Cursos</a>
         <a href="#">Usuarios</a>
       </nav>
       {% from "components/dropdown.html" import dropdown_profile %}

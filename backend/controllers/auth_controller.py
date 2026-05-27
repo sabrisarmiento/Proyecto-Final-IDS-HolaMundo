@@ -41,7 +41,7 @@ def login_user(data):
                 "message": "Unauthorized",
                 "description": "Credenciales inválidas"
             }
-
+        
         token = jwt.encode({
             "id_usuario": user["id_usuario"],
             "correo": user["correo"],

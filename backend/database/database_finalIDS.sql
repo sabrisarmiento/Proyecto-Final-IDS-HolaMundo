@@ -133,7 +133,7 @@ CREATE TABLE calendario (
     titulo VARCHAR(100) NOT NULL,
     tipo_clase VARCHAR(50) NOT NULL,
     descripcion TEXT,
-    modalidad VARCHAR(100)
+    modalidad VARCHAR(100),
     hipervinculo VARCHAR(255),
     fecha_evento DATETIME NOT NULL,
     id_profesor INT NOT NULL,
