@@ -85,23 +85,3 @@ border-radius: 0.5rem;
   color: var(--color-2);
 }
 
-.modal-container {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.2);
-    z-index: 100;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-container.active {
-  display: flex;
-  color: var(--color-2);
-}
-
-.modal {
-  background: var(--color-5);
-  padding: 2rem;
-  border-radius: 0.8rem;
-}
