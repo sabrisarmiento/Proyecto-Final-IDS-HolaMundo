@@ -15,9 +15,12 @@
     <nav class="header-private-nav">
       <a href="{{ url_for('landing.landing') }}"
         class="{% if active_page == 'landing' %}is-active{% endif %}">Inicio</a>
-      <a href="{{ url_for('materials.public_materials') }}">Materiales</a>
+      <a href="{{ url_for('materials.public_materials') }} "
+        class="{% if active_page == 'materials' %}is-active{% endif %}">Materiales</a>
       <a href="{{ url_for('advertisements.public_advertisements') }}"
         class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
+      <a href="{{ url_for('calendar.calendar') }}"
+        class="{% if active_page == 'calendar' %}is-active{% endif %}">Cronograma</a>
       {% if session.get('user') %}
         <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
       {% endif %}

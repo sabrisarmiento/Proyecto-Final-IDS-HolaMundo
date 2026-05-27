@@ -11,14 +11,16 @@
     <h2>Cursos</h2>
     <div class="courses-container">
       {% for course in courses %}
-        <article class="course">
+        <article class="course" onclick="window.location.href='/cursos/{{ course.id_curso }}'">
           <div class="course-header">
             <span class="course-id">#{{ course.id_curso }}</span>
-            <span class="course-cuatrimestre">{{ course.cuatrimestre }}</span>
+            status: 
           </div>
           <h3 class="course-nombre">{{ course.nombre }}</h3>
           <div class="course-footer">
-            <span class="course-anio">📅 {{ course.anio }}</span>
+            <span class="course-anio">📅 {{ course.anio }}, 
+              <span class="course-cuatrimestre">{{ course.cuatrimestre }}</span>
+            </span>
           </div>
         </article>
       {% endfor %}

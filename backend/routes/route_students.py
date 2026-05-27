@@ -20,6 +20,7 @@ def get_students():
         "password": request.args.get('password'),
         "id_rol": request.args.get('id_rol'),
         "created_at": request.args.get('created_at'),
+        "id_curso": request.args.get('id_curso'),
     }
     return fetch_students_service(filters)
 

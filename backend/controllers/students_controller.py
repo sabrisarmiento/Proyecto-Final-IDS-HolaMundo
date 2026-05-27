@@ -9,6 +9,7 @@ _FILTER_COLUMNS = {
     "password": "password",
     "id_rol": "id_rol",
     "created_at": "created_at",
+    "id_curso" : "id_curso",
 }
 
 def get_all_students(filters):

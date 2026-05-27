@@ -42,4 +42,4 @@ def calendar():
     }
   ]
   
-  return render_template('calendar.html', schedule=schedule)
+  return render_template('calendar.html', schedule=schedule, active_page='calendar')
