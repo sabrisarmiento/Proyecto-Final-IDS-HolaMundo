@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}IDS Lanzillota{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=PT+Sans:wght@400;700&family=Prompt:wght@400;500;700&family=Red+Hat+Display:wght@400;500;700&display=swap" rel="stylesheet">
   {% block extra_styles %}{% endblock %}
   
@@ -26,7 +27,7 @@
         <p>Bienvenido, {{ session['user']['nombre'] }}</p>
       {% else %}
         {% from "components/modal.html" import modal %}
-          <button type="button" onclick="openModal('login-modal')">Iniciar Sesion</button>
+          <button type="button" class="btn-primary" onclick="openModal('login-modal')">Iniciar Sesion</button>
         {% call modal("login-modal", "iniciar Sesion") %}
           <form action="{{ url_for("login.login") }}" method="POST">
             <input type="email" name="correo" placeholder="Ingresar correo ..." required>
