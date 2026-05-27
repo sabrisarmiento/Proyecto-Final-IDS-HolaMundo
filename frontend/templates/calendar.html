@@ -9,42 +9,43 @@
 {% block content %}
 <main class="calendar-container">
     <section class="calendar-header">
-        <h1>Cronograma IDS</h1>
-        <p>Fechas, temas y modalidades de cada clase del cuatrimestre.</p>
+        <h1>Cronograma</h1>
+        <p>Fechas, temas y modalidades de cada clase del cuatrimestre actual</p>
     </section>
 
-    <!-- <section class="calendar-info-grid">
-        <div class="calendar-info-card">
-            <h3>Horario</h3>
-            <p>Lunes y Viernes de 18:30 a 21:30</p>
-        </div>
-        <div class="calendar-info-card">
-            <h3>Aulas</h3>
-            <p>Lunes: Aula X &middot; Viernes: Aula X</p>
-        </div> -->
-
     <section class="calendar-schedule">
-        {% for week in schedule %}
-        <div class="calendar-week-block">
-            <h2 class="calendar-week-title">Semana: {{ week.week }}</h2>
+        {% if schedule %}
+            {% for week in schedule %}
+            <div class="calendar-week-block">
+                <h2 class="calendar-week-title">Semana: {{ week.week }}</h2>
 
-            <div class="calendar-classes-grid">
-                {% for class in week.classes %}
-                <div class="calendar-class-card">
-                    <h3 class="calendar-class-title">{{ class.type }} ({{ class.date}})</h3>
-                    
-                    <ul class="calendar-class-topics">
-                        {% for topic in class.topics %}
-                          <li>{{ topic }}</li>
-                        {% endfor %}
-                    </ul>
+                <div class="calendar-classes-grid">
+                    {% for class in week.classes %}
+                    <article class="calendar-class-card">
+                        <h3 class="calendar-class-title">
+                            {{ class.tipo }} ({{ class.fecha }})
+                        </h3>
+                        
+                        <div class="calendar-class-content">
+                            <ul class="calendar-class-topics">
+                                <li>{{ class.temas }}</li>
+                            </ul>
+                        </div>
 
-                    <span class="calendar-class-badge"> {{class.modality}}</span>
+                        <span class="calendar-class-badge">
+                            {{ class.modalidad }}
+                        </span>
+                    </article>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <div class="calendar-empty">
+                <p>El cronograma de clases todavia no fue publicado para este curso</p>
+                <i class="fas fa-calendar-times"></i>
+            </div>
+        {% endif %}
     </section>
 </main>
 {% endblock %}

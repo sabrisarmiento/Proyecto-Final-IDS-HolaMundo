@@ -35,7 +35,7 @@
 
 .material-card {
     background-color: #ffffff;
-    border: 1px solid var(--color-6);
+    border: 1px solid var(--color-8);
     border-radius: 12px;
     padding: 1.5rem 2rem;
     display: flex;
@@ -49,9 +49,9 @@
 
 .material-card:hover {
     transform: translateY(-2px);
-    border-color: var(--color-65);
+    border-color: var(--color-9);
     transform: translateY(-5px);
-    border-color: var(--color-65);
+    border-color: var(--color-9);
 }
 
 .material-content {

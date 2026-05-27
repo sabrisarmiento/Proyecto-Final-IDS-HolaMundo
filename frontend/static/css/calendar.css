@@ -1,80 +1,106 @@
 .calendar-container {
-    max-width: 900px;
+    max-width: 950px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 3rem 1.5rem;
 }
 
-/* Encabezado calendario */
 .calendar-header {
-    margin-bottom: 2rem;
+    text-align: center;
+    margin-bottom: 3rem;
 }
 
 .calendar-header h1 {
     color: var(--color-9);
     font-size: 2.5rem;
     font-weight: 800;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .calendar-header p {
     color: var(--color-9);
     font-size: 1.25rem;
+    margin: 0;
 }
 
-/* Cronograma dinámico */
 .calendar-schedule {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 3rem;
+    position: relative;
 }
 
 .calendar-week-block {
-    background-color: white;
-    border-radius: 12px;
-    padding: 2.5rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2rem;
+    border-left: 6px solid var(--color-3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.calendar-week-block:hover {
+    transform: scale(1.01);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.07);
 }
 
 .calendar-week-title {
     color: var(--color-9);
-    font-size: 1.5rem;
-    border-bottom: 2px solid var(--color-3);
-    padding-bottom: 0.75rem;
-    margin-bottom: 2rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .calendar-classes-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
 }
 
 .calendar-class-card {
-    display: flex;
-    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.02);
+    padding: 1.5rem;
+    border-radius: 15px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
 }
 
 .calendar-class-title {
     color: var(--color-9);
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
+    margin-bottom: 0.8rem;
+    display: block;
 }
 
 .calendar-class-topics {
     color: var(--color-9);
-    list-style-type: disc;
-    margin-left: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
     margin-bottom: 1.5rem;
-    min-height: 50px;
+    list-style: none;
+    padding: 0;
+}
+
+.calendar-class-topics li::before {
+    content: "•";
+    color: var(--color-3);
+    font-weight: bold;
+    display: inline-block; 
+    width: 1em;
+    margin-left: -1em;
 }
 
 .calendar-class-badge {
-    align-self: flex-start;
+    display: inline-block;
+    padding: 0.5rem 1.2rem;
     background-color: var(--color-9);
     color: white;
-    padding: 0.35rem 1rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
 }
