@@ -2,24 +2,28 @@ from database.db import query_db, modify_db
 
 def get_all_courses(filters):
     try:
-        name = filters.get('nombre')
-        term = filters.get('cuatrimestre')
+        materia = filters.get('materia')
+        catedra = filters.get('catedra')
         year = filters.get('anio')
 
-        sql = "SELECT id_curso, nombre, cuatrimestre, anio FROM cursos"
+        sql = """
+            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio 
+            FROM cursos c
+            JOIN materias m ON c.id_materia = m.id_materia
+        """
         condition = " WHERE 1=1"
         params = []
 
-        if name is not None:
-            condition += " AND nombre LIKE %s"
-            params.append(f"%{name}%")
+        if materia:
+            condition += " AND m.nombre LIKE %s"
+            params.append(f"%{materia}%")
 
-        if term is not None:
-            condition += " AND cuatrimestre = %s"
-            params.append(term)
+        if catedra:
+            condition += " AND c.catedra LIKE %s"
+            params.append(f"%{catedra}%")
 
-        if year is not None:
-            condition += " AND anio = %s"
+        if year:
+            condition += " AND c.anio = %s"
             params.append(int(year))
 
         result = query_db(sql + condition, params)
@@ -37,7 +41,12 @@ def get_all_courses(filters):
 
 def get_course_id(id_course):
     try:
-        sql = "SELECT id_curso, nombre, cuatrimestre, anio FROM cursos WHERE id_curso = %s"
+        sql = """
+            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio 
+            FROM cursos c
+            JOIN materias m ON c.id_materia = m.id_materia
+            WHERE c.id_curso = %s
+        """
         result = query_db(sql, (id_course,))
 
         if not result:
@@ -49,7 +58,7 @@ def get_course_id(id_course):
             }
         return {
             "ok": True,
-            "data": result
+            "data": result[0]
         }
     except Exception as e:
         return {
@@ -61,15 +70,17 @@ def get_course_id(id_course):
 
 def create_course(data):
     try:
-        name = data.get('nombre')
+        id_materia = data.get('id_materia')
+        catedra = data.get('catedra')
         term = data.get('cuatrimestre')
         year = data.get('anio')
+        id_profe = data.get('id_profesor')
 
         sql = """
-            INSERT INTO cursos (nombre, cuatrimestre, anio)
-            VALUES (%s, %s, %s)
+            INSERT INTO cursos (id_materia, catedra, cuatrimestre, anio, id_profesor)
+            VALUES (%s, %s, %s, %s, %s)
         """
-        modify_db(sql, (name, term, int(year)))
+        modify_db(sql, (id_materia, catedra, term, int(year), id_profe))
         return {
             "ok": True,
             "message": "curso creado correctamente"
@@ -84,22 +95,30 @@ def create_course(data):
 
 def patch_course(id_course, data):
     try:
-        name = data.get('nombre')
+        id_materia = data.get('id_materia')
+        catedra = data.get('catedra')
         term = data.get('cuatrimestre')
         year = data.get('anio')
+        id_profe = data.get('id_profesor')
 
         updates = []
         params = []
 
-        if name is not None:
-            updates.append("nombre = %s")
-            params.append(name)
+        if id_materia is not None:
+            updates.append("id_materia = %s")
+            params.append(id_materia)
+        if catedra is not None:
+            updates.append("catedra = %s")
+            params.append(catedra)
         if term is not None:
             updates.append("cuatrimestre = %s")
             params.append(term)
         if year is not None:
             updates.append("anio = %s")
             params.append(int(year))
+        if id_profe is not None:
+            updates.append("id_profesor = %s")
+            params.append(id_profe)
 
         if not updates:
             return {

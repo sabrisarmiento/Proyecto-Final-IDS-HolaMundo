@@ -1,6 +1,6 @@
 {% extends "base_private.html" %}
 
-{% block title %}IDS Lanzillota - {{ course[0].id_curso }}{% endblock %}
+{% block title %}IDS Lanzillota - Curso #{{ course.id_curso }}{% endblock %}
 
 {% block extra_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}">
@@ -10,8 +10,9 @@
 <section class="course-detail">
 
     <div class="course-detail-header">
-        <h1>{{ course[0].nombre }}</h1>
-        <span class="course-cuatrimestre">{{ course[0].cuatrimestre }} — {{ course[0].anio }}</span>
+        <h1>{{ course.materia }}</h1>
+        <p class="catedra-subtitle">{{ course.catedra }}</p>
+        <span class="course-cuatrimestre">{{ course.cuatrimestre }} — {{ course.anio }}</span>
     </div>
 
     <nav class="course-subnav">
@@ -25,9 +26,10 @@
     <div class="tab-content">
 
         <div id="tab-general" class="tab-panel">
-            <p><strong>Nombre:</strong> {{ course[0].nombre }}</p>
-            <p><strong>Cuatrimestre:</strong> {{ course[0].cuatrimestre }}</p>
-            <p><strong>Año:</strong> {{ course[0].anio }}</p>
+            <p><strong>Materia:</strong> {{ course.materia }}</p>
+            <p><strong>Cátedra:</strong> {{ course.catedra }}</p>
+            <p><strong>Cuatrimestre:</strong> {{ course.cuatrimestre }}</p>
+            <p><strong>Año:</strong> {{ course.anio }}</p>
         </div>
 
         <div id="tab-students" class="tab-panel hidden">
@@ -57,18 +59,16 @@
                     </tbody>
                 </table>
             {% else %}
-                <p class="tab-empty">No hay alumnos en este curso.</p>
+                <p class="tab-empty">No hay alumnos inscriptos en este curso.</p>
             {% endif %}
         </div>
 
         <div id="tab-teams" class="tab-panel hidden">
             <p class="tab-empty">Próximamente.</p>
         </div>
-
         <div id="tab-calendar" class="tab-panel hidden">
             <p class="tab-empty">Próximamente.</p>
         </div>
-
         <div id="tab-ads" class="tab-panel hidden">
             <p class="tab-empty">Próximamente.</p>
         </div>

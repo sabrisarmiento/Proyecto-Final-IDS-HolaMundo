@@ -8,24 +8,9 @@ CREATE TABLE roles (
     nivel_administracion INT NOT NULL
 );
 
--- cursos --
-CREATE TABLE cursos (
-    id_curso INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    cuatrimestre VARCHAR(20) NOT NULL,
-    anio INT NOT NULL
-);
-
--- tipos_evaluacion --
-CREATE TABLE tipos_evaluacion (
-    id_tipo INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) UNIQUE NOT NULL,
-    descripcion TEXT
-);
-
 -- usuarios --
 CREATE TABLE usuarios (
-    id_usuario int AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     correo VARCHAR(255) UNIQUE NOT NULL,
@@ -35,6 +20,32 @@ CREATE TABLE usuarios (
     FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
 );
 
+-- materias --
+CREATE TABLE materias (
+    id_materia INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    codigo VARCHAR(20) UNIQUE
+);
+
+-- cursos --
+CREATE TABLE cursos (
+    id_curso INT AUTO_INCREMENT PRIMARY KEY,
+    id_materia INT NOT NULL,
+    catedra VARCHAR(100) NOT NULL,
+    cuatrimestre VARCHAR(20) NOT NULL,
+    anio INT NOT NULL,
+    id_profesor INT,
+    FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
+    FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
+);
+
+-- tipos_evaluacion --
+CREATE TABLE tipos_evaluacion (
+    id_tipo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL,
+    descripcion TEXT
+);
+
 -- alumnos --
 CREATE TABLE alumnos (
     id_alumno INT AUTO_INCREMENT PRIMARY KEY,
@@ -42,12 +53,12 @@ CREATE TABLE alumnos (
     apellido VARCHAR(100) NOT NULL,
     padron INT UNIQUE NOT NULL,
     correo VARCHAR(255) NOT NULL,
-    estado_alumno BOOLEAN DEFAULT FALSE,
+    estado_alumno BOOLEAN DEFAULT TRUE,
     id_curso INT NOT NULL,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
 );
 
--- equipos --
+-- 7. equipos --
 CREATE TABLE equipos (
     id_equipo INT AUTO_INCREMENT PRIMARY KEY,
     nombre_equipo VARCHAR(20) NOT NULL,
@@ -62,7 +73,7 @@ CREATE TABLE clases (
     temas TEXT,
     semana INT NOT NULL,
     tipo VARCHAR(50),
-    modalidad VARCHAR(50)
+    modalidad VARCHAR(50),
     id_curso INT NOT NULL,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
@@ -77,7 +88,7 @@ CREATE TABLE materiales (
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
--- equipo_alumno -- tabla intermedia
+-- equipo_alumno --
 CREATE TABLE equipo_alumno (
     id_equipo INT NOT NULL,
     id_alumno INT NOT NULL,
@@ -96,7 +107,7 @@ CREATE TABLE asistencia (
     FOREIGN KEY (id_clase) REFERENCES clases(id_clase) 
 );
 
--- aviso --
+-- avisos --
 CREATE TABLE avisos (
     id_aviso INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -130,23 +141,3 @@ CREATE TABLE notas (
     FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
     FOREIGN KEY (id_corrector) REFERENCES usuarios(id_usuario)
 );
-
-CREATE TABLE calendario (
-    id_evento INT AUTO_INCREMENT PRIMARY KEY, 
-    titulo VARCHAR(100) NOT NULL,
-    tipo_clase VARCHAR(50) NOT NULL,
-    descripcion TEXT,
-    modalidad VARCHAR(100),
-    hipervinculo VARCHAR(255),
-    fecha_evento DATETIME NOT NULL,
-    id_profesor INT NOT NULL,
-    FOREIGN KEY (id_profesor) REFERENCES usuarios (id_usuario)
-);
-
-INSERT INTO ROLES (nombre, nivel_administracion) VALUES ('Profesor', 1);
-
-INSERT INTO USUARIOS (nombre, apellido, correo, contraseña, id_rol)
-VALUES ('Bruno', 'Profe', 'bruno@fiuba.com', '123456', 1);
-
-SELECT * FROM usuarios;
-SELECT * FROM roles;
