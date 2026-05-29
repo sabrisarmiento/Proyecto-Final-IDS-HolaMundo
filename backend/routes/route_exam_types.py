@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from services.exam_types_service import (
     exam_types_get_handler,
     exam_type_get_handler,
@@ -22,13 +22,15 @@ def get_exam_type(id):
 @exam_types_bp.route("/tipos-evaluacion", methods=["POST"])
 @require_auth
 def post_exam_type():
-    return exam_type_post_handler()
+    data = request.get_json()
+    return exam_type_post_handler(data)
 
 
 @exam_types_bp.route("/tipos-evaluacion/<int:id>", methods=["PATCH"])
 @require_auth
 def patch_exam_type(id):
-    return exam_type_patch_handler(id)
+    data = request.get_json()
+    return exam_type_patch_handler(id, data)
 
 
 @exam_types_bp.route("/tipos-evaluacion/<int:id>", methods=["DELETE"])
