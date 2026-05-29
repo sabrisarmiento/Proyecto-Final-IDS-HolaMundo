@@ -13,7 +13,7 @@ courses_bp = Blueprint('courses', __name__)
 @courses_bp.route('/courses', methods=['GET'])
 def get_courses():
     filters = {
-        "nombre": request.args.get('nombre'),
+        "materia": request.args.get('nombre'),
         "cuatrimestre": request.args.get('cuatrimestre'),
         "anio": request.args.get('anio')
     }
