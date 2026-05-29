@@ -19,23 +19,26 @@
   <div class="info-panel-classes" >
     <h3>Proximas Clases</h3>
     <div class="classes-container">
-      {% for clase in clases %}
-        <article class="class">
-          <h4>{{ clase.nombre }}</h4>
-          <p>{{ clase.tema }}</p>
-          <p>{{ clase.tipo }}</p>
-        </article>
-      {% endfor %}
+      <div class="classes-inner-row">
+        {% for clase in clases %}
+          <article class="class">
+            <h4>{{ clase.nombre }}</h4>
+            <p>{{ clase.tema }}</p>
+            <p>{{ clase.tipo }}</p>
+          </article>
+        {% endfor %}
+      </div>
+      
       <button type="button">Ver el Calendario</button>
     </div>
   </div>
+
   <div class="info-panel-advertisments">
     <h3>Ultimos Avisos</h3>
     <div class="advertisments-container">
       {% for aviso in avisos %}
         <article class="advertisment">
-          <h4>{{ aviso.titulo }}</h3>
-          <p>ID: {{ aviso.id_usuario }}</p>
+          <h4>{{ aviso.titulo }}</h4> <p>ID: {{ aviso.id_usuario }}</p>
         </article>
       {% endfor %}
       <button type="button">Ver todos los avisos</button>
