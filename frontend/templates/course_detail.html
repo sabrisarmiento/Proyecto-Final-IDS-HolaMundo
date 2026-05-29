@@ -1,9 +1,9 @@
 {% extends "base_private.html" %}
 
-{% block title %}IDS Lanzillota - {{ course[0].id_curso }}{% endblock %}
+{% block title %}Panel FIUBA - {{ course[0].id_curso }}{% endblock %}
 
 {% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/course_detail.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -62,15 +62,15 @@
         </div>
 
         <div id="tab-teams" class="tab-panel hidden">
-            <p class="tab-empty">Próximamente.</p>
+            <p class="tab-empty">Aca va EQUIPOS</p>
         </div>
 
         <div id="tab-calendar" class="tab-panel hidden">
-            <p class="tab-empty">Próximamente.</p>
+            <p class="tab-empty">Aca va Calendario</p>
         </div>
 
         <div id="tab-ads" class="tab-panel hidden">
-            <p class="tab-empty">Próximamente.</p>
+            <p class="tab-empty">Aca va Avisos</p>
         </div>
 
     </div>
