@@ -141,3 +141,13 @@ CREATE TABLE notas (
     FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
     FOREIGN KEY (id_corrector) REFERENCES usuarios(id_usuario)
 );
+
+-- roles básicos
+INSERT INTO roles (nombre, nivel_administracion) VALUES
+('Profesor', 3),
+('Ayudante', 2);
+
+
+-- profe prueba
+INSERT INTO usuarios (nombre, apellido, correo, contraseña, id_rol) VALUES
+('Bruno', 'Lanzillotta', 'bruno@fiuba.com', '123456', 1);
