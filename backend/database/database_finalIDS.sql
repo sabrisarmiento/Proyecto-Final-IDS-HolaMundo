@@ -151,5 +151,5 @@ CREATE TABLE notas (
     CONSTRAINT uq_alumno_evaluacion UNIQUE (id_alumno, id_evaluacion),
     FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion),
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
