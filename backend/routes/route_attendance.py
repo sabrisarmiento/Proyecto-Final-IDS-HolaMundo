@@ -12,11 +12,14 @@ attendance_bp = Blueprint('attendance', __name__)
 
 @attendance_bp.route("/asistencia", methods=["GET"])
 def get_attendance():
-    return attendance_get_handler()
+    id_clase = request.args.get("id_clase")
+    id_alumno = request.args.get("id_alumno")
+    return attendance_get_handler(id_clase, id_alumno)
 
 @attendance_bp.route("/asistencia", methods=["POST"])
 def post_attendance():
-    return attendance_post_handler()
+    data = request.get_json()
+    return attendance_post_handler(data)
 
 @attendance_bp.route("/asistencia/generar-qr", methods=["POST"])
 def post_generate_qr():
@@ -26,7 +29,8 @@ def post_generate_qr():
 @attendance_bp.route("/asistencia/<int:id>", methods=["PATCH"])
 @require_auth
 def patch_attendance(id):
-    return attendance_patch_handler(id)
+    data = request.get_json()
+    return attendance_patch_handler(id, data)
 
 
 @attendance_bp.route("/asistencia/<int:id>", methods=["DELETE"])

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}IDS Lanzillota{% endblock %}</title>
+    <title>{% block title %}Panel FIUBA{% endblock %}</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/styles.css') }}"
@@ -20,7 +20,7 @@
   <body>
     <header class="header-private">
       <a href="{{ url_for('landing.landing') }}" class="header-private-logo"
-        >IDS Lanzillota</a
+        >Panel FIUBA</a
       >
       <nav class="header-private-nav">
         <a
@@ -38,12 +38,14 @@
         {{ dropdown_profile(session.get('user')) }}
       {% endif %}
     </header>
-    {% block content %}{% endblock %}
+    <main class="main-private">
+      {% block content %}{% endblock %}
+    </main>
     <footer class="footer-private">
       <div class="footer-private-container">
         <div class="footer-private-info">
           <p>
-            Introducción al Desarrollo de Software, Cátedra Lanzillota © 2026
+            Panel FIUBA, Hola Mundo! © 2026
           </p>
         </div>
       </div>

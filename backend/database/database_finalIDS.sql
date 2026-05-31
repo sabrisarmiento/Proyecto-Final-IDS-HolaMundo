@@ -24,7 +24,8 @@ CREATE TABLE usuarios (
 CREATE TABLE materias (
     id_materia INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE,
-    codigo VARCHAR(20) UNIQUE
+    codigo VARCHAR(20) UNIQUE,
+    descripcion TEXT
 );
 
 -- cursos --
@@ -32,11 +33,20 @@ CREATE TABLE cursos (
     id_curso INT AUTO_INCREMENT PRIMARY KEY,
     id_materia INT NOT NULL,
     catedra VARCHAR(100) NOT NULL,
+    id_profesor INT,
     cuatrimestre VARCHAR(20) NOT NULL,
     anio INT NOT NULL,
-    id_profesor INT,
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
+);
+
+-- curso_ayudantes --
+CREATE TABLE curso_ayudantes (
+    id_curso INT NOT NULL,
+    id_usuario INT NOT NULL,
+    PRIMARY KEY (id_curso, id_usuario),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
 -- tipos_evaluacion --
@@ -58,7 +68,7 @@ CREATE TABLE alumnos (
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
 );
 
--- 7. equipos --
+-- equipos --
 CREATE TABLE equipos (
     id_equipo INT AUTO_INCREMENT PRIMARY KEY,
     nombre_equipo VARCHAR(20) NOT NULL,
@@ -104,7 +114,7 @@ CREATE TABLE asistencia (
     id_clase INT NOT NULL,
     presente BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) 
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase)
 );
 
 -- avisos --
@@ -121,10 +131,12 @@ CREATE TABLE avisos (
 CREATE TABLE evaluaciones (
     id_evaluacion INT AUTO_INCREMENT PRIMARY KEY,
     id_tipo INT NOT NULL,
+    id_curso INT NOT NULL,
     id_usuario INT NOT NULL,
     fecha DATE,
     asociacion ENUM('Individual', 'Equipo') NOT NULL,
     FOREIGN KEY (id_tipo) REFERENCES tipos_evaluacion(id_tipo),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
@@ -135,19 +147,10 @@ CREATE TABLE notas (
     id_evaluacion INT NOT NULL,
     id_equipo INT,
     nota DECIMAL(4, 2) NOT NULL,
-    id_corrector INT NOT NULL,
+    corrector_nombre VARCHAR(100) NULL,
+    CONSTRAINT uq_alumno_evaluacion UNIQUE (id_alumno, id_evaluacion),
     FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion),
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
     FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
     FOREIGN KEY (id_corrector) REFERENCES usuarios(id_usuario)
 );
-
--- roles básicos
-INSERT INTO roles (nombre, nivel_administracion) VALUES
-('Profesor', 3),
-('Ayudante', 2);
-
-
--- profe prueba
-INSERT INTO usuarios (nombre, apellido, correo, contraseña, id_rol) VALUES
-('Bruno', 'Lanzillotta', 'bruno@fiuba.com', '123456', 1);
