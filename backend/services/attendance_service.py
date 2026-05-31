@@ -51,10 +51,8 @@ def generate_class_qr_service(id_clase):
             raw_data = f"{student['id_alumno']}-{id_clase}-2026-secret"
             qr_hash = hashlib.sha256(raw_data.encode()).hexdigest()
 
-            # URL que captura la ubicación del alumno [cite: 431]
             qr_url = f"https://introds-web.vercel.app/presente?id={student['id_alumno']}&clase={id_clase}&code={qr_hash}"
 
-            # Llamada al envío de mail
             if send_attendance_email(student['correo'], student['nombre'], qr_url):
                 sent += 1
 
