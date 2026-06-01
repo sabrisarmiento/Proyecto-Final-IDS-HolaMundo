@@ -5,7 +5,7 @@ landing_bp = Blueprint('landing', __name__)
 
 @landing_bp.route('/', methods=["GET"])
 def landing():
-  print("SESION INCIADA" ,session.get('user'))
+  print("TODO SESSION", session)
   try:
     response = requests.get('http://127.0.0.1:5000/advertisements')
     data = response.json()

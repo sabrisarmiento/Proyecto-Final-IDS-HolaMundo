@@ -1,31 +1,75 @@
-.course-detail{
-  padding: 0 2rem;
+.course-detail-header {
+  color: var(--color-2);
+  padding: 0 1.5rem;
 }
 
-.course-detail-header{}
+.course-detail-header h1 {
+  margin-bottom: 0;
+}
 
-.course-cuatrimestre{
+.course-detail-header p {
+  margin-top: 0.3rem;
+  color: var(--color-3);
+}
+
+.course-cuatrimestre {
   color: var(--color-8);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
 }
 
-.course-subnav{}
+.course-detail-content {
+  width: 97dvw;
+  margin: 0 auto;
+}
 
-.subnav-btn{}
+.course-nav {
+  display: flex;
+  width: fit-content;
+  margin-left: 1.5rem;
+}
 
-.active{}
+.nav-btn {
+  border: none;
+  padding: 0.5rem 1.5rem;
+  color: var(--color-6);
+  border-radius: 0.7rem 0.7rem 0 0;
+  margin: 0 0.7rem;
+  border-top: 3px solid var(--color-6);
+  border-left: 3px solid var(--color-6);
+  border-right: 3px solid var(--color-6);
+  background: var(--color-5);
+  cursor: pointer;
+}
 
-.tab-content{}
+.active {
+  border-bottom: 0;
+  border-top: 3px solid var(--color-65);
+  border-left: 3px solid var(--color-65);
+  border-right: 3px solid var(--color-65);
+  translate: 0 3px;
+  background: var(--color-45);
+  color: var(--color-3);
+  font-weight: bold;
+}
 
-.tab-panel{}
+.tab-content {
+  padding: 0 1rem;
+  padding-bottom: 1rem;
+  border: 3px solid var(--color-65);
+  border-radius: 0.7rem;
+  background: var(--color-45);
+}
 
-.hidden{
+.tab-panel {
+}
+
+.hidden {
   display: none;
 }
 
-.tab-table{
+.tab-table {
   width: 100%;
   border-collapse: collapse;
 }
@@ -49,7 +93,7 @@
   background: var(--color-6);
 }
 
-.status-active{
+.status-active {
   background: var(--color-6);
   color: var(--color-9);
   padding: 0.3rem 0.75rem;
@@ -58,7 +102,7 @@
   font-weight: 600;
 }
 
-.status-inactive{
+.status-inactive {
   background: var(--color-4);
   color: var(--color-45);
   padding: 0.3rem 0.75rem;
@@ -67,8 +111,38 @@
   font-weight: 600;
 }
 
-.tab-empty{
+.tab-empty {
   color: var(--color-8);
   padding: 2rem 0;
   text-align: center;
 }
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-6);
+  color: var(--color-9);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.page-btn:hover {
+  background-color: var(--color-6);
+}
+
+.page-active {
+  background-color: var(--color-9);
+  color: white;
+  border-color: var(--color-9);
+}
+
+
