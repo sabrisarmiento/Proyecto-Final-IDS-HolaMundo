@@ -1,27 +1,47 @@
 import csv, io
-from flask import jsonify
 from database.db import query_db, modify_db
 
 _FILTER_COLUMNS = {
     "name": "nombre",
     "surname": "apellido",
-    "mail": "mail",
-    "password": "password",
-    "id_rol": "id_rol",
-    "created_at": "created_at",
+    "padron": "padron",
+    "mail": "correo",
+    "id_course": "id_curso",
     "id_curso" : "id_curso",
+    "state_student": "estado_alumno",
 }
 
 def get_all_students(filters):
     try:
+        limit = filters.pop('limit', None)
+        offset = filters.pop('offset', 0)
+
         sql = "SELECT * FROM alumnos WHERE 1 = 1"
+        count_sql = "SELECT COUNT(*) as total FROM alumnos WHERE 1 = 1"
         params = []
+
         for key, column in _FILTER_COLUMNS.items():
             value = filters.get(key)
             if value:
-                sql += f" AND {column} = %s"
+                condition = f" AND {column} = %s"
+                sql += condition
+                count_sql += condition
                 params.append(value)
-        return {"ok": True, "data": query_db(sql, params)}
+
+        order_by = filters.get("order_by", None)
+        order = filters.pop("order", None)
+
+        if order_by and order:
+            sql += f" ORDER BY {order_by} {order.upper()}"
+
+        total = query_db(count_sql, params)[0]['total']
+
+        if limit is not None:
+            sql += " LIMIT %s OFFSET %s"
+            params.append(int(limit))
+            params.append(int(offset))
+
+        return {"ok": True, "data": query_db(sql, params), "total": total}
     except Exception as e:
         return {"ok": False, "code": 500, "message": "Internal Server Error",
                 "description": str(e)}
@@ -49,32 +69,24 @@ def create_student(data):
             return {"ok": False, "code": 400, "message": "Bad Request",
                     "description": "JSON requerido"}
 
-        required = ["nombre", "apellido", "correo", "password", "id_rol"]
+        required = ["nombre", "apellido", "padron", "correo", "id_curso"]
         missing = [k for k in required if k not in data]
         if missing:
             return {"ok": False, "code": 400, "message": "Bad Request",
                     "description": f"Faltan campos: {missing}"}
 
-        if not isinstance(data["id_rol"], int):
-            return {"ok": False, "code": 400, "message": "Bad Request",
-                    "description": "id_rol debe ser un entero"}
-        if data["id_rol"] < 0:
-            return {"ok": False, "code": 400, "message": "Bad Request",
-                    "description": "id_rol debe ser mayor a 0"}
-
         exists = query_db(
-            "SELECT id_alumno FROM alumnos WHERE correo = %s",
-            (data["correo"],),
+            "SELECT id_alumno FROM alumnos WHERE correo = %s OR padron = %s",
+            (data["correo"], data["padron"]),
         )
         if exists:
             return {"ok": False, "code": 409, "message": "Conflict",
-                    "description": "El alumno ya existe (correo duplicado)"}
+                    "description": "El alumno ya existe (correo o padrón duplicado)"}
 
         new_id = modify_db(
-            """INSERT INTO alumnos (nombre, apellido, correo, password, id_rol)
+            """INSERT INTO alumnos (nombre, apellido, padron, correo, id_curso)
             VALUES (%s, %s, %s, %s, %s)""",
-            (data["nombre"], data["apellido"], data["correo"],
-            data["password"], data["id_rol"]),
+            (data["nombre"], data["apellido"], data["padron"], data["correo"], data["id_curso"]),
         )
         return {"ok": True, "message": "Alumno creado correctamente", "id": new_id}
     except Exception as e:

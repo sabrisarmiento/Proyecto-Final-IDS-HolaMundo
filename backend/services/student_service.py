@@ -6,16 +6,19 @@ from controllers.students_controller import (
     import_students_from_csv,
 )
 
-def fetch_students_service(filters):
+def students_service(filters):
     result = get_all_students(filters)
     if not result["ok"]:
         return error_response(result)
     if not result["data"]:
         return success_response("", 204)
-    return success_response({"students": result["data"]})
+    return success_response({
+        "students": result["data"],
+        "total": result["total"],
+    })
 
 
-def fetch_student_id_service(id):
+def student_service(id):
     result = get_student_by_id(id)
     if not result["ok"]:
         return error_response(result)
