@@ -1,6 +1,8 @@
 :root {
   --color-1: #1E1E24;
+  --color-15: rgba(146, 20, 12, 0.15); 
   --color-2: #581918;
+  --color-25: #b3170f;
   --color-3: #92140C;
   --color-4: #C9867E;
   --color-45: #ffffff;
@@ -9,6 +11,7 @@
   --color-65: #FFDAAF;
   --color-7: #FFCF99;
   --color-8: #887672;
+  --color-85: #5f534f;
   --color-9: #111D4A;
 }
 
