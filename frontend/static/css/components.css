@@ -183,6 +183,34 @@
   }
 }
 
+/* ── Perfil de usuario ── */
+.profile-info {
+  margin: 0;
+  padding: 0;
+}
+
+.profile-info dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-8);
+  margin-bottom: 0.2rem;
+}
+
+.profile-info dd {
+  margin: 0 0 0.85rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--color-6);
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.profile-info dd:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
 /* ── Button config y login ── */
 
 .header-private-actions {

@@ -208,7 +208,7 @@ table td {
     display: flex;
 }
 
-.modal-content {
+.modal-overlay .modal-content {
     background: white;
     padding: 2rem;
     border-radius: 16px;
@@ -229,7 +229,7 @@ table td {
     margin: 0;
 }
 
-.modal-close {
+.modal-overlay .modal-close {
     font-size: 1.5rem;
     color: #777;
     cursor: pointer;

@@ -33,9 +33,24 @@
         <a href="#">Usuarios</a>
         <a href="#">Asistencia</a>
       </nav>
+
       {% from "components/dropdown.html" import dropdown_profile %}
+      {% from "components/modal.html" import modal %}
       {% if session.get('user') %}
         {{ dropdown_profile(session.get('user')) }}
+        {% set perfil = session.get('user') %}
+        {% call modal('profile-modal', 'Mi Perfil') %}
+          <dl class="profile-info">
+            <dt>Nombre</dt>
+            <dd>{{ perfil['nombre'] }} {{ perfil['apellido'] }}</dd>
+            <dt>Correo</dt>
+            <dd>{{ perfil['correo'] }}</dd>
+            <dt>ID de usuario</dt>
+            <dd>{{ perfil['id_usuario'] }}</dd>
+            <dt>Rol</dt>
+            <dd>{{ perfil['id_rol'] }}</dd>
+          </dl>
+        {% endcall %}
       {% endif %}
     </header>
     <main class="main-private">
