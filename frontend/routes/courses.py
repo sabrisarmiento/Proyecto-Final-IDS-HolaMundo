@@ -33,7 +33,7 @@ def course_detail(course_id):
       requests.post('http://127.0.0.1:5000/students', headers=headers, json=data)
     except Exception as e:
       print(f"Error creating student: {e}")
-      return redirect(url_for('courses.course_detail', course_id=course_id, tab='students'))
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='students'))
     
   active_tab = request.args.get('tab', 'general')
   page = request.args.get('page', 1, type=int)
@@ -71,8 +71,8 @@ def course_detail(course_id):
       token = session.get('token')
       headers = {'Authorization': f'Bearer {token}'}
       students_res = requests.get(
-        f'http://127.0.0.1:5000/students?id_curso={course_id}
-        + (&page={page}&per_page={per_page}')
+        f'http://127.0.0.1:5000/students?id_curso={course_id}'
+        + (f'&page={page}&per_page={per_page}')
         + (f"&order_by={order_by}" if order_by else "")
         + (f"&order={order}" if order else ""),
         headers=headers
@@ -83,6 +83,7 @@ def course_detail(course_id):
         or response_data.get("students")
         or response_data.get("alumnos")
         or []
+      )
       total = response_data.get("total") or 0
   except Exception as e:
       students_data = []
@@ -99,71 +100,65 @@ def course_detail(course_id):
             notas_dict[int(id_ev.strip())] = nota.strip()
           except ValueError:
             pass
-  s['notas_todas'] = notas_dict
+    s['notas_todas'] = notas_dict
   
-  correctores_dict = {}
-  raw_corr = s.get('correctores_raw') or ""
-  if raw_corr:
-    for par in raw_corr.split(','):
-      if ':' in par:
-        id_ev, nombre_corr = par.split(':', 1)
+    correctores_dict = {}
+    raw_corr = s.get('correctores_raw') or ""
+    if raw_corr:
+      for par in raw_corr.split(','):
+        if ':' in par:
+          id_ev, nombre_corr = par.split(':', 1)
+          try:
+            val = nombre_corr.strip()
+            if val:
+              correctores_dict[int(id_ev.strip())] = val
+          except ValueError:
+            pass
+    s['correctores_todas'] = correctores_dict
+  
+    if not s.get('promedio_final') and notas_dict:
+      valores = [float(v) for v in notas_dict.values() if v not in ('', None)]
+      s['promedio_final'] = round(sum(valores) / len(valores), 1) if valores else None
+ 
+  eval_id_sel = session.get('eval_seleccionada')
+  eval_seleccionada = next(
+    (e for e in evaluaciones if e['id_evaluacion'] == eval_id_sel),
+    None
+  )
+  if not eval_seleccionada and evaluaciones:
+    eval_seleccionada = evaluaciones[0]
+ 
+  promedio_eval = 0.0
+  if eval_seleccionada:
+    notas_activa = []
+    for s in students_data:
+      n = s.get('notas_todas', {}).get(eval_seleccionada['id_evaluacion'])
+      if n not in (None, ''):
         try:
-          val = nombre_corr.strip()
-          if val:
-            correctores_dict[int(id_ev.strip())] = val
+          notas_activa.append(float(n))
         except ValueError:
           pass
-  s['correctores_todas'] = correctores_dict
-  
-  if not s.get('promedio_final') and notas_dict:
-    valores = [float(v) for v in notas_dict.values() if v not in ('', None)]
-    s['promedio_final'] = round(sum(valores) / len(valores), 1) if valores else None
- 
-    eval_id_sel = session.get('eval_seleccionada')
-    eval_seleccionada = next(
-        (e for e in evaluaciones if e['id_evaluacion'] == eval_id_sel),
-        None
-    )
-    if not eval_seleccionada and evaluaciones:
-        eval_seleccionada = evaluaciones[0]
- 
-    promedio_eval = 0.0
-    if eval_seleccionada:
-        notas_activa = []
-        for s in students_data:
-            n = s.get('notas_todas', {}).get(eval_seleccionada['id_evaluacion'])
-            if n not in (None, ''):
-                try:
-                    notas_activa.append(float(n))
-                except ValueError:
-                    pass
-        promedio_eval = round(sum(notas_activa) / len(notas_activa), 1) if notas_activa else 0.0
- 
-    todos_los_valores = []
-    for s in students_data:
-        for nota in (s.get('notas_todas') or {}).values():
-            if nota not in (None, ''):
-                try:
-                    todos_los_valores.append(float(nota))
-                except ValueError:
-                    pass
-    promedio_general = round(
-        sum(todos_los_valores) / len(todos_los_valores), 1
-    ) if todos_los_valores else 0.0
-        
-        
-        
+    promedio_eval = round(sum(notas_activa) / len(notas_activa), 1) if notas_activa else 0.0
+
+  todos_los_valores = []
+  for s in students_data:
+    for nota in (s.get('notas_todas') or {}).values():
+      if nota not in (None, ''):
+        try:
+          todos_los_valores.append(float(nota))
+        except ValueError:
+          pass
+  promedio_general = round(
+    sum(todos_los_valores) / len(todos_los_valores), 1
+  ) if todos_los_valores else 0.0
+
   total_pages = max(1, (total + per_page - 1) // per_page)
 
-
-        
-        
-        
   return render_template(
     'course_detail.html',
     course=course,
     students=students_data,
-    active_page=active_tab,
+    active_page='courses',
     page=page,
     total_pages=total_pages,
     course_id=course_id,
