@@ -7,6 +7,18 @@ landing_bp = Blueprint('landing', __name__)
 @landing_bp.route('/', methods=["GET"])
 def landing():
     print("SESION INICIADA", session.get('user'))
+    print("TODO SESSION", session)
+
+    try:
+        response = requests.get('http://127.0.0.1:5000/advertisements')
+        data = response.json()
+
+        advertisements = data.get("advertisements") or data.get("data") or []
+        advertisements = advertisements[-3:][::-1]
+
+    except Exception as e:
+        print("ERROR advertisements:", e)
+        advertisements = []
 
     id_curso = session.get("selected_course", 1)
 

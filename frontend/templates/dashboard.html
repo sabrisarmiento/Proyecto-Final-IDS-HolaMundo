@@ -183,6 +183,56 @@
         </section>
 
     </section>
+    <section class="dashboard-grid">
+            <section class="dashboard-card" style="margin-top: 2rem;">
+                <div class="card-header">
+                    <h2>Usuarios</h2>
+                </div>
+                <div class="card-header">       
+                <h3>Profesor</h3>
+                </div> 
+                <table>
+                    <thead>
+                        <tr>
+                            <th>nombre</th>
+                            <th>apellido</th>
+                            <th>correo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in Profesor %}
+                        <tr>
+                            <td>{{usuario.nombre}}</td>
+                            <td>{{usuario.apellido}}</td>
+                            <td>{{usuario.correo}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="card-header">
+                <h3>Ayudantes</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>nombre</th>
+                            <th>apellido</th>
+                            <th>correo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in Ayudantes %}
+                        <tr>
+                            <td>{{usuario.nombre}}</td>
+                            <td>{{usuario.apellido}}</td>
+                            <td>{{usuario.correo}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                
+    </section>
 
     <div id="modalExportar" class="modal-overlay">
         <div class="modal-content">

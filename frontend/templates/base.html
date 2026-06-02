@@ -39,21 +39,30 @@
       {% if session.get('user') %}
         <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
       {% endif %}
+
     </nav>
-      {% if session.get('user') %}
-        <p>Bienvenido, {{ session['user']['nombre'] }}</p>
-      {% else %}
-        {% from "components/modal.html" import modal %}
-          <button type="button" class="btn-primary" onclick="openModal('login-modal')">Iniciar Sesion</button>
-        {% call modal("login-modal", "iniciar Sesion") %}
-          <form action="{{ url_for("login.login") }}" method="POST">
-            <input type="email" name="correo" placeholder="Ingresar correo ..." required>
-            <input type="password" name="contraseña" placeholder="Ingresar contraseña ...">
-            <button type="submit">Iniciar Sesion</button>
-          </form>
-        {% endcall %}
-      {% endif %}
-	</header>
+    {% from "components/dropdown.html" import dropdown_settings %}
+    <div class="header-private-actions">
+      {{ dropdown_settings() }}
+    </div>
+    {% if session.get('user') %}
+      <p>Bienvenido, {{ session['user']['nombre'] }}</p>
+    {% else %}
+      {% from "components/modal.html" import modal %}
+      <button type="button" class="btn-primary" onclick="openModal('login-modal')">
+        Iniciar Sesion
+      </button>
+
+      {% call modal("login-modal", "iniciar Sesion") %}
+        <form action="{{ url_for("login.login") }}" method="POST">
+          <input type="email" name="correo" placeholder="Ingresar correo ..." required>
+          <input type="password" name="contraseña" placeholder="Ingresar contraseña ...">
+          <button type="submit">Iniciar Sesion</button>
+        </form>
+      {% endcall %}
+    {% endif %}
+
+  </header>
   <main class="main-private">
     {% block content %}{% endblock %}
   </main>
@@ -66,5 +75,6 @@
       </div>
   </footer>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/darkMode.js') }}"></script>
 </body>
 </html>

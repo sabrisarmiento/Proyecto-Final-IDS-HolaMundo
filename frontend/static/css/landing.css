@@ -358,8 +358,15 @@
 .teachers-grid {
   display: flex;
   justify-content: center;
+}
+
+.teachers-grid {
+  display: flex;
+  justify-content: center;
   gap: 2rem;
   flex-wrap: wrap;
+  background-color: var(--color-14);
+  padding: 1.5rem 0 1.5rem 10rem;
 }
 
 .teacher-card {

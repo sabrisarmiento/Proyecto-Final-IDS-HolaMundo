@@ -47,7 +47,7 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--color-45);
+  color: var(--color-10);
   background-color: var(--color-3);
   border: none;
   border-radius: 0.5rem;
@@ -106,7 +106,7 @@
   margin: 0 0 1.25rem;
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-1);
+  color: var(--color-15);
   text-align: center;
 }
 
@@ -148,21 +148,21 @@
   border: 1px solid var(--color-6);
   border-radius: 0.5rem;
   background: var(--color-5);
-  color: var(--color-1);
+  color: var(--color-15);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .modal-content input:focus {
   border-color: var(--color-3);
-  box-shadow: 0 0 0 3px rgba(146, 20, 12, 0.12);
+  box-shadow: 0 0 0 3px var(--color-16);
 }
 
 .modal-content button[type="submit"] {
   font-family: 'Poppins', sans-serif;
   font-size: 0.95rem;
   font-weight: 500;
-  color: var(--color-45);
+  color: white;
   background-color: var(--color-3);
   border: none;
   border-radius: 0.5rem;
@@ -195,7 +195,7 @@
   appearance: none;
   background: var(--color-45);
   color: var(--color-8);
-  border: none;              
+  border: none;
   outline: none;
   padding: 0.55rem 2.2rem 0.55rem 1rem;
   border-radius: 999px;
@@ -211,7 +211,7 @@
   transform: translateY(-1px);
 }
 
-.course-dropdown select:focus {  
+.course-dropdown select:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(0,0,0,0.12);
 }
@@ -223,4 +223,31 @@
   pointer-events: none;
   color: var(--color-8);
   font-size: 0.8rem;
+}
+
+/* ── Header private actions (from develop) ── */
+
+.header-private-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.settings-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-right: 1rem;
+  font-size: 1.5rem;
+  color: var(--color-2);
+}
+
+.settings-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  gap: 1rem;
+  color: var(--color-15);
 }

@@ -4,15 +4,34 @@ from services.course_frontend_service import CourseFrontendService
 
 materials_bp = Blueprint('materials', __name__)
 
+SUBJECT = 'Introducción al Desarrollo de Software'
+
 @materials_bp.route('/materiales')
 def public_materials():
+
     id_curso = session.get("selected_course", 1)
-    materiales_api = MaterialFrontendService.get_all(id_curso)
-    cursos = CourseFrontendService.get_all()
+
+    materials = MaterialFrontendService.get_all(id_curso)
+    courses = CourseFrontendService.get_all()
+
+    chair_by_course = {c['id_curso']: c['catedra'] for c in courses}
+
+    groups = {}
+
+    for material in materials:
+        chair = chair_by_course.get(material['id_curso'], 'Sin catedra')
+        groups.setdefault(chair, []).append(material)
+
+    sections = [
+        {'name': name, 'materials': items}
+        for name, items in sorted(groups.items())
+    ]
+
     return render_template(
         "materials.html",
-        materiales=materiales_api,
-        cursos=cursos,
+        subject=SUBJECT,
+        sections=sections,
+        courses=courses,
         selected_course=id_curso,
         active_page="materials"
     )

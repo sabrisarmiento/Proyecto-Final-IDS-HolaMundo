@@ -104,3 +104,7 @@
     text-transform: uppercase;
     letter-spacing: 0.8px;
 }
+
+.calendar-empty {
+    color:var(--color-15);
+}
