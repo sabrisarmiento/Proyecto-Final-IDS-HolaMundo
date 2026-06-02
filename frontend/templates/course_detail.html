@@ -1,79 +1,161 @@
-{% extends "base_private.html" %}
+{% extends "base_private.html" %} 
+{% block title %}Panel FIUBA - {{course.id_curso }}{% endblock %}
 
-{% block title %}Panel FIUBA - {{ course.id_curso }}{% endblock %}
+{% from "components/pagination.html" import pagination %}
+{% from "components/modal.html" import modal %}
+{% from "components/table_sort_header.html" import sortable_th %}
 
 {% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/course_detail.css') }}">
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/course_detail.css') }}"
+/>
 {% endblock %}
-
 {% block content %}
-<section class="course-detail">
+<section class="course-detail-header">
+  <h1>
+    {{ course.materia }} ( {{ course.cuatrimestre }} — {{ course.anio }} )
+  </h1>
+  <p class="catedra-subtitle">{{ course.catedra }}</p>
+</section>
+<section class="course-detail-content">
+  <nav class="course-nav">
+    <a
+      href="?tab=general"
+      class="nav-btn {% if active_tab == 'general' %}active{% endif %}"
+      >General</a
+    >
+    <a
+      href="?tab=students"
+      class="nav-btn {% if active_tab == 'students' %}active{% endif %}"
+      >Alumnos</a
+    >
+    <a
+      href="?tab=teams"
+      class="nav-btn {% if active_tab == 'teams' %}active{% endif %}"
+      >Equipos</a
+    >
+    <a
+      href="?tab=calendar"
+      class="nav-btn {% if active_tab == 'calendar' %}active{% endif %}"
+      >Calendario</a
+    >
+    <a
+      href="?tab=marks"
+      class="nav-btn {% if active_tab == 'marks' %}active{% endif %}"
+      >Notas</a
+    >
+    <a
+      href="?tab=ads"
+      class="nav-btn {% if active_tab == 'ads' %}active{% endif %}"
+      >Avisos</a
+    >
+  </nav>
 
-    <div class="course-detail-header">
-        <h1>{{ course.materia }}</h1>
-        <p class="catedra-subtitle">{{ course.catedra }}</p>
-        <span class="course-cuatrimestre">{{ course.cuatrimestre }} — {{ course.anio }}</span>
+  <div class="tab-content">
+    <div
+      id="tab-general"
+      class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}"
+    >
+      <p><strong>Materia:</strong> {{ course.materia }}</p>
+      <p><strong>Cátedra:</strong> {{ course.catedra }}</p>
+      <p><strong>Cuatrimestre:</strong> {{ course.cuatrimestre }}</p>
+      <p><strong>Año:</strong> {{ course.anio }}</p>
     </div>
 
-    <nav class="course-subnav">
-        <button class="subnav-btn active" onclick="switchTab('general', this)">General</button>
-        <button class="subnav-btn" onclick="switchTab('students', this)">Alumnos</button>
-        <button class="subnav-btn" onclick="switchTab('teams', this)">Equipos</button>
-        <button class="subnav-btn" onclick="switchTab('calendar', this)">Calendario</button>
-        <button class="subnav-btn" onclick="switchTab('ads', this)">Notas</button>
-    </nav>
+    <div
+      id="tab-students"
+      class="tab-panel {% if active_tab != 'students' %}hidden{% endif %}"
+    >
+      <section>
+        <button
+          type="button"
+          class="btn-create-student"
+          onclick="openModal('create-student-modal')"
+        >
+          agregar alumno
+        </button>
+        {% call modal("create-student-modal", "Crear Alumno") %}
+        <form
+          action="{{ url_for('courses.course_detail', course_id=course.id_curso) }}"
+          method="POST"
+        >
+          <label for="student-name">Nombre:</label>
+          <input type="text" id="student-name" name="nombre" required />
+          <label for="student-lastname">Apellido:</label>
+          <input type="text" id="student-lastname" name="apellido" required />
+          <label for="student-dni">Padrón:</label>
+          <input type="text" id="student-dni" name="padron" required />
+          <label for="student-email">Correo:</label>
+          <input type="email" id="student-email" name="correo" required />
+          <button type="submit">Crear</button>
+        </form>
+        {% endcall %}
+      </section>
+      {% if students %}
 
-    <div class="tab-content">
+        {% set current_order_by = request.args.get('order_by', '') %}
+        {% set current_order = request.args.get('order', '') %}
+        {% set students_base_url = '?tab=students&page=' ~ page %}
 
-        <div id="tab-general" class="tab-panel">
-            <p><strong>Materia:</strong> {{ course.materia }}</p>
-            <p><strong>Cátedra:</strong> {{ course.catedra }}</p>
-            <p><strong>Cuatrimestre:</strong> {{ course.cuatrimestre }}</p>
-            <p><strong>Año:</strong> {{ course.anio }}</p>
-        </div>
+      <table class="tab-table">
+        <thead>
+          <tr>
+            {{ sortable_th('Nombre', 'nombre', current_order_by, current_order, students_base_url) }}
+            {{ sortable_th('Apellido', 'apellido', current_order_by, current_order, students_base_url) }}
+            <th>Padrón</th>
+            <th>Correo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr>
+            <td>{{ student.nombre }}</td>
+            <td>{{ student.apellido }}</td>
+            <td>{{ student.padron }}</td>
+            <td>{{ student.correo }}</td>
+            <td>
+              <span
+                class="{% if student.estado_alumno %}status-active{% else %}status-inactive{% endif %}"
+              >
+                {% if student.estado_alumno %}Activo{% else %}Baja{% endif %}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+      {% set order_by = request.args.get('order_by', '') %}
+      {% set order = request.args.get('order', '') %}
+      {% set base_url = '?tab=students' %}
+      {% if order_by %}{% set base_url = base_url ~ '&order_by=' ~ order_by %}{% endif %}
+      {% if order %}{% set base_url = base_url ~ '&order=' ~ order %}{% endif %}
+      {{ pagination(page, total_pages, base_url) }}
 
-        <div id="tab-students" class="tab-panel hidden">
-            {% if students %}
-                <table class="tab-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Padrón</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for s in students %}
-                        <tr>
-                            <td>{{ s.nombre }}</td>
-                            <td>{{ s.apellido }}</td>
-                            <td>{{ s.padron }}</td>
-                            <td>
-                                <span class="{% if s.estado_alumno %}status-active{% else %}status-inactive{% endif %}">
-                                    {% if s.estado_alumno %}Activo{% else %}Baja{% endif %}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="tab-empty">No hay alumnos inscriptos en este curso.</p>
-            {% endif %}
-        </div>
+      {% else %}
+        <p class="tab-empty">No hay alumnos inscriptos en este curso.</p>
+      {% endif %}
+    </div>
 
-        <div id="tab-teams" class="tab-panel hidden">
-            <p class="tab-empty">Acá va EQUIPOS</p>
-        </div>
-
-        <div id="tab-calendar" class="tab-panel hidden">
-            <p class="tab-empty">Acá va Calendario</p>
-        </div>
-
-        <div id="tab-ads" class="tab-panel hidden">
-
-            <div class="mgmt-wrapper">
+    <div
+      id="tab-teams"
+      class="tab-panel {% if active_tab != 'teams' %}hidden{% endif %}"
+    >
+      <p class="tab-empty">Aca va EQUIPOS</p>
+    </div>
+    <div
+      id="tab-calendar"
+      class="tab-panel {% if active_tab != 'calendar' %}hidden{% endif %}"
+    >
+      <p class="tab-empty">Aca va Calendario</p>
+    </div>
+    <div
+      id="tab-marks"
+      class="tab-panel {% if active_tab != 'marks' %}hidden{% endif %}"
+    >
+      <div class="mgmt-wrapper">
                 <div class="mgmt-card">
 
                     <div class="mgmt-box">
@@ -271,8 +353,14 @@
                 </div>
             </div>
 
-        </div>
     </div>
+    <div
+      id="tab-ads"
+      class="tab-panel {% if active_tab != 'ads' %}hidden{% endif %}"
+    >
+      <p class="tab-empty">Aca va Avisos</p>
+    </div>
+  </div>
 </section>
 
 <dialog id="delete-modal" class="confirm-modal">
@@ -285,6 +373,6 @@
         </div>
     </div>
 </dialog>
-
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/course_detail.js') }}"></script>
 {% endblock %}
