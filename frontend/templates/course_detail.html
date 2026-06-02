@@ -155,7 +155,204 @@
       id="tab-marks"
       class="tab-panel {% if active_tab != 'marks' %}hidden{% endif %}"
     >
-      <p class="tab-empty">Aca va Notas</p>
+      <div class="mgmt-wrapper">
+                <div class="mgmt-card">
+
+                    <div class="mgmt-box">
+                        <label class="mgmt-label">1. SELECCIONAR EVALUACIÓN ACTIVA</label>
+                        <p class="mgmt-hint">Modificarás únicamente las celdas de esta evaluación en el panel de carga de notas</p>
+                        <div class="select-row">
+                            <form action="/cambiar-evaluacion" method="POST" id="form-cambiar-eval">
+                                <select name="eval_activa" class="eval-select" onchange="document.getElementById('form-cambiar-eval').submit()">
+                                    {% for eval in evaluaciones %}
+                                        <option value="{{ eval.id_evaluacion }}"
+                                            {% if eval_seleccionada and eval.id_evaluacion == eval_seleccionada.id_evaluacion %}selected{% endif %}>
+                                            {{ eval.nombre or 'Evaluación ' ~ eval.id_evaluacion }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+
+                            {% if eval_seleccionada %}
+                            {% set nombre_eval_activa = eval_seleccionada.nombre if eval_seleccionada.nombre else 'Evaluación ' ~ eval_seleccionada.id_evaluacion %}
+                            {% set cant_students = students | length %}
+                            <form action="/cursos/{{ course.id_curso }}/evaluaciones/eliminar/{{ eval_seleccionada.id_evaluacion }}"
+                                  method="POST"
+                                  onsubmit="return confirmarEliminarEval(this.dataset.nombre, this.dataset.cant);"
+                                  data-nombre="{{ nombre_eval_activa }}"
+                                  data-cant="{{ cant_students }}">
+                                <button type="submit" class="btn-del-eval" title="Eliminar evaluación seleccionada">🗑️</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mgmt-box mgmt-box--right">
+                        <label class="mgmt-label">2. CREAR UN NUEVO TIPO DE EVALUACIÓN</label>
+                        <p class="mgmt-hint">Se incorporará una nueva columna interactiva en la planilla inferior al instante.</p>
+                        <form action="/cursos/{{ course.id_curso }}/evaluaciones/crear" method="POST" class="create-form">
+                            <input type="text" name="nombre_eval" placeholder="Ej: TP1, Defensa oral, Recuperatorio..." required>
+                            <button type="submit" class="btn-crear">+ CREAR</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+            {% if eval_seleccionada %}
+            <div class="quick-grade-section">
+                <div class="qg-header">
+                    <div class="qg-title-block">
+                        <h2 class="qg-title">CARGA DE NOTAS: <span class="highlight-eval">{{ eval_seleccionada.nombre or 'Eval ' ~ eval_seleccionada.id_evaluacion }}</span></h2>
+                        <p class="qg-subtitle">Escribe directamente los números (escala 0-10) del alumno correspondiente</p>
+                    </div>
+
+                    <div class="qg-right-controls">
+                        <div class="promedio-bubble">
+                            <span class="promedio-label">PROMEDIO DE CLASE</span>
+                            <span class="promedio-val" id="promedio-display">{{ promedio_eval }}</span>
+                        </div>
+
+                        <div class="filter-equipo">
+                            <label class="filter-icon">✔</label>
+                            <select id="filtro-equipo" class="filter-select" onchange="filtrarPorEquipo(this.value)">
+                                <option value="">Todos los equipos</option>
+                                {% set equipos_vistos = [] %}
+                                {% for s in students %}
+                                    {% if s.equipo and s.equipo not in equipos_vistos %}
+                                        {% set _ = equipos_vistos.append(s.equipo) %}
+                                        <option value="{{ s.equipo }}">{{ s.equipo }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                                <option value="sin-equipo">Sin equipo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <form action="/cursos/{{ course.id_curso }}/notas/guardar" method="POST" id="form-notas">
+                    <input type="hidden" name="id_evaluacion" value="{{ eval_seleccionada.id_evaluacion }}">
+
+                    <div class="grade-grid" id="grade-grid">
+                        {% for s in students %}
+                        {% if s.estado_alumno %}
+                        {% set nota_actual = s.notas_todas.get(eval_seleccionada.id_evaluacion, '') if s.notas_todas else '' %}
+                        <div class="grade-card" data-equipo="{{ s.equipo or 'sin-equipo' }}">
+                            <div class="card-left">
+                                <strong class="card-name">{{ s.nombre }} {{ s.apellido }}</strong>
+                                <small class="card-meta">{{ s.padron }} — {{ s.equipo or 'Sin equipo' }}</small>
+                            </div>
+                            <div class="card-right">
+                                <div class="nota-wrapper">
+                                    <input
+                                        type="number"
+                                        name="nota_{{ s.id_alumno }}"
+                                        value="{{ nota_actual }}"
+                                        step="0.5" min="0" max="10"
+                                        class="nota-input {% if nota_actual != '' %}{% if nota_actual|float >= 4 %}nota-aprobado{% else %}nota-reprobado{% endif %}{% endif %}"
+                                        onchange="colorearNota(this)"
+                                        placeholder="—">
+                                    <span class="nota-dot {% if nota_actual != '' %}{% if nota_actual|float >= 4 %}dot-verde{% else %}dot-rojo{% endif %}{% endif %}" id="dot-{{ s.id_alumno }}"></span>
+                                </div>
+                                {% set corrector_activo = s.correctores_todas.get(eval_seleccionada.id_evaluacion, '') %}
+                                <input
+                                    type="text"
+                                    name="corrector_{{ s.id_alumno }}"
+                                    value="{{ corrector_activo }}"
+                                    placeholder="Corrector"
+                                    class="corrector-input">
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="floating-bar">
+                        <button type="submit" class="btn-guardar">💾 GUARDAR CALIFICACIONES</button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+                <p class="tab-empty">Creá una evaluación para empezar a cargar notas.</p>
+            {% endif %}
+
+            <div class="planilla-section">
+                <div class="planilla-header">
+                    <div>
+                        <h3 class="planilla-title">PLANILLA GENERAL DE CALIFICACIONES</h3>
+                        <p class="planilla-subtitle">Planilla de notas cargadas oficial, incluye promedios automáticos por columna</p>
+                    </div>
+                    <div class="promedio-general-bubble">
+                        <span class="promedio-label">PROMEDIO GENERAL DE LA CURSADA</span>
+                        <span class="promedio-val-big">{{ promedio_general }}</span>
+                    </div>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="planilla-table">
+                        <thead>
+                            <tr>
+                                <th class="th-padron">PADRÓN ID</th>
+                                <th class="th-alumno">ALUMNO</th>
+                                <th class="th-comision">EQUIPO</th>
+                                {% for eval in evaluaciones %}
+                                {% set nombre_eval_col = eval.nombre if eval.nombre else 'Eval ' ~ eval.id_evaluacion %}
+                                <th class="th-eval">
+                                    <div class="th-eval-inner">
+                                        <span>{{ nombre_eval_col }}</span>
+                                        <form action="/cursos/{{ course.id_curso }}/evaluaciones/eliminar/{{ eval.id_evaluacion }}"
+                                              method="POST"
+                                              style="display:inline;"
+                                              onsubmit="return confirmarEliminarEval(this.dataset.nombre, 1);"
+                                              data-nombre="{{ nombre_eval_col }}">
+                                            <button type="submit" class="btn-del-col" title="Eliminar columna">🗑️</button>
+                                        </form>
+                                    </div>
+                                </th>
+                                {% endfor %}
+                                <th class="th-final">NOTA FINAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in students %}
+                            {% if s.estado_alumno %}
+                            <tr>
+                                <td class="td-padron">{{ s.padron }}</td>
+                                <td class="td-nombre">{{ s.nombre }} {{ s.apellido }}</td>
+                                <td class="td-comision"><span class="team-badge">{{ s.equipo or 'Sin Equipo' }}</span></td>
+                                {% for eval in evaluaciones %}
+                                <td class="td-nota">
+                                    {% set nota = s.notas_todas.get(eval.id_evaluacion, None) if s.notas_todas else None %}
+                                    {% if nota is not none and nota != '' %}
+                                        <div class="nota-cell {% if nota|float >= 4 %}nota-cell--ok{% else %}nota-cell--mal{% endif %}">
+                                            <span class="nota-num">{{ nota }}</span>
+                                            {% set corr_col = s.correctores_todas.get(eval.id_evaluacion, '') %}
+                                            {% if corr_col %}
+                                            <span class="nota-by">por {{ corr_col }}</span>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span class="nota-vacia">—</span>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                                <td class="td-final">
+                                    {% if s.promedio_final %}
+                                        <span class="nota-final {% if s.promedio_final|float >= 4 %}nota-cell--ok{% else %}nota-cell--mal{% endif %}">
+                                            {{ s.promedio_final }}
+                                        </span>
+                                    {% else %}
+                                        <span class="nota-vacia">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
     </div>
     <div
       id="tab-ads"
@@ -166,5 +363,16 @@
   </div>
 </section>
 
+<dialog id="delete-modal" class="confirm-modal">
+    <div class="modal-inner">
+        <h3 class="modal-title">⚠️ Confirmar eliminación</h3>
+        <p class="modal-body" id="modal-msg">¿Estás seguro de que querés eliminar esta evaluación?</p>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="document.getElementById('delete-modal').close()">Cancelar</button>
+            <button class="btn-modal-confirm" id="modal-confirm-btn">Sí, eliminar</button>
+        </div>
+    </div>
+</dialog>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/course_detail.js') }}"></script>
 {% endblock %}
