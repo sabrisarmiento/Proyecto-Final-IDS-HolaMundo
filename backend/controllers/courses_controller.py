@@ -42,7 +42,7 @@ def get_all_courses(filters):
 def get_course_id(id_course):
     try:
         sql = """
-            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio 
+            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio,  c.slack_url, c.youtube_url
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
             WHERE c.id_curso = %s

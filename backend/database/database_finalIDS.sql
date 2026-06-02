@@ -35,6 +35,8 @@ CREATE TABLE cursos (
     cuatrimestre VARCHAR(20) NOT NULL,
     anio INT NOT NULL,
     id_profesor INT,
+    slack_url VARCHAR(500),
+    youtube_url VARCHAR (500),
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 );
@@ -111,10 +113,12 @@ CREATE TABLE asistencia (
 CREATE TABLE avisos (
     id_aviso INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
+    id_curso INT NOT NULL,
     titulo VARCHAR(100) NOT NULL,
     mensaje TEXT NOT NULL,
     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
 );
 
 -- evaluaciones --
