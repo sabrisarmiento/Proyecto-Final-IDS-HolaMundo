@@ -15,11 +15,12 @@
   --color-12:#92140C;
   --color-13: #FFE4C5;
   --color-14:#111D4A;
-  --color-15:#0e0e0e;
+  --color-15:#1E1E24;
+  --color-16:rgba(146, 20, 12, 0.12);
 }
 
 [data-theme="dark"] {
-  --color-3:rgb(63, 56, 76);
+  --color-3:#4f465f;
   --color-5: #3f384c;
   --color-45: #1d1d21;
   --color-65: #3f384c;
@@ -33,6 +34,7 @@
   --color-13: #ffffff;
   --color-14:#837dbc;
   --color-15:#ffffff;
+  --color-16:#18151d;
   border-color: #262628;
 
 }
