@@ -14,13 +14,17 @@ document.addEventListener("click", function(event){
 })
 
 //dropdown
-function toggleDropdown() {
-  document.getElementById("dropdown-menu").classList.toggle("active")
+function toggleDropdown(id) {
+  document.getElementById(id).classList.toggle("active")
 }
 
 document.addEventListener("click", function(event){
-  const dropdown = document.querySelector(".dropdown")
-  if (dropdown && !dropdown.contains(event.target)) {
-    document.getElementById("dropdown-menu").classList.remove("active")
-  }
-})
+  document.querySelectorAll(".dropdown").forEach(dropdown => {
+    if (!dropdown.contains(event.target)) {
+      const menu=dropdown.querySelector(".dropdown-menu")
+      if (menu) {
+        menu.classList.remove("active");
+      }
+    }
+  });
+});
