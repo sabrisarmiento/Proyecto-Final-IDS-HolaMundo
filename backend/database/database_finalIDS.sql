@@ -36,12 +36,8 @@ CREATE TABLE cursos (
     id_profesor INT,
     cuatrimestre VARCHAR(20) NOT NULL,
     anio INT NOT NULL,
-<<<<<<< HEAD
-    id_profesor INT,
     slack_url VARCHAR(500),
     youtube_url VARCHAR (500),
-=======
->>>>>>> origin/develop
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 );
