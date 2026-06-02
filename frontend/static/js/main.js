@@ -24,3 +24,10 @@ document.addEventListener("click", function(event){
     document.getElementById("dropdown-menu").classList.remove("active")
   }
 })
+
+function changeCourse(id) {
+  if (id) {
+    const currentPage = encodeURIComponent(window.location.pathname);
+    window.location.href = "/set-course/" + id + "?next=" + currentPage;
+  }
+}

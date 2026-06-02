@@ -1,6 +1,7 @@
 :root {
   --color-1: #1E1E24;
   --color-2: #581918;
+  --color-25: #6f2826;
   --color-3: #92140C;
   --color-4: #C9867E;
   --color-45: #ffffff;
@@ -29,32 +30,35 @@ body {
 }
 
 .header-private {
-display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 1rem 2rem;
-background: var(--color-45);
-border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: var(--color-45);
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .header-private-logo {
-font-size: 1.25rem;
-font-weight: 700;
-color: var(--color-9);
-text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-9);
+  text-decoration: none;
 }
 
 .header-private-nav {
-display: flex;
-gap: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
 }
 
 .header-private-nav a {
-color: var(--color-8);
-text-decoration: none;
-font-weight: 500;
-padding: 0.5rem 0.75rem;
-border-radius: 0.5rem;
+  color: var(--color-8);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
 }
 
 .header-private-nav a:hover {
