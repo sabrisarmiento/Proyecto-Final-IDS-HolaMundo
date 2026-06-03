@@ -25,8 +25,8 @@
         class="{% if active_page == 'calendar' %}is-active{% endif %}">Cronograma</a>
       <div class="course-dropdown">
         <select id="courseSelect" onchange="changeCourse(this.value)">
-          <option value="" disabled {% if not selected_course %}selected{% endif %}>
-            Elegir cátedra
+          <option value="general" {% if not selected_course %}selected{% endif %}>
+              General
           </option>
           {% for c in cursos %}
             <option value="{{ c.id_curso }}"

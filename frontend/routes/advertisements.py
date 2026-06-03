@@ -7,7 +7,7 @@ advertisements_bp = Blueprint('advertisements', __name__)
 @advertisements_bp.route('/avisos')
 def public_advertisements():
 
-    id_curso = session.get("selected_course", 1)
+    id_curso = session.get("selected_course")
 
     avisos = AdvertisementFrontendService.get_all(id_curso)
 

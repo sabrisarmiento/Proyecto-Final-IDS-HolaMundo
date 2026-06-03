@@ -7,7 +7,7 @@ calendar_bp = Blueprint('calendar', __name__)
 @calendar_bp.route('/cronograma', methods=['GET'])
 def calendar():
 
-    id_curso = session.get("selected_course", 1)
+    id_curso = session.get("selected_course")
 
     clases_api = CalendarFrontendService.get_all(id_curso)
 

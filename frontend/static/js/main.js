@@ -33,8 +33,12 @@ document.addEventListener("click", function(event) {
 });
 
 function changeCourse(id) {
-  if (id) {
-    const currentPage = encodeURIComponent(window.location.pathname);
-    window.location.href = "/set-course/" + id + "?next=" + currentPage;
-  }
+    const next = encodeURIComponent(window.location.pathname);
+    if (id === "general") {
+        window.location.href =
+            "/set-course/general?next=" + next;
+    } else {
+        window.location.href =
+            "/set-course/" + id + "?next=" + next;
+    }
 }
