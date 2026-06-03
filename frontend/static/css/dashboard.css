@@ -339,3 +339,9 @@ table td {
 .qr-form .btn-primary:hover {
     opacity: 0.9;
 }
+
+.header-private-dropdowns {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}

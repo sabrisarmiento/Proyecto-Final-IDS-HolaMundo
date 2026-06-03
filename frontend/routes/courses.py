@@ -28,6 +28,17 @@ def set_course(course_id):
 
     return redirect('/')
 
+@courses_bp.route('/set-course/general')
+def set_general():
+    session.pop('selected_course', None)
+
+    next_page = request.args.get('next')
+
+    if next_page:
+        return redirect(next_page)
+
+    return redirect('/')
+
 # DETALLE DE CURSO
 
 @courses_bp.route('/cursos/<int:course_id>', methods=['GET', 'POST'])

@@ -9,51 +9,43 @@ def landing():
     print("SESION INICIADA", session.get('user'))
     print("TODO SESSION", session)
 
-    try:
-        response = requests.get('http://127.0.0.1:5000/advertisements')
-        data = response.json()
-
-        advertisements = data.get("advertisements") or data.get("data") or []
-        advertisements = advertisements[-3:][::-1]
-
-    except Exception as e:
-        print("ERROR advertisements:", e)
-        advertisements = []
-
-    id_curso = session.get("selected_course", 1)
+    id_curso = session.get("selected_course")
 
     # Avisos
-    try:
-        response = requests.get("http://127.0.0.1:5000/advertisements", params={"id_curso": id_curso})
-        data = response.json()
-        advertisements = data.get("advertisements") or data.get("data") or []
-        advertisements = advertisements[-3:][::-1]
-    except Exception as e:
-        print("ERROR AVISOS:", e)
+    if id_curso:
+        try:
+            response = requests.get("http://127.0.0.1:5000/advertisements", params={"id_curso": id_curso})
+            data = response.json()
+            advertisements = data.get("advertisements") or []
+            advertisements = advertisements[-3:][::-1]
+        except Exception as e:
+            print("ERROR AVISOS:", e)
+            advertisements = []
+    else:
         advertisements = []
 
     # Clases
-    try:
-        response = requests.get(
-            "http://127.0.0.1:5000/clases",
-            params={"id_curso": id_curso}
-        )
-
-        data = response.json()
-        clases = data.get("classes", [])
-
-    except Exception as e:
-        print("ERROR CLASES:", e)
+    if id_curso:
+        try:
+            response = requests.get("http://127.0.0.1:5000/clases", params={"id_curso": id_curso})
+            data = response.json()
+            clases = data.get("classes", [])
+        except Exception as e:
+            print("ERROR CLASES:", e)
+            clases = []
+    else:
         clases = []
 
     # Curso seleccionado
-    try:
-        curso = CourseFrontendService.get_by_id(id_curso)
-    except Exception as e:
-        print("ERROR CURSO:", e)
+    if id_curso:
+        try:
+            curso = CourseFrontendService.get_by_id(id_curso)
+        except Exception as e:
+            print("ERROR CURSO:", e)
+            curso = {}
+    else:
         curso = {}
 
-    # Todos los cursos (para el dropdown)
     try:
         cursos = CourseFrontendService.get_all()
     except Exception as e:
