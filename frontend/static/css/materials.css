@@ -206,8 +206,8 @@
 .material-empty {
     text-align: center;
     padding: 5rem;
-    background-color: var(--color-45);
-    border: 2px dashed var(--color-3);
+    background-color: var(--color-11);
+    border: 2px dashed var(--color-12);
     border-radius: 20px;
     color: var(--color-85);
 }
@@ -221,7 +221,7 @@
 .btn-drive {
     display: inline-block;
     margin-top: 1.5rem;
-    color: var(--color-3);
+    color: var(--color-12);
     text-decoration: underline;
     font-weight: 700;
 }
