@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, request
 #from services.advertisement_frontend_service import AdvertisementFrontendService
-from services.course_frontend_service import CourseFrontendService
+from services.course_frontend_service import course_get_all
 #from services.slack_advertisement_frontend_service import SlackAdvertisementFrontendService
 from services.advertisement_frontend_service import get_all_combined_advertisements
 from services.courses_service import get_courses
@@ -13,6 +13,7 @@ def public_advertisements():
     id_subject = request.args.get("subject")
     avisos = []
     cursos = []
+    cursos_by_subject = []
     subjects = []
 
     if id_subject:
@@ -49,7 +50,7 @@ def public_advertisements():
 
 #     avisos = SlackAdvertisementFrontendService.get_all()
 
-#     cursos = CourseFrontendService.get_all()
+#     cursos = course_get_all()
 
 #     return render_template(
 #         "advertisements.html",
