@@ -1,10 +1,22 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session
 from services.advertisement_frontend_service import AdvertisementFrontendService
-import requests 
+from services.course_frontend_service import CourseFrontendService
 
 advertisements_bp = Blueprint('advertisements', __name__)
 
 @advertisements_bp.route('/avisos')
 def public_advertisements():
-    avisos = AdvertisementFrontendService.get_all()
-    return render_template("advertisements.html", avisos=avisos, active_page='advertisements')
+
+    id_curso = session.get("selected_course", 1)
+
+    avisos = AdvertisementFrontendService.get_all(id_curso)
+
+    cursos = CourseFrontendService.get_all()
+
+    return render_template(
+        "advertisements.html",
+        avisos=avisos,
+        cursos=cursos,
+        selected_course=id_curso,
+        active_page="advertisements"
+    )

@@ -3,6 +3,7 @@ from database.db import query_db, modify_db
 def get_all_advertisements(filters):
   try:
     id_user = filters.get("id_usuario")
+    id_course = filters.get("id_curso")
     title = filters.get("titulo")
     date = filters.get("fecha")
 
@@ -10,6 +11,7 @@ def get_all_advertisements(filters):
       SELECT
         a.id_aviso,
         a.id_usuario,
+        a.id_curso,
         a.titulo,
         a.mensaje,
         a.fecha,
@@ -23,6 +25,10 @@ def get_all_advertisements(filters):
     if id_user:
       condition += " AND a.id_usuario = %s"
       params.append(int(id_user))
+
+    if id_course:
+      condition += " AND a.id_curso = %s"
+      params.append(int(id_course))
 
     if title is not None:
       condition += " AND titulo = %s"

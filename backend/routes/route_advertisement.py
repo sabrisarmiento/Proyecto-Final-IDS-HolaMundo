@@ -14,6 +14,7 @@ advertisements_bp = Blueprint('advertisements', __name__)
 def get_advertisements():
   filters = {
     "id_usuario": request.args.get('id_usuario'),
+    "id_curso": request.args.get('id_curso'),
     "titulo": request.args.get('titulo'),
     "fecha": request.args.get('fecha'),
   }

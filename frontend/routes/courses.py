@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+
 import requests
  
 courses_bp = Blueprint('courses', __name__)
@@ -15,7 +16,19 @@ def courses():
     courses = []
   return render_template('courses.html', courses=courses, active_page='courses')
 
-#Detalle del curso
+@courses_bp.route('/set-course/<int:course_id>')
+def set_course(course_id):
+
+    session['selected_course'] = course_id
+
+    next_page = request.args.get('next')
+
+    if next_page:
+        return redirect(next_page)
+
+    return redirect('/')
+
+# DETALLE DE CURSO
 
 @courses_bp.route('/cursos/<int:course_id>', methods=['GET', 'POST'])
 def course_detail(course_id):
