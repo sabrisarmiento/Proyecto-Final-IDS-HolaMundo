@@ -1,0 +1,11 @@
+.attendance {
+    padding: 2rem;
+}
+
+.attendance h2{
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--color-9);
+    text-align: center;
+}
