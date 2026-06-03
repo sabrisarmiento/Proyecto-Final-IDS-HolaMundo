@@ -87,15 +87,16 @@ def get_advertisement_by_id(id_advertisement):
 def create_advertisement(data):
   try:
     id_user = data.get("id_usuario")
+    id_course = data.get("id_curso")
     title = data.get("titulo")
     message = data.get("mensaje")
-    date = data.get("fecha")
 
     sql = """
-      INSERT INTO avisos (id_usuario, titulo, mensaje)
-      VALUES (%s, %s, %s)
+      INSERT INTO avisos (id_usuario, id_curso, titulo, mensaje)
+      VALUES (%s, %s, %s, %s)
     """
-    modify_db(sql, (id_user, title, message))
+    modify_db(sql, (id_user, id_course, title, message))
+
     return {
       "ok": True,
       "data": "aviso creado correctamente"

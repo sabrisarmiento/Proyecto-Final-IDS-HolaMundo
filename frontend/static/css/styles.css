@@ -133,3 +133,10 @@ body {
   background-color: var(--color-2);
   color: var(--color-13);
 }
+
+.config-box{
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+}

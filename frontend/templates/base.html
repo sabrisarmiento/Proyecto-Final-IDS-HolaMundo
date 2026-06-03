@@ -12,55 +12,67 @@
   
 </head>
 <body>
+  {% from "components/dropdown.html" import dropdown_settings %}
+  {% from "components/modal.html" import modal %}
+
   <header class="header-private">
-    <a href="{{ url_for('landing.landing') }}" class="header-private-logo">Panel FIUBA</a>
+    <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+    class="header-private-logo">
+    Panel FIUBA
+</a>
+
     <nav class="header-private-nav">
-      <a href="{{ url_for('landing.landing') }}"
-        class="{% if active_page == 'landing' %}is-active{% endif %}">Inicio</a>
-      <a href="{{ url_for('materials.public_materials') }} "
-        class="{% if active_page == 'materials' %}is-active{% endif %}">Materiales</a>
-      <a href="{{ url_for('advertisements.public_advertisements') }}"
-        class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
-      <a href="{{ url_for('calendar.calendar') }}"
-        class="{% if active_page == 'calendar' %}is-active{% endif %}">Cronograma</a>
-      <div class="course-dropdown">
-        <select id="courseSelect" onchange="changeCourse(this.value)">
-          <option value="general" {% if not selected_course %}selected{% endif %}>
-              General
-          </option>
-          {% for c in cursos %}
-            <option value="{{ c.id_curso }}"
-              {% if c.id_curso == selected_course %}selected{% endif %}>
-              {{ c.catedra }}
-            </option>
-          {% endfor %}
-        </select>
+  <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+    class="{% if active_page == 'landing' %}is-active{% endif %}">Inicio</a>
+
+  <a href="{{ url_for('materials.public_materials') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+    class="{% if active_page == 'materials' %}is-active{% endif %}">Materiales</a>
+
+  <a href="{{ url_for('advertisements.public_advertisements') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+    class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
+
+  <a href="{{ url_for('calendar.calendar') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+    class="{% if active_page == 'calendar' %}is-active{% endif %}">Cronograma</a>
+
+  {% if session.get('user') %}
+    <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+  {% endif %}
+
+  <div class="subject-select-container">
+    <select id="subject-select" onchange="changeSubject(this.value)">
+      <option value="general" {% if not selected_subject %}selected{% endif %}>
+        General
+      </option>
+      {% for s in subjects %}
+        <option value="{{ s.id_materia }}"
+          {% if s.id_materia == selected_subject %}selected{% endif %}>
+          {{ s.nombre }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+</nav>
+
+    <div class="config-box">
+      <div class="header-private-actions">
+        {{ dropdown_settings() }}
       </div>
       {% if session.get('user') %}
-        <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+        <p>Bienvenido, {{ session['user']['nombre'] }}</p>
+      {% else %}
+        <button type="button" class="btn-primary" onclick="openModal('login-modal')">
+          Iniciar Sesion
+        </button>
+  
+        {% call modal("login-modal", "iniciar Sesion") %}
+          <form action="{{ url_for("login.login") }}" method="POST">
+            <input type="email" name="correo" placeholder="Ingresar correo ..." required>
+            <input type="password" name="contraseña" placeholder="Ingresar contraseña ...">
+            <button type="submit">Iniciar Sesion</button>
+          </form>
+        {% endcall %}
       {% endif %}
-
-    </nav>
-    {% from "components/dropdown.html" import dropdown_settings %}
-    <div class="header-private-actions">
-      {{ dropdown_settings() }}
     </div>
-    {% if session.get('user') %}
-      <p>Bienvenido, {{ session['user']['nombre'] }}</p>
-    {% else %}
-      {% from "components/modal.html" import modal %}
-      <button type="button" class="btn-primary" onclick="openModal('login-modal')">
-        Iniciar Sesion
-      </button>
-
-      {% call modal("login-modal", "iniciar Sesion") %}
-        <form action="{{ url_for("login.login") }}" method="POST">
-          <input type="email" name="correo" placeholder="Ingresar correo ..." required>
-          <input type="password" name="contraseña" placeholder="Ingresar contraseña ...">
-          <button type="submit">Iniciar Sesion</button>
-        </form>
-      {% endcall %}
-    {% endif %}
 
   </header>
   <main class="main-private">

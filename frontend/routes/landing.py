@@ -1,63 +1,70 @@
-from flask import Blueprint, render_template, session
-from services.course_frontend_service import CourseFrontendService
+from flask import Blueprint, render_template, session, request
+from services.subjects_service import get_subjects, get_subject_by_id
+from services.courses_service import get_courses
 import requests
 
 landing_bp = Blueprint('landing', __name__)
 
 @landing_bp.route('/', methods=["GET"])
 def landing():
-    print("SESION INICIADA", session.get('user'))
-    print("TODO SESSION", session)
+    print("DATOS DE LA SESSION de Flask")
+    print(session)
 
-    id_curso = session.get("selected_course")
+    id_subject = request.args.get("subject")
+    selected_subject = int(id_subject) if id_subject else None
 
-    # Avisos
-    if id_curso:
+    advertisements = []
+    clases = []
+    cursos = []
+    subject = {}
+
+    if id_subject:
         try:
-            response = requests.get("http://127.0.0.1:5000/advertisements", params={"id_curso": id_curso})
-            data = response.json()
-            advertisements = data.get("advertisements") or []
-            advertisements = advertisements[-3:][::-1]
-        except Exception as e:
-            print("ERROR AVISOS:", e)
-            advertisements = []
-    else:
-        advertisements = []
+            all_courses = get_courses()
+            resp = get_subject_by_id(id_subject)
+            subject = resp.get("subject", {})   # 👈 desanidás acá
+            print("SUBJECT:", subject)
 
-    # Clases
-    if id_curso:
-        try:
-            response = requests.get("http://127.0.0.1:5000/clases", params={"id_curso": id_curso})
-            data = response.json()
-            clases = data.get("classes", [])
-        except Exception as e:
-            print("ERROR CLASES:", e)
-            clases = []
-    else:
-        clases = []
+            courses_by_subject = [c for c in all_courses if c.get("materia") == subject.get("nombre")]
+            cursos = courses_by_subject
 
-    # Curso seleccionado
-    if id_curso:
-        try:
-            curso = CourseFrontendService.get_by_id(id_curso)
+            for c in courses_by_subject:
+                id_course = c.get("id_curso")
+
+                try:
+                    resp_adv = requests.get("http://127.0.0.1:5000/advertisements", params={"id_curso": id_course}).json()
+                    advertisements.extend(resp_adv.get("advertisements", []))
+                except Exception as e:
+                    print(f"Error en obtener anuncion de los cursos: {e}")
+
+                try:
+                    resp_clases = requests.get("http://127.0.0.1:5000/classes", params={"id_curso": id_course}).json()
+                    clases.extend(resp_clases.get("classes", []))
+                except Exception as e:
+                    print(f"Error en obtener clases de los cursos: {e}")
         except Exception as e:
-            print("ERROR CURSO:", e)
-            curso = {}
-    else:
-        curso = {}
+            print(f"Error en obtener cursos por materia: {e}")
+        try:
+            subject = get_subject_by_id(id_subject)
+        except Exception as e:
+            print(f"Error en obtener materia: {e}")
+            subject = {}
 
     try:
-        cursos = CourseFrontendService.get_all()
+        subjects = get_subjects()
     except Exception as e:
-        print("ERROR CURSOS:", e)
-        cursos = []
+        print(f"Error en obtener materia: {e}")
+        subjects = []
+
+    print("CURSOS:" , cursos)
 
     return render_template(
         "index.html",
         avisos=advertisements,
         clases=clases,
-        curso=curso,
+        subject=subject,
+        subjects=subjects,
         cursos=cursos,
         active_page="landing",
-        selected_course=id_curso
+        selected_subject=selected_subject
     )

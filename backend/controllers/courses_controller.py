@@ -7,7 +7,14 @@ def get_all_courses(filters):
         year = filters.get('anio')
 
         sql = """
-            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio 
+            SELECT 
+                c.id_curso,
+                m.nombre AS materia,
+                c.catedra,
+                c.cuatrimestre,
+                c.anio,
+                c.slack_url,
+                c.youtube_url
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
         """
