@@ -42,11 +42,15 @@
           >Asistencia</a
         >
       </nav>
+
       {% from "components/dropdown.html" import dropdown_settings %}
       <div class="header-private-dropdowns">
-        {{ dropdown_settings() }} {% from "components/dropdown.html" import
-        dropdown_profile %} {% if session.get('user') %} {{
-        dropdown_profile(session.get('user')) }} {% endif %}
+      {{ dropdown_settings() }}
+      {% from "components/dropdown.html" import dropdown_profile %}
+      {% if session.get('user') %}
+        {{ dropdown_profile(session.get('user')) }}
+      {% endif %}
+      {% include "profile.html" %}
       </div>
     </header>
     <main class="main-private">{% block content %}{% endblock %}</main>

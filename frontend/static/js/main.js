@@ -1,15 +1,17 @@
 //modal
 function openModal(id) {
   document.getElementById(id).classList.add("active");
+  document.body.style.overflow = "hidden";
 }
 
 function closeModal(id) {
   document.getElementById(id).classList.remove("active");
+  document.body.style.overflow = "";
 }
 
 document.addEventListener("click", function (event) {
   if (event.target.classList.contains("modal-container")) {
-    event.target.classList.remove("active");
+    closeModal(event.target.id);
   }
 });
 

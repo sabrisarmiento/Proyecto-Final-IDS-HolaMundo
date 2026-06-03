@@ -6,6 +6,8 @@ from helpers.responses import error_response, success_response
 
 #def register_service(data):
 #   result = register_user(data)
+
+#    if not result["ok"]:
 #      return error_response(result)
 
 #    return success_response({

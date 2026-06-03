@@ -191,14 +191,19 @@ def update_user_by_id(id_user, data):
     """
     params.append(int(id_user))
 
-    modify_row = modify_db(sql, params)
-    if modify_row == 0:
+    exists = query_db(
+      "SELECT id_usuario FROM usuarios WHERE id_usuario = %s",
+      (int(id_user),)
+    )
+    if not exists:
       return {
         "ok": False,
         "code": 404,
         "message": "Not Found",
         "description": f"No existe un usuario con ID {id_user} para actualizar"
       }
+
+    modify_db(sql, params)
     return {
       "ok": True,
       "message": "Usuario actualizado con exito",
