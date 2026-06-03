@@ -13,7 +13,8 @@ classes_bp = Blueprint('classes', __name__)
 @classes_bp.route('/clases', methods=['GET'])
 def get_classes_route():
     filters = {
-        "date": request.args.get("fecha")
+        "fecha": request.args.get("fecha"),
+        "id_curso": request.args.get("id_curso")
     }
     return class_service(filters)
   
