@@ -123,7 +123,7 @@ def dashboard():
     
     Ayudantes = [
         {"nombre": "Leonel",
-        "apellido": "chaves",
+        "apellido": "Chaves",
         "correo": "leonel@fiuba.com"},
         {"nombre": "Tomás",
         "apellido": "Rodríguez",
