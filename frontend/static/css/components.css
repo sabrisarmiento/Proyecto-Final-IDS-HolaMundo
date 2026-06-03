@@ -210,8 +210,27 @@
 }
 
 /* ── Cambio de contraseña ── */
-.is-hidden {
-  display: none;
+.profile-window {
+  overflow: hidden;
+  transition: height 0.3s ease;
+}
+
+.profile-track {
+  display: flex;
+  align-items: flex-start;
+  width: 200%;
+  transition: transform 0.3s ease;
+}
+
+.profile-track.show-password {
+  transform: translateX(-50%);
+}
+
+.profile-pane {
+  width: 50%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0 4px;
 }
 
 .link-button {

@@ -1,23 +1,59 @@
-// Cambio entre la vista de perfil y la de cambiar contraseña dentro del modal.
-function showPasswordView() {
-  const modal = document.getElementById('profile-modal');
-  modal.querySelector('#perfil-view').classList.add('is-hidden');
-  modal.querySelector('#password-view').classList.remove('is-hidden');
-  modal.querySelector('h3').textContent = 'Cambiar mi contraseña';
-}
-
-function showProfileView() {
-  const modal = document.getElementById('profile-modal');
-  modal.querySelector('#password-view').classList.add('is-hidden');
-  modal.querySelector('#perfil-view').classList.remove('is-hidden');
-  modal.querySelector('h3').textContent = 'Mi Perfil';
-  if (window.resetPasswordForm) window.resetPasswordForm();
-}
-
 document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('password-form');
-  if (!form) return;
+  const modal = document.getElementById('profile-modal');
+  if (!modal) return;
 
+  // ── Cambio de vista (slide lateral + altura animada) ──────────────────
+  const track = modal.querySelector('.profile-track');
+  const windowEl = modal.querySelector('.profile-window');
+  const perfilPane = document.getElementById('perfil-view');
+  const passwordPane = document.getElementById('password-view');
+  const title = modal.querySelector('h3');
+  let activePane = perfilPane;
+
+  function syncHeight() {
+    windowEl.style.height = activePane.scrollHeight + 'px';
+  }
+
+  // La altura sigue al panel activo (se reajusta si aparece un mensaje, etc.)
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(syncHeight);
+    ro.observe(perfilPane);
+    ro.observe(passwordPane);
+  }
+  syncHeight();
+
+  window.showPasswordView = function () {
+    track.classList.add('show-password');
+    title.textContent = 'Cambiar mi contraseña';
+    activePane = passwordPane;
+    syncHeight();
+  };
+
+  window.showProfileView = function () {
+    track.classList.remove('show-password');
+    title.textContent = 'Mi Perfil';
+    activePane = perfilPane;
+    if (window.resetPasswordForm) window.resetPasswordForm();
+    syncHeight();
+  };
+
+  // ── "Guardar cambios" solo se habilita si hay cambios ─────────────────
+  const perfilSubmit = document.getElementById('perfil-submit');
+  const nombre = document.getElementById('perfil-nombre');
+  const correo = document.getElementById('perfil-correo');
+
+  function checkProfileDirty() {
+    const dirty = nombre.value !== nombre.defaultValue || correo.value !== correo.defaultValue;
+    const valid = nombre.value.trim() !== '' && correo.value.trim() !== '';
+    perfilSubmit.disabled = !(dirty && valid);
+  }
+  [nombre, correo].forEach(function (input) {
+    input.addEventListener('input', checkProfileDirty);
+  });
+  checkProfileDirty();
+
+  // ── Form de cambio de contraseña ──────────────────────────────────────
+  const form = document.getElementById('password-form');
   const current = document.getElementById('pw-current');
   const newPw = document.getElementById('pw-new');
   const confirm = document.getElementById('pw-confirm');
@@ -104,33 +140,26 @@ document.addEventListener('DOMContentLoaded', function () {
     message.hidden = true;
     validate();
   };
-});
 
-// Tras guardar el perfil (?perfil=...): reabrir el modal, limpiar la URL y
-// auto-descartar el mensaje a los 3s o al cerrar el modal.
-document.addEventListener('DOMContentLoaded', function () {
-  if (!new URLSearchParams(window.location.search).has('perfil')) return;
+  // ── Tras guardar el perfil (?perfil=...): reabrir el modal, limpiar la URL
+  //    y auto-descartar el mensaje a los 3s o al cerrar el modal ───────────
+  if (new URLSearchParams(window.location.search).has('perfil')) {
+    openModal('profile-modal');
+    history.replaceState(null, '', window.location.pathname);
 
-  const modalEl = document.getElementById('profile-modal');
-  if (!modalEl) return;
-
-  openModal('profile-modal');
-  history.replaceState(null, '', window.location.pathname);
-
-  const msg = modalEl.querySelector('.form-message');
-  if (!msg) return;
-
-  let timer;
-  function dismiss() {
-    msg.remove();
-    clearTimeout(timer);
-    observer.disconnect();
+    const msg = perfilPane.querySelector('.form-message');
+    if (msg) {
+      let timer;
+      function dismiss() {
+        msg.remove();
+        clearTimeout(timer);
+        observer.disconnect();
+      }
+      const observer = new MutationObserver(function () {
+        if (!modal.classList.contains('active')) dismiss();
+      });
+      timer = setTimeout(dismiss, 3000);
+      observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    }
   }
-
-  const observer = new MutationObserver(function () {
-    if (!modalEl.classList.contains('active')) dismiss();
-  });
-
-  timer = setTimeout(dismiss, 3000);
-  observer.observe(modalEl, { attributes: true, attributeFilter: ['class'] });
 });
