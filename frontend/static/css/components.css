@@ -227,18 +227,21 @@
 
 /* ── Header private actions (from develop) ── */
 
+.header-private-dropdowns {
+  display: flex;
+  align-items: center;
+}
+
+
 .header-private-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-left: auto;
 }
 
 .settings-btn {
   background: transparent;
   border: none;
   cursor: pointer;
-  margin-right: 1rem;
   font-size: 1.5rem;
   color: var(--color-2);
 }

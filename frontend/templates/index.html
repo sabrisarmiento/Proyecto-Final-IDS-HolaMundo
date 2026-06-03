@@ -1,64 +1,61 @@
-{% extends "base.html" %}
-
-{% block title %}Panel FIUBA - Inicio{% endblock %}
-{% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Panel FIUBA - Inicio{% endblock %} {%
+block extra_styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/landing.css') }}"
+/>
+{% endblock %} {% block content %}
 
 <section class="hero">
-  <h2>Introducción al Desarrollo de Software</h2>
-  <p> FIUBA{% if curso and curso.catedra %} - {{ curso.catedra }}{% endif %} </p>
+  <h2>
+    {% if subject.subject and subject.subject.nombre %} {{
+    subject.subject.nombre }} {% else %} Panel FIUBA {% endif %}
+  </h2>
+  <p>
+    FIUBA{% if subjects and subject.nombre %} - {{ subject.nombre }}{% endif %}
+  </p>
 </section>
 
-{% if curso.slack_url %}
-<a href="{{ curso.slack_url }}"
-   target="_blank"
-   class="slack-banner">
+{% if cursos and cursos[0].slack_url %}
+<a href="{{ cursos[0].slack_url }}" target="_blank" class="slack-banner">
   <div class="slack-left">
-      <i class="fa-brands fa-slack"></i>
-      <div>
-          <h3>Únete a nuestro Slack</h3>
-          <p>Consultá con tus profesores y enterate de novedades</p>
-      </div>
+    <i class="fa-brands fa-slack"></i>
+    <div>
+      <h3>Únete a nuestro Slack</h3>
+      <p>Consultá con tus profesores y enterate de novedades</p>
+    </div>
   </div>
 </a>
 {% endif %}
 
 <section class="info-panel">
   {% if clases %}
-  <div class="info-panel-classes {% if not curso.youtube_url %}full-width{% endif %}">
+  <div
+    class="info-panel-classes {% if not courses[0].youtube_url %}full-width{% endif %}"
+  >
     <h3 class="week-title">
       <i class="fa-solid fa-calendar-days"></i>
-        Semana {{ clases[0].semana }}
+      Semana {{ clases[0].semana }}
     </h3>
     <div class="classes-container">
       <div class="classes-list">
         {% for clase in clases[:2] %}
-          <article class="class-row">
-            <div class="class-number">
-              Clase {{ clase.semana }}
-            </div>
-            <div class="class-info">
+        <article class="class-row">
+          <div class="class-number">Clase {{ clase.semana }}</div>
+          <div class="class-info">
             <h4>{{ clase.temas }}</h4>
-              <p>
-                {% if clase.modalidad == "Virtual" %}
-                  💻 Virtual
-                {% else %}
-                  📍 Presencial
-                {% endif %}
-              </p>
-            </div>
-          </article>
+            <p>
+              {% if clase.modalidad == "Virtual" %} 💻 Virtual {% else %} 📍
+              Presencial {% endif %}
+            </p>
+          </div>
+        </article>
         {% endfor %}
-      </div> 
+      </div>
       <button type="button">Ver el Calendario</button>
     </div>
   </div>
-  {% endif %} 
-
-  {% if curso.youtube_url %}
+  {% endif %} {% if cursos and cursos[0].youtube_url %}
   <div class="youtube-panel {% if not clases %}full-width{% endif %}">
     <div class="youtube-card">
       <div class="youtube-icon">
@@ -66,17 +63,14 @@
       </div>
       <div class="youtube-content">
         <h3>Canal Oficial de YouTube</h3>
-        <p>
-          Accedé a clases grabadas.
-        </p>
-        <p>
-          Podrás mantenerte al día y no perderte ninguna consulta en vivo.
-        </p>
+        <p>Accedé a clases grabadas.</p>
+        <p>Podrás mantenerte al día y no perderte ninguna consulta en vivo.</p>
         <a
-          href="{{ curso.youtube_url }}"
+          href="{{ cursos[0].youtube_url }}"
           class="youtube-btn"
           target="_blank"
-          rel="noopener noreferrer">
+          rel="noopener noreferrer"
+        >
           Ir al canal
         </a>
       </div>
@@ -133,7 +127,7 @@
 
 <section class="teachers-section">
   <h2>Equipo Docente</h2>
-<!-- hasta que no esten bien definidos roles se mantiene fija esta sección-->
+  <!-- hasta que no esten bien definidos roles se mantiene fija esta sección-->
   <div class="teachers-grid">
     <div class="teacher-card">
       <div class="teacher-avatar">
@@ -144,7 +138,7 @@
     </div>
     <div class="teacher-card">
       <div class="teacher-avatar">
- <!-- <i class="fa-solid fa-user-graduate"></i>  una Mousekeherramienta que servira mas tarde-->       
+        <!-- <i class="fa-solid fa-user-graduate"></i>  una Mousekeherramienta que servira mas tarde-->
         <i class="fa-solid fa-user-tie"></i>
       </div>
       <h3>Tómas Rodríguez</h3>
@@ -156,16 +150,13 @@
 <button
   class="floating-announcements"
   onclick="openModal('avisos-modal')"
-  title="Ver avisos">
+  title="Ver avisos"
+>
   <i class="fa-solid fa-bullhorn"></i>
 </button>
-{% from "components/modal.html" import modal %}
-{% call modal("avisos-modal", "Últimos Avisos") %}
-  {% for aviso in avisos %}
-    <article class="modal-aviso">
-      <h4>{{ aviso.titulo }}</h4>
-    </article>
-  {% endfor %}
-{% endcall %}
-
-{% endblock %}
+{% from "components/modal.html" import modal %} {% call modal("avisos-modal",
+"Últimos Avisos") %} {% for aviso in avisos %}
+<article class="modal-aviso">
+  <h4>{{ aviso.titulo }}</h4>
+</article>
+{% endfor %} {% endcall %} {% endblock %}
