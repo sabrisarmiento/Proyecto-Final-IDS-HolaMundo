@@ -1,0 +1,59 @@
+{% from "components/modal.html" import modal %}
+{% if session.get('user') %}
+  {% set perfil = session.get('user') %}
+  {% call modal('profile-modal', 'Mi Perfil') %}
+    {% set estado = request.args.get('perfil') %}
+
+    <div id="perfil-view">
+      <form method="POST" action="{{ url_for('profile.update_profile') }}">
+        <label for="perfil-nombre">Nombre</label>
+        <input type="text" id="perfil-nombre" name="nombre" value="{{ perfil['nombre'] }}" required>
+
+        <label for="perfil-correo">Correo</label>
+        <input type="email" id="perfil-correo" name="correo" value="{{ perfil['correo'] }}" required>
+
+        <button type="submit">Guardar cambios</button>
+      </form>
+      {% if estado == 'ok' %}
+        <p class="form-message form-message-ok">Perfil actualizado correctamente.</p>
+      {% elif estado == 'error' %}
+        <p class="form-message form-message-error">No se pudo actualizar el perfil. Error interno del servidor.</p>
+      {% endif %}
+      <button type="button" class="link-button link-change" onclick="showPasswordView()">Cambiar mi contraseña</button>
+    </div>
+
+    <div id="password-view" class="is-hidden">
+      <button type="button" class="link-button link-back" onclick="showProfileView()">← Volver</button>
+      <form id="password-form">
+        <label for="pw-current">Contraseña actual</label>
+        <div class="input-eye">
+          <input type="password" id="pw-current" name="current_password" required>
+          <button type="button" class="eye-btn" data-target="pw-current" aria-label="Mostrar contraseña">👁</button>
+        </div>
+
+        <label for="pw-new">Nueva contraseña</label>
+        <div class="input-eye">
+          <input type="password" id="pw-new" name="new_password" required>
+          <button type="button" class="eye-btn" data-target="pw-new" aria-label="Mostrar contraseña">👁</button>
+        </div>
+
+        <label for="pw-confirm">Confirmar nueva contraseña</label>
+        <div class="input-eye">
+          <input type="password" id="pw-confirm" name="confirm_password" required>
+          <button type="button" class="eye-btn" data-target="pw-confirm" aria-label="Mostrar contraseña">👁</button>
+        </div>
+
+        <ul class="pw-checklist">
+          <li data-rule="length">Mínimo 8 caracteres</li>
+          <li data-rule="uppercase">Una letra mayúscula</li>
+          <li data-rule="symbol">Un símbolo</li>
+          <li data-rule="match">Las contraseñas coinciden</li>
+        </ul>
+
+        <button type="submit" id="pw-submit" disabled>Cambiar contraseña</button>
+        <p id="pw-message" class="form-message" hidden></p>
+      </form>
+    </div>
+  {% endcall %}
+  <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endif %}
