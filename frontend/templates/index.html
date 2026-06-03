@@ -7,42 +7,165 @@
 
 {% block content %}
 
-<section class="hero" >
+<section class="hero">
   <h2>Introducción al Desarrollo de Software</h2>
-  <p>FIUBA - Catedra Bruno Lanzillota</p>
+  <p> FIUBA{% if curso and curso.catedra %} - {{ curso.catedra }}{% endif %} </p>
 </section>
-<a href="https://intro-desa-software.slack.com/" class="slack-banner">
-    <h3>Únete a nuestro Slack</h3>
-    <p>Consulta con tus profesores y enterate de novedades</p>
+
+{% if curso.slack_url %}
+<a href="{{ curso.slack_url }}"
+   target="_blank"
+   class="slack-banner">
+  <div class="slack-left">
+      <i class="fa-brands fa-slack"></i>
+      <div>
+          <h3>Únete a nuestro Slack</h3>
+          <p>Consultá con tus profesores y enterate de novedades</p>
+      </div>
+  </div>
 </a>
+{% endif %}
+
 <section class="info-panel">
-  <div class="info-panel-classes" >
-    <h3>Proximas Clases</h3>
+  {% if clases %}
+  <div class="info-panel-classes {% if not curso.youtube_url %}full-width{% endif %}">
+    <h3 class="week-title">
+      <i class="fa-solid fa-calendar-days"></i>
+        Semana {{ clases[0].semana }}
+    </h3>
     <div class="classes-container">
-      <div class="classes-inner-row">
-        {% for clase in clases %}
-          <article class="class">
-            <h4>{{ clase.nombre }}</h4>
-            <p>{{ clase.tema }}</p>
-            <p>{{ clase.tipo }}</p>
+      <div class="classes-list">
+        {% for clase in clases[:2] %}
+          <article class="class-row">
+            <div class="class-number">
+              Clase {{ clase.semana }}
+            </div>
+            <div class="class-info">
+            <h4>{{ clase.temas }}</h4>
+              <p>
+                {% if clase.modalidad == "Virtual" %}
+                  💻 Virtual
+                {% else %}
+                  📍 Presencial
+                {% endif %}
+              </p>
+            </div>
           </article>
         {% endfor %}
-      </div>
-      
+      </div> 
       <button type="button">Ver el Calendario</button>
     </div>
   </div>
+  {% endif %} 
 
-  <div class="info-panel-advertisments">
-    <h3>Ultimos Avisos</h3>
-    <div class="advertisments-container">
-      {% for aviso in avisos %}
-        <article class="advertisment">
-          <h4>{{ aviso.titulo }}</h4> <p>ID: {{ aviso.id_usuario }}</p>
-        </article>
-      {% endfor %}
-      <button type="button">Ver todos los avisos</button>
+  {% if curso.youtube_url %}
+  <div class="youtube-panel {% if not clases %}full-width{% endif %}">
+    <div class="youtube-card">
+      <div class="youtube-icon">
+        <i class="fa-brands fa-youtube"></i>
+      </div>
+      <div class="youtube-content">
+        <h3>Canal Oficial de YouTube</h3>
+        <p>
+          Accedé a clases grabadas.
+        </p>
+        <p>
+          Podrás mantenerte al día y no perderte ninguna consulta en vivo.
+        </p>
+        <a
+          href="{{ curso.youtube_url }}"
+          class="youtube-btn"
+          target="_blank"
+          rel="noopener noreferrer">
+          Ir al canal
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</section>
+
+<section class="topics-section">
+  <h2>¿Qué aprenderás en la materia?</h2>
+  <div class="topics-grid">
+    <div class="topic-card">
+      <i class="fa-brands fa-linux"></i>
+      <span>Linux</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-solid fa-code"></i>
+      <span>Entorno de Programación</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-solid fa-bug"></i>
+      <span>Debugging</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-solid fa-terminal"></i>
+      <span>Terminal</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-brands fa-git-alt"></i>
+      <span>Control de Versiones</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-solid fa-file-code"></i>
+      <span>Shell Scripting</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-solid fa-diagram-project"></i>
+      <span>Ingeniería de Software</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-solid fa-globe"></i>
+      <span>Desarrollo Web</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-solid fa-database"></i>
+      <span>Bases de Datos</span>
+    </div>
+    <div class="topic-card">
+      <i class="fa-brands fa-docker"></i>
+      <span>Docker</span>
     </div>
   </div>
 </section>
+
+<section class="teachers-section">
+  <h2>Equipo Docente</h2>
+<!-- hasta que no esten bien definidos roles se mantiene fija esta sección-->
+  <div class="teachers-grid">
+    <div class="teacher-card">
+      <div class="teacher-avatar">
+        <i class="fa-solid fa-user-tie"></i>
+      </div>
+      <h3>Bruno Lanzillotta</h3>
+      <p>Profesor Titular</p>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-avatar">
+ <!-- <i class="fa-solid fa-user-graduate"></i>  una Mousekeherramienta que servira mas tarde-->       
+        <i class="fa-solid fa-user-tie"></i>
+      </div>
+      <h3>Tómas Rodríguez</h3>
+      <p>Profesor</p>
+    </div>
+  </div>
+</section>
+
+<button
+  class="floating-announcements"
+  onclick="openModal('avisos-modal')"
+  title="Ver avisos">
+  <i class="fa-solid fa-bullhorn"></i>
+</button>
+{% from "components/modal.html" import modal %}
+{% call modal("avisos-modal", "Últimos Avisos") %}
+  {% for aviso in avisos %}
+    <article class="modal-aviso">
+      <h4>{{ aviso.titulo }}</h4>
+    </article>
+  {% endfor %}
+{% endcall %}
+
 {% endblock %}

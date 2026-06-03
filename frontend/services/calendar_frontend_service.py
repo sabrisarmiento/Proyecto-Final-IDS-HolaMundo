@@ -1,13 +1,27 @@
 import requests
 
 class CalendarFrontendService:
+
     @staticmethod
-    def get_all():
+    def get_all(id_curso=None):
+
         try:
-            response = requests.get('http://localhost:5000/clases')
+
+            params = {}
+
+            if id_curso:
+                params["id_curso"] = id_curso
+
+            response = requests.get(
+                'http://localhost:5000/clases',
+                params=params
+            )
+
             if response.status_code == 200:
-                return response.json().get("classes", []) 
+                return response.json().get("classes", [])
+
             return []
+
         except Exception as e:
             print(f"Error: {e}")
             return []

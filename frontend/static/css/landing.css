@@ -1,3 +1,4 @@
+/* ===== HERO ===== */
 .hero {
   width: 100%;
   display: flex;
@@ -22,21 +23,48 @@
   font-size: 1.3rem;
 }
 
+/* ===== SLACK ===== */
+.slack-banner {
+  color: var(--color-4);
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 3rem;
+  background-color: var(--color-2);
+  transition: all 0.25s ease;
+}
+
+.slack-banner:hover {
+  color: var(--color-45);
+}
+
+.slack-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.slack-left i {
+  font-size: 3rem;
+}
+
+.slack-left h3 {
+  margin: 0;
+}
+
+.slack-left p {
+  margin: 0.3rem 0 0 0;
+}
+
+/* ===== PANEL ===== */
 .info-panel {
   width: 80dvw;
   display: flex;
   justify-content: space-between; 
-  color: white;
+  color: var(--color-45);
   padding: .5rem 0 1.5rem 0;
   margin: auto;
-}
-
-.info-panel-classes {
-  width: 65%;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .info-panel h3 {
@@ -47,54 +75,112 @@
   font-weight: 700;
 }
 
-/* --- CONTENEDOR DE CLASES Y BOTÓN --- */
+.info-panel-classes {
+  flex: 1.2;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.info-panel-classes h3 {
+  margin-left: 1rem;
+}
+
+.info-panel-classes.full-width {
+    flex: 1 1 100%;
+}
+
+.youtube-panel {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.youtube-panel.full-width {
+  flex: 1 1 100%;
+}
+
+/* ===== CLASSES ===== */
 .classes-container {
   width: 100%;
   display: flex;
-  flex-direction: column; /* Alineación vertical: clases arriba, botón abajo */
+  flex-direction: column;
   align-items: center;
   gap: 2rem;
 }
 
-/* Esta es la clave para que las clases vuelvan a estar una al lado de la otra */
-.classes-inner-row {
+.classes-list {
   width: 100%;
   display: flex;
-  flex-direction: row; /* Fuerza la fila */
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.9rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
-.class {
-  background: var(--color-6);
-  width: 120px; /* Cambiado a px para evitar que se colapsen tanto */
-  min-height: 150px;
+.class-row {
+  width: 100%;
+  min-height: 100px;
+  background: var(--color-45);
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.class-row:hover {
+  transform: translateY(-3px);
+}
+
+.class-number {
+  width: 110px;
+  background: var(--color-25);
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  padding: 1rem;
-  border-radius: 0.8rem;
+  justify-content: center;
   align-items: center;
+  border-right: 1px solid rgba(0,0,0,0.08);
+}
+
+.class-number strong {
+  font-size: 1.8rem;
   color: var(--color-9);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-  transition: transform 0.2s ease;
 }
 
-.class p {
-  text-align: center;
+.class-info {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.class-info h4 {
+  margin: 0 0 .5rem 0;
+  color: var(--color-9);
+}
+
+.class-info p {
   margin: 0;
-  font-size: 0.85rem;
+  color: var(--color-8);
+}
+  
+.week-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
 }
 
-.class h4 {
-  margin: 0;
-  font-size: 0.95rem;
+.week-title i {
+  color: var(--color-9);
 }
 
-/* --- EL BOTÓN OVALADO --- */
+/* ===== CALENDER BUTTON ===== */
 .classes-container button {
-  width: fit-content; /* Para que no ocupe todo el ancho */
+  width: fit-content;
   background: var(--color-6);
   border: none;
   padding: 0.8rem 3rem; 
@@ -112,50 +198,205 @@
   transform: translateY(-2px);
 }
 
-/* --- SECCIÓN DE AVISOS (Sin cambios) --- */
-.info-panel-advertisments {
-  width: 35%;
+/* ===== ANNOUNCEMENTS BUTTON ===== */
+.floating-announcements {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 65px;
+  height: 65px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--color-3);
+  color: var(--color-45);
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  z-index: 999;
+  transition: all 0.2s ease;
+}
+
+.floating-announcements:hover {
+  transform: scale(1.08);
+}
+
+.modal-aviso {
+  background: var(--color-6);
   padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.advertisment {
-  background-color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  width: 90%;
-  display: flex;
-  justify-content: space-between;
-  padding: 1.2rem 1.5rem;
   border-radius: 0.8rem;
-  align-items: center;
-  border-left: 4px solid var(--color-8);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.advertisment h4 {
+.modal-aviso h4 {
   margin: 0;
   color: var(--color-9);
-  font-weight: 600;
 }
 
-.info-panel-advertisments button {
-  border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 0.8rem;
-  cursor: pointer;
-  color: var(--color-9);
-  background-color: var(--color-6);
-  font-weight: 600;
+/* ===== YOUTUBE ===== */
+.youtube-section {
+  width: 80dvw;
+  margin: 1rem auto;
 }
 
-.slack-banner {
-  text-decoration: none;
-  color: white;
+.youtube-card {
+  background: var(--color-45);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+}
+
+.youtube-icon {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--color-3);
+  color: var(--color-45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.youtube-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.youtube-content h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--color-9);
+}
+
+.youtube-content p {
+  margin: 0 0 0.5rem 0;
+  color: var(--color-8);
+}
+
+.youtube-btn {
+  display: inline-block;
+  text-decoration: none;
+  background: var(--color-3);
+  color: var(--color-45);
+  padding: 0.8rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.youtube-btn:hover {
+  background: var(--color-2);
+}
+
+/* ===== TOPICS ===== */
+.topics-section {
+  width: 80dvw;
+  margin: 3rem auto;
+  text-align: center;
+}
+
+.topics-section h2 {
+  color: var(--color-9);
+  margin-bottom: 2rem;
+}
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.topic-card {
+  background: var(--color-45);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.topic-card:hover {
+  transform: translateY(-5px);
+}
+
+.topic-card i {
+  font-size: 2rem;
+  color: var(--color-3);
+}
+
+.topic-card span {
+  color: var(--color-9);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ===== TEACHERS ===== */
+.teachers-section {
+  width: 80dvw;
+  margin: 4rem auto;
+  text-align: center;
+}
+
+.teachers-section h2 {
+  color: var(--color-9);
+  margin-bottom: 2rem;
+}
+
+.teachers-grid {
+  display: flex;
   justify-content: center;
-  background-color: var(--color-14);
-  padding: 1.5rem 0 1.5rem 10rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 1.5rem 0;
+}
+
+.teacher-card {
+  width: 260px;
+  background: var(--color-45);
+  padding: 2rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.teacher-card:hover {
+  transform: translateY(-4px);
+}
+
+.teacher-avatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: var(--color-6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.teacher-avatar i {
+  font-size: 2rem;
+  color: var(--color-3);
+}
+
+.teacher-card h3 {
+  margin: 0.5rem 0;
+  color: var(--color-9);
+}
+
+.teacher-card p {
+  margin: 0;
+  color: var(--color-8);
 }

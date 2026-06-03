@@ -183,7 +183,49 @@
   }
 }
 
-/* ── Button config y login ── */
+/* ===== COURSES SELECTION ===== */
+.course-dropdown {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  position: relative;
+}
+
+.course-dropdown select {
+  appearance: none;
+  background: var(--color-45);
+  color: var(--color-8);
+  border: none;
+  outline: none;
+  padding: 0.55rem 2.2rem 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+  transition: all 0.2s ease;
+}
+
+.course-dropdown select:hover {
+  color: var(--color-9);
+  transform: translateY(-1px);
+}
+
+.course-dropdown select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.12);
+}
+
+.course-dropdown::after {
+  content: "▾";
+  position: absolute;
+  right: 14px;
+  pointer-events: none;
+  color: var(--color-8);
+  font-size: 0.8rem;
+}
+
+/* ── Header private actions (from develop) ── */
 
 .header-private-actions {
   display: flex;
@@ -193,12 +235,12 @@
 }
 
 .settings-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    margin-right: 1rem;
-    font-size: 1.5rem;
-    color: var(--color-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-right: 1rem;
+  font-size: 1.5rem;
+  color: var(--color-2);
 }
 
 .settings-option {
@@ -207,5 +249,5 @@
   align-items: center;
   padding: 0.75rem 1rem;
   gap: 1rem;
-  color:var(--color-15)
+  color: var(--color-15);
 }
