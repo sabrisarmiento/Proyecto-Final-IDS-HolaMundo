@@ -1,165 +1,189 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('profile-modal');
   if (!modal) return;
 
+  // ── Helpers compartidos ───────────────────────────────────────────────
+  const postJSON = async (url, body) => {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await resp.json();
+    return { ok: resp.ok && data.ok, data };
+  };
+
+  const setMessage = (el, text, ok) => {
+    el.textContent = text;
+    el.hidden = false;
+    el.classList.toggle('form-message-ok', ok);
+    el.classList.toggle('form-message-error', !ok);
+  };
+
   // ── Cambio de vista (slide lateral + altura animada) ──────────────────
-  const track = modal.querySelector('.profile-track');
-  const windowEl = modal.querySelector('.profile-window');
-  const perfilPane = document.getElementById('perfil-view');
-  const passwordPane = document.getElementById('password-view');
-  const title = modal.querySelector('h3');
-  let activePane = perfilPane;
+  const initViewSwitcher = () => {
+    const track = modal.querySelector('.profile-track');
+    const windowEl = modal.querySelector('.profile-window');
+    const perfilPane = document.getElementById('perfil-view');
+    const passwordPane = document.getElementById('password-view');
+    const title = modal.querySelector('h3');
+    let activePane = perfilPane;
 
-  function syncHeight() {
-    windowEl.style.height = activePane.scrollHeight + 'px';
-  }
+    const syncHeight = () => {
+      windowEl.style.height = activePane.scrollHeight + 'px';
+    };
 
-  // La altura sigue al panel activo (se reajusta si aparece un mensaje, etc.)
-  if (window.ResizeObserver) {
-    const ro = new ResizeObserver(syncHeight);
-    ro.observe(perfilPane);
-    ro.observe(passwordPane);
-  }
-  syncHeight();
-
-  window.showPasswordView = function () {
-    track.classList.add('show-password');
-    title.textContent = 'Cambiar mi contraseña';
-    activePane = passwordPane;
+    // La altura sigue al panel activo (se reajusta si aparece un mensaje, etc.)
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(syncHeight);
+      ro.observe(perfilPane);
+      ro.observe(passwordPane);
+    }
     syncHeight();
+
+    window.showPasswordView = () => {
+      track.classList.add('show-password');
+      title.textContent = 'Cambiar mi contraseña';
+      activePane = passwordPane;
+      syncHeight();
+    };
+
+    window.showProfileView = () => {
+      track.classList.remove('show-password');
+      title.textContent = 'Mi Perfil';
+      activePane = perfilPane;
+      if (window.resetPasswordForm) window.resetPasswordForm();
+      syncHeight();
+    };
+
+    return { syncHeight };
   };
 
-  window.showProfileView = function () {
-    track.classList.remove('show-password');
-    title.textContent = 'Mi Perfil';
-    activePane = perfilPane;
-    if (window.resetPasswordForm) window.resetPasswordForm();
-    syncHeight();
-  };
+  // ── Form de perfil (AJAX): "Guardar cambios" solo si hay cambios ──────
+  const initProfileForm = ({ syncHeight }) => {
+    const form = document.getElementById('perfil-form');
+    const submit = document.getElementById('perfil-submit');
+    const message = document.getElementById('perfil-message');
+    const nombre = document.getElementById('perfil-nombre');
+    const correo = document.getElementById('perfil-correo');
 
-  // ── "Guardar cambios" solo se habilita si hay cambios ─────────────────
-  const perfilSubmit = document.getElementById('perfil-submit');
-  const nombre = document.getElementById('perfil-nombre');
-  const correo = document.getElementById('perfil-correo');
+    const checkDirty = () => {
+      const dirty = nombre.value !== nombre.defaultValue || correo.value !== correo.defaultValue;
+      const valid = nombre.value.trim() !== '' && correo.value.trim() !== '';
+      submit.disabled = !(dirty && valid);
+    };
 
-  function checkProfileDirty() {
-    const dirty = nombre.value !== nombre.defaultValue || correo.value !== correo.defaultValue;
-    const valid = nombre.value.trim() !== '' && correo.value.trim() !== '';
-    perfilSubmit.disabled = !(dirty && valid);
-  }
-  [nombre, correo].forEach(function (input) {
-    input.addEventListener('input', checkProfileDirty);
-  });
-  checkProfileDirty();
+    [nombre, correo].forEach((input) => input.addEventListener('input', checkDirty));
 
-  // ── Form de cambio de contraseña ──────────────────────────────────────
-  const form = document.getElementById('password-form');
-  const current = document.getElementById('pw-current');
-  const newPw = document.getElementById('pw-new');
-  const confirm = document.getElementById('pw-confirm');
-  const submit = document.getElementById('pw-submit');
-  const message = document.getElementById('pw-message');
-  const checklist = form.querySelector('.pw-checklist');
+    checkDirty();
 
-  // Toggle mostrar/ocultar de cada input
-  form.querySelectorAll('.eye-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const input = document.getElementById(btn.dataset.target);
-      const oculto = input.type === 'password';
-      input.type = oculto ? 'text' : 'password';
-      btn.classList.toggle('is-on', oculto);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (submit.disabled) return;
+      submit.disabled = true;
+
+      try {
+        const { ok, data } = await postJSON('/perfil', { 
+          nombre: nombre.value, correo: correo.value 
+        });
+        
+        if (ok) {
+          // Los valores guardados pasan a ser los nuevos "defaults" para el dirty-check.
+          nombre.defaultValue = nombre.value;
+          correo.defaultValue = correo.value;
+          setMessage(message, data.message, true);
+        } else {
+          setMessage(message, data.message, false);
+          checkDirty();
+        }
+      } catch (err) {
+        setMessage(message, 'Error de conexión con el servidor', false);
+        checkDirty();
+      }
+      syncHeight();
     });
-  });
-
-  // Mismas reglas que valida el backend
-  const rules = {
-    length: function (v) { return v.length >= 8; },
-    uppercase: function (v) { return /[A-Z]/.test(v); },
-    symbol: function (v) { return /[^A-Za-z0-9]/.test(v); },
   };
 
-  function validate() {
-    const v = newPw.value;
-    let ok = true;
-    Object.keys(rules).forEach(function (key) {
-      const valid = rules[key](v);
-      checklist.querySelector('[data-rule="' + key + '"]').classList.toggle('valid', valid);
-      if (!valid) ok = false;
+  // ── Form de cambio de contraseña (AJAX) ───────────────────────────────
+  const initPasswordForm = ({ syncHeight }) => {
+    const form = document.getElementById('password-form');
+    const current = document.getElementById('pw-current');
+    const newPw = document.getElementById('pw-new');
+    const confirm = document.getElementById('pw-confirm');
+    const submit = document.getElementById('pw-submit');
+    const message = document.getElementById('pw-message');
+    const checklist = form.querySelector('.pw-checklist');
+
+    // Toggle mostrar/ocultar de cada input
+    form.querySelectorAll('.eye-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        const oculto = input.type === 'password';
+        input.type = oculto ? 'text' : 'password';
+        btn.classList.toggle('is-on', oculto);
+      });
     });
-    const match = v.length > 0 && v === confirm.value;
-    checklist.querySelector('[data-rule="match"]').classList.toggle('valid', match);
 
-    submit.disabled = !(ok && match && current.value.length > 0);
-    return !submit.disabled;
-  }
+    // Mismas reglas que valida el backend
+    const rules = {
+      length: (value) => value.length >= 8,
+      uppercase: (value) => /[A-Z]/.test(value),
+      symbol: (value) => /[^A-Za-z0-9]/.test(value),
+    };
 
-  [current, newPw, confirm].forEach(function (input) {
-    input.addEventListener('input', validate);
-  });
+    const validate = () => {
+      const v = newPw.value;
+      let ok = true;
 
-  function showMessage(text, ok) {
-    message.textContent = text;
-    message.hidden = false;
-    message.classList.toggle('form-message-ok', ok);
-    message.classList.toggle('form-message-error', !ok);
-  }
+      Object.keys(rules).forEach((key) => {
+        const valid = rules[key](v);
+        checklist.querySelector('[data-rule="' + key + '"]').classList.toggle('valid', valid);
+        if (!valid) ok = false;
+      });
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    if (!validate()) return;
-    submit.disabled = true;
+      const match = v.length > 0 && v === confirm.value;
+      checklist.querySelector('[data-rule="match"]').classList.toggle('valid', match);
 
-    try {
-      const resp = await fetch('/perfil/password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      submit.disabled = !(ok && match && current.value.length > 0);
+      return !submit.disabled;
+    };
+
+    [current, newPw, confirm].forEach((input) => input.addEventListener('input', validate));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validate()) return;
+      submit.disabled = true;
+
+      try {
+        const { ok, data } = await postJSON('/perfil/password', {
           current_password: current.value,
           new_password: newPw.value,
           confirm_password: confirm.value,
-        }),
-      });
-      const data = await resp.json();
-
-      if (resp.ok && data.ok) {
-        showMessage(data.message, true);
-        setTimeout(function () { showProfileView(); }, 1500);
-      } else {
-        showMessage(data.message, false);
+        });
+        if (ok) {
+          setMessage(message, data.message, true);
+          setTimeout(() => showProfileView(), 1500);
+        } else {
+          setMessage(message, data.message, false);
+          submit.disabled = false;
+        }
+      } catch (err) {
+        setMessage(message, 'Error de conexión con el servidor', false);
         submit.disabled = false;
       }
-    } catch (err) {
-      showMessage('Error de conexión con el servidor', false);
-      submit.disabled = false;
-    }
-  });
+      syncHeight();
+    });
 
-  // Reset al volver a la vista de perfil (limpia campos, mensaje y checklist).
-  window.resetPasswordForm = function () {
-    form.reset();
-    message.hidden = true;
-    validate();
+    // Reset al volver a la vista de perfil (limpia campos, mensaje y checklist).
+    window.resetPasswordForm = () => {
+      form.reset();
+      message.hidden = true;
+      validate();
+    };
   };
 
-  // ── Tras guardar el perfil (?perfil=...): reabrir el modal, limpiar la URL
-  //    y auto-descartar el mensaje a los 3s o al cerrar el modal ───────────
-  if (new URLSearchParams(window.location.search).has('perfil')) {
-    openModal('profile-modal');
-    history.replaceState(null, '', window.location.pathname);
-
-    const msg = perfilPane.querySelector('.form-message');
-    if (msg) {
-      let timer;
-      function dismiss() {
-        msg.remove();
-        clearTimeout(timer);
-        observer.disconnect();
-      }
-      const observer = new MutationObserver(function () {
-        if (!modal.classList.contains('active')) dismiss();
-      });
-      timer = setTimeout(dismiss, 3000);
-      observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-    }
-  }
+  const views = initViewSwitcher();
+  initProfileForm(views);
+  initPasswordForm(views);
 });

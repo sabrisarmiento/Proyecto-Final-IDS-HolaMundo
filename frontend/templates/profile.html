@@ -2,13 +2,12 @@
 {% if session.get('user') %}
   {% set perfil = session.get('user') %}
   {% call modal('profile-modal', 'Mi Perfil') %}
-    {% set estado = request.args.get('perfil') %}
-
     <div class="profile-window">
       <div class="profile-track">
 
+        <!-- Form de datos de usuario -->
         <div id="perfil-view" class="profile-pane">
-          <form method="POST" action="{{ url_for('profile.update_profile') }}">
+          <form id="perfil-form">
             <label for="perfil-nombre">Nombre</label>
             <input type="text" id="perfil-nombre" name="nombre" value="{{ perfil['nombre'] }}" required>
 
@@ -16,15 +15,12 @@
             <input type="email" id="perfil-correo" name="correo" value="{{ perfil['correo'] }}" required>
 
             <button type="submit" id="perfil-submit" disabled>Guardar cambios</button>
+            <p id="perfil-message" class="form-message" hidden></p>
           </form>
-          {% if estado == 'ok' %}
-            <p class="form-message form-message-ok">Perfil actualizado correctamente.</p>
-          {% elif estado == 'error' %}
-            <p class="form-message form-message-error">No se pudo actualizar el perfil. Error interno del servidor.</p>
-          {% endif %}
           <button type="button" class="link-button link-change" onclick="showPasswordView()">Cambiar mi contraseña</button>
         </div>
 
+        <!-- Form de cambio de contraseña -->
         <div id="password-view" class="profile-pane">
           <button type="button" class="link-button link-back" onclick="showProfileView()">← Volver</button>
           <form id="password-form">

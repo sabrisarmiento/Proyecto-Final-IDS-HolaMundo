@@ -1,25 +1,18 @@
-from urllib.parse import urlsplit, urlunsplit
-from flask import Blueprint, request, redirect, url_for, session
+from flask import Blueprint, request, session
 import requests
 
 profile_bp = Blueprint('profile', __name__)
 
-def _redirect_back(status):
-  """Vuelve a la pagina anterior agregando ?perfil=<status> (descartando
-  cualquier query previa para no acumular flags)."""
-  back = request.referrer or url_for('dashboard.dashboard')
-  scheme, netloc, path, _query, fragment = urlsplit(back)
-  return redirect(urlunsplit((scheme, netloc, path, f'perfil={status}', fragment)))
-
 @profile_bp.route('/perfil', methods=['POST'])
 def update_profile():
   if not session.get('user') or not session.get('token'):
-    return redirect(url_for('landing.landing'))
+    return {'ok': False, 'message': 'Sesión no válida'}, 401
 
   user = session['user']
+  data = request.get_json(silent=True) or {}
   payload = {
-    'nombre': request.form.get('nombre'),
-    'correo': request.form.get('correo'),
+    'nombre': data.get('nombre'),
+    'correo': data.get('correo'),
   }
 
   try:
@@ -33,17 +26,17 @@ def update_profile():
       # Reflejar los cambios en la sesion para que el modal los muestre al recargar.
       user.update(payload)
       session['user'] = user
-      return _redirect_back('ok')
+      return {'ok': True, 'message': 'Perfil actualizado correctamente'}
 
-    return _redirect_back('error')
+    body = response.json() if response.content else {}
+    errors = body.get('errors') or [{}]
+    return {'ok': False, 'message': errors[0].get('description', 'No se pudo actualizar el perfil')}, response.status_code
 
   except Exception:
-    return _redirect_back('error')
+    return {'ok': False, 'message': 'Error de conexión con el servidor'}, 502
 
 @profile_bp.route('/perfil/password', methods=['POST'])
 def change_password():
-  """Cambio de contrasena via AJAX. Reenvia el PUT /change-password al backend
-  con el token de la sesion y devuelve JSON para que el front lo muestre inline."""
   if not session.get('token'):
     return {'ok': False, 'message': 'Sesión no válida'}, 401
 
