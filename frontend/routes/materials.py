@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, session
-from services.material_frontend_service import MaterialFrontendService
-from services.course_frontend_service import CourseFrontendService
+from flask import Blueprint, render_template
+from services.material_frontend_service import material_get_all
+from services.course_frontend_service import course_get_all
 
 materials_bp = Blueprint('materials', __name__)
 
@@ -8,12 +8,9 @@ SUBJECT = 'Introducción al Desarrollo de Software'
 
 @materials_bp.route('/materiales')
 def public_materials():
-
-    id_curso = session.get("selected_course")
-
-    materials = MaterialFrontendService.get_all(id_curso)
-    courses = CourseFrontendService.get_all()
-
+    materials = material_get_all()
+    courses = course_get_all()
+    
     chair_by_course = {c['id_curso']: c['catedra'] for c in courses}
 
     groups = {}
