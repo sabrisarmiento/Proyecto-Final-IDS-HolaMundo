@@ -9,7 +9,7 @@
 
 <section class="hero">
   <h2>Introducción al Desarrollo de Software</h2>
-  <p>FIUBA - {{ curso.catedra }}</p>
+  <p> FIUBA{% if curso and curso.catedra %} - {{ curso.catedra }}{% endif %} </p>
 </section>
 
 {% if curso.slack_url %}

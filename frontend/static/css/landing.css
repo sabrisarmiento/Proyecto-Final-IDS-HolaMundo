@@ -31,12 +31,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 3rem;
-  background-color: var(--color-25);
+  background-color: var(--color-2);
   transition: all 0.25s ease;
 }
 
 .slack-banner:hover {
-  background-color: var(--color-2);
   color: var(--color-45);
 }
 
@@ -358,15 +357,9 @@
 .teachers-grid {
   display: flex;
   justify-content: center;
-}
-
-.teachers-grid {
-  display: flex;
-  justify-content: center;
   gap: 2rem;
   flex-wrap: wrap;
-  background-color: var(--color-14);
-  padding: 1.5rem 0 1.5rem 10rem;
+  padding: 1.5rem 0;
 }
 
 .teacher-card {

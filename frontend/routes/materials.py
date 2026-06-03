@@ -9,7 +9,7 @@ SUBJECT = 'Introducción al Desarrollo de Software'
 @materials_bp.route('/materiales')
 def public_materials():
 
-    id_curso = session.get("selected_course", 1)
+    id_curso = session.get("selected_course")
 
     materials = MaterialFrontendService.get_all(id_curso)
     courses = CourseFrontendService.get_all()
@@ -31,7 +31,7 @@ def public_materials():
         "materials.html",
         subject=SUBJECT,
         sections=sections,
-        courses=courses,
+        cursos=courses,
         selected_course=id_curso,
         active_page="materials"
     )
