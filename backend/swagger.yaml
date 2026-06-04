@@ -1,0 +1,3418 @@
+openapi: 3.0.3
+info:
+  title: Course Administration API
+  description: API para la administración de cursos universitarios
+  version: 1.0.0
+
+tags:
+  - name: Advertisements
+    description: Gestión de avisos de cursos
+  - name: Attendance
+    description: Gestión de asistencia a clases
+  - name: Classes
+    description: Gestión de clases dentro de un curso
+  - name: Courses
+    description: Gestión de cursos universitarios
+  - name: Exams
+    description: Gestión de evaluaciones y notas
+  - name: ExamTypes
+    description: Gestión de tipos de evaluación
+  - name: Marks
+    description: Gestión de notas individuales
+  - name: Materials
+    description: Gestión de materiales de estudio de un curso
+  - name: Roles
+    description: Gestión de roles de usuario
+  - name: Students
+    description: Gestión de alumnos
+  - name: Subjects
+    description: Gestión de materias
+  - name: Teams
+    description: Gestión de equipos de alumnos
+  - name: Users
+    description: Gestión de usuarios del sistema
+
+paths:
+
+# AVISOS
+
+  /advertisements:
+    get:
+      tags:
+        - Advertisements
+      summary: Obtener todos los avisos
+      description: Retorna una lista de avisos. Se pueden filtrar por usuario, curso, título o fecha.
+      parameters:
+        - in: query
+          name: id_usuario
+          schema:
+            type: integer
+          description: ID del usuario emisor del aviso
+        - in: query
+          name: id_curso
+          schema:
+            type: integer
+          description: ID del curso asociado al aviso
+        - in: query
+          name: titulo
+          schema:
+            type: string
+          description: Título exacto del aviso
+        - in: query
+          name: fecha
+          schema:
+            type: string
+            format: date
+          description: Fecha del aviso (YYYY-MM-DD)
+      responses:
+        "200":
+          description: Lista de avisos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      advertisements:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Advertisement"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Advertisements
+      summary: Crear un nuevo aviso
+      description: Crea un aviso nuevo. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdvertisementCreate"
+      responses:
+        "201":
+          description: Aviso creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: aviso creado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /advertisements/slack:
+    get:
+      tags:
+        - Advertisements
+      summary: Obtener avisos para Slack
+      description: Retorna los avisos formateados para ser enviados por Slack.
+      responses:
+        "200":
+          description: Avisos para Slack obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /advertisements/{id_advertisement}:
+    get:
+      tags:
+        - Advertisements
+      summary: Obtener un aviso por ID
+      description: Retorna los datos de un aviso específico.
+      parameters:
+        - in: path
+          name: id_advertisement
+          required: true
+          schema:
+            type: integer
+          description: ID del aviso
+      responses:
+        "200":
+          description: Aviso encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      advertisement:
+                        $ref: "#/components/schemas/Advertisement"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags:
+        - Advertisements
+      summary: Actualizar parcialmente un aviso
+      description: Actualiza uno o más campos de un aviso existente. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_advertisement
+          required: true
+          schema:
+            type: integer
+          description: ID del aviso a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdvertisementPatch"
+      responses:
+        "200":
+          description: Aviso actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: aviso actualizado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Advertisements
+      summary: Eliminar un aviso
+      description: Elimina un aviso por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_advertisement
+          required: true
+          schema:
+            type: integer
+          description: ID del aviso a eliminar
+      responses:
+        "200":
+          description: Aviso eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Aviso con ID 1 eliminado correctamente
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# ASISTENCIA
+
+  /asistencia:
+    get:
+      tags:
+        - Attendance
+      summary: Obtener registros de asistencia
+      description: Retorna registros de asistencia. Se puede filtrar por clase o por alumno.
+      parameters:
+        - in: query
+          name: id_clase
+          schema:
+            type: integer
+          description: ID de la clase para filtrar asistencia
+        - in: query
+          name: id_alumno
+          schema:
+            type: integer
+          description: ID del alumno para filtrar asistencia
+      responses:
+        "200":
+          description: Registros de asistencia obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      attendance:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Attendance"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Attendance
+      summary: Registrar asistencia
+      description: >
+        Registra la asistencia de un alumno a una clase.
+        Valida que el alumno esté activo y que su ubicación GPS esté dentro del radio permitido (300 m de FIUBA).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttendanceCreate"
+      responses:
+        "201":
+          description: Asistencia registrada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Asistencia registrada correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /asistencia/generar-qr:
+    post:
+      tags:
+        - Attendance
+      summary: Generar y enviar QRs de asistencia
+      description: >
+        Genera códigos QR únicos para cada alumno activo de una clase y los envía por correo electrónico.
+        Cada QR contiene un hash SHA-256 vinculado al alumno y a la clase.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id_clase
+              properties:
+                id_clase:
+                  type: integer
+                  description: ID de la clase para la cual se generan los QRs
+                  example: 5
+      responses:
+        "200":
+          description: QRs generados y enviados correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: QRs generados y enviados a 30 alumnos correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          description: No se encontraron alumnos activos para la clase indicada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /asistencia/{id}:
+    patch:
+      tags:
+        - Attendance
+      summary: Actualizar un registro de asistencia
+      description: Modifica el campo `presente` de un registro de asistencia existente. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del registro de asistencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - presente
+              properties:
+                presente:
+                  type: boolean
+                  description: Nuevo valor de presencia
+                  example: true
+      responses:
+        "200":
+          description: Asistencia actualizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Asistencia actualizada con éxito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Attendance
+      summary: Eliminar un registro de asistencia
+      description: Elimina un registro de asistencia por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del registro de asistencia a eliminar
+      responses:
+        "200":
+          description: Registro de asistencia eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Registro de asistencia con ID 3 eliminado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# CLASES
+
+  /clases:
+    get:
+      tags:
+        - Classes
+      summary: Obtener clases
+      description: >
+        Retorna todas las clases de un curso, ordenadas por semana y fecha.
+        Si no se especifica `id_curso`, se usa el curso con ID 1 por defecto.
+      parameters:
+        - in: query
+          name: id_curso
+          schema:
+            type: integer
+          description: ID del curso (default 1 si no se envía)
+        - in: query
+          name: fecha
+          schema:
+            type: string
+            format: date
+          description: Filtrar por fecha exacta (YYYY-MM-DD)
+      responses:
+        "200":
+          description: Lista de clases obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      classes:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Class"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Classes
+      summary: Crear una nueva clase
+      description: Crea una clase dentro de un curso. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassCreate"
+      responses:
+        "201":
+          description: Clase creada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Clase creada correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /clases/{id_clase}:
+    get:
+      tags:
+        - Classes
+      summary: Obtener una clase por ID
+      parameters:
+        - in: path
+          name: id_clase
+          required: true
+          schema:
+            type: integer
+          description: ID de la clase
+      responses:
+        "200":
+          description: Clase encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      class:
+                        $ref: "#/components/schemas/Class"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags:
+        - Classes
+      summary: Actualizar parcialmente una clase
+      description: Actualiza uno o más campos permitidos de una clase. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_clase
+          required: true
+          schema:
+            type: integer
+          description: ID de la clase a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassPatch"
+      responses:
+        "200":
+          description: Clase actualizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Clase con ID 3 actualizada correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags:
+        - Classes
+      summary: Eliminar una clase
+      description: Elimina una clase por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_clase
+          required: true
+          schema:
+            type: integer
+          description: ID de la clase a eliminar
+      responses:
+        "200":
+          description: Clase eliminada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Clase con ID 3 eliminada correctamente
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# CURSOS
+
+  /courses:
+    get:
+      tags:
+        - Courses
+      summary: Obtener todos los cursos
+      description: Retorna todos los cursos. Se puede filtrar por nombre de materia, cátedra o año.
+      parameters:
+        - in: query
+          name: nombre
+          schema:
+            type: string
+          description: Nombre (parcial) de la materia
+        - in: query
+          name: cuatrimestre
+          schema:
+            type: integer
+          description: Número de cuatrimestre
+        - in: query
+          name: anio
+          schema:
+            type: integer
+          description: Año del curso
+      responses:
+        "200":
+          description: Lista de cursos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      courses:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Course"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Courses
+      summary: Crear un nuevo curso
+      description: Crea un curso nuevo asociado a una materia. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseCreate"
+      responses:
+        "201":
+          description: Curso creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: curso creado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /courses/{id_course}:
+    get:
+      tags:
+        - Courses
+      summary: Obtener un curso por ID
+      parameters:
+        - in: path
+          name: id_course
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+      responses:
+        "200":
+          description: Curso encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      course:
+                        $ref: "#/components/schemas/Course"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags:
+        - Courses
+      summary: Actualizar parcialmente un curso
+      description: Actualiza uno o más campos de un curso existente. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_course
+          required: true
+          schema:
+            type: integer
+          description: ID del curso a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoursePatch"
+      responses:
+        "200":
+          description: Curso actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Curso actualizado con éxito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Courses
+      summary: Eliminar un curso
+      description: Elimina un curso por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_course
+          required: true
+          schema:
+            type: integer
+          description: ID del curso a eliminar
+      responses:
+        "200":
+          description: Curso eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Curso con ID 2 eliminado correctamente
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# EVALUACIONES
+
+  /evaluaciones:
+    get:
+      tags:
+        - Exams
+      summary: Obtener todas las evaluaciones
+      description: Retorna evaluaciones. Se puede filtrar por `id_curso`, `id_tipo`, `id_usuario` o `fecha`.
+      parameters:
+        - in: query
+          name: id_curso
+          schema:
+            type: integer
+          description: Filtrar por ID de curso
+        - in: query
+          name: id_tipo
+          schema:
+            type: integer
+          description: Filtrar por tipo de evaluación
+        - in: query
+          name: id_usuario
+          schema:
+            type: integer
+          description: Filtrar por ID del usuario creador
+        - in: query
+          name: fecha
+          schema:
+            type: string
+            format: date
+          description: Filtrar por fecha (YYYY-MM-DD)
+      responses:
+        "200":
+          description: Lista de evaluaciones obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      evaluaciones:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Exam"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Exams
+      summary: Crear una evaluación
+      description: >
+        Crea una evaluación. Si el `nombre` del tipo de evaluación no existe en la tabla
+        `tipos_evaluacion`, se inserta automáticamente. El campo `id_usuario` es opcional;
+        si se omite se usa el primer usuario de la base de datos como fallback.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamCreate"
+      responses:
+        "201":
+          description: Evaluación creada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Evaluacion creada con exito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /evaluaciones/{id}:
+    get:
+      tags:
+        - Exams
+      summary: Obtener una evaluación por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la evaluación
+      responses:
+        "200":
+          description: Evaluación encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      exams:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ExamDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags:
+        - Exams
+      summary: Actualizar parcialmente una evaluación
+      description: Modifica `id_tipo`, `id_usuario` y/o `fecha` de una evaluación. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la evaluación a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamPatch"
+      responses:
+        "200":
+          description: Evaluación actualizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Evaluacion actualizada con exito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Exams
+      summary: Eliminar una evaluación
+      description: >
+        Elimina una evaluación y todas las notas asociadas a ella (cascade manual).
+        Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la evaluación a eliminar
+      responses:
+        "200":
+          description: Evaluación eliminada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Evaluacion con ID 4 eliminada correctamente
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /notas/guardar:
+    post:
+      tags:
+        - Exams
+      summary: Guardar notas de una evaluación
+      description: >
+        Guarda o actualiza las notas de múltiples alumnos para una evaluación.
+        Usa `INSERT ... ON DUPLICATE KEY UPDATE`, por lo que es idempotente.
+        El campo `correctores` es opcional y permite asignar un nombre de corrector
+        por alumno; si se omite, se usa `id_corrector` como fallback.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveNotes"
+      responses:
+        "200":
+          description: Notas guardadas correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Notas guardadas con éxito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /students_with_notes:
+    get:
+      tags:
+        - Exams
+      summary: Reporte de alumnos con notas
+      description: >
+        Retorna todos los alumnos de un curso junto con sus notas por evaluación,
+        su equipo (si corresponde) y el nombre del corrector por nota.
+        Las notas se devuelven en campos `notas_raw` y `correctores_raw` como strings
+        con el formato `id_evaluacion:valor` separados por coma.
+      parameters:
+        - in: query
+          name: id_curso
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+      responses:
+        "200":
+          description: Reporte obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/StudentNotesReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# TIPOS DE EVALUACION
+
+  /tipos-evaluacion:
+    get:
+      tags:
+        - ExamTypes
+      summary: Obtener todos los tipos de evaluación
+      description: Retorna todos los registros de la tabla `tipos_evaluacion`.
+      responses:
+        "200":
+          description: Lista de tipos de evaluación obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      exam_types:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ExamType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - ExamTypes
+      summary: Crear un tipo de evaluación
+      description: Crea un nuevo tipo de evaluación. El campo `nombre` es obligatorio. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamTypeCreate"
+      responses:
+        "201":
+          description: Tipo de evaluación creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Tipo de evaluación creado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /tipos-evaluacion/{id}:
+    get:
+      tags:
+        - ExamTypes
+      summary: Obtener un tipo de evaluación por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del tipo de evaluación (debe ser > 0)
+      responses:
+        "200":
+          description: Tipo de evaluación encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      exam_type:
+                        $ref: "#/components/schemas/ExamType"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags:
+        - ExamTypes
+      summary: Actualizar un tipo de evaluación
+      description: >
+        Actualiza `nombre` y/o `descripcion` de un tipo de evaluación.
+        Solo se aceptan esos dos campos; cualquier otro devuelve 400.
+        Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del tipo de evaluación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamTypePatch"
+      responses:
+        "200":
+          description: Tipo de evaluación actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Tipo de evaluación actualizado con éxito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - ExamTypes
+      summary: Eliminar un tipo de evaluación
+      description: Elimina un tipo de evaluación por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del tipo de evaluación a eliminar
+      responses:
+        "200":
+          description: Tipo de evaluación eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Tipo de evaluación con ID 3 eliminado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# NOTAS
+
+  /marks:
+    get:
+      tags:
+        - Marks
+      summary: Obtener notas
+      description: Retorna notas con filtros opcionales por alumno, evaluación, equipo, corrector o valor de nota.
+      parameters:
+        - in: query
+          name: id_alumno
+          schema:
+            type: integer
+          description: Filtrar por ID de alumno
+        - in: query
+          name: id_evaluacion
+          schema:
+            type: integer
+          description: Filtrar por ID de evaluación
+        - in: query
+          name: id_equipo
+          schema:
+            type: integer
+          description: Filtrar por ID de equipo
+        - in: query
+          name: id_corrector
+          schema:
+            type: integer
+          description: Filtrar por ID de corrector
+        - in: query
+          name: nota
+          schema:
+            type: number
+          description: Filtrar por valor exacto de nota
+      responses:
+        "200":
+          description: Lista de notas obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      marks:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Mark"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Marks
+      summary: Crear una nota
+      description: Registra una nota para un alumno en una evaluación. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarkCreate"
+      responses:
+        "201":
+          description: Nota creada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: nota creada correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /marks/{id_mark}:
+    get:
+      tags:
+        - Marks
+      summary: Obtener una nota por ID
+      parameters:
+        - in: path
+          name: id_mark
+          required: true
+          schema:
+            type: integer
+          description: ID de la nota
+      responses:
+        "200":
+          description: Nota encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      mark:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Mark"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags:
+        - Marks
+      summary: Actualizar parcialmente una nota
+      description: Modifica uno o más campos de una nota existente. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_mark
+          required: true
+          schema:
+            type: integer
+          description: ID de la nota a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarkPatch"
+      responses:
+        "200":
+          description: Nota actualizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Nota actualizada con éxito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Marks
+      summary: Eliminar una nota
+      description: Elimina una nota por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_mark
+          required: true
+          schema:
+            type: integer
+          description: ID de la nota a eliminar
+      responses:
+        "200":
+          description: Nota eliminada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Nota con ID 7 eliminada correctamente
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# MATERIALES
+
+  /materials:
+    get:
+      tags:
+        - Materials
+      summary: Obtener materiales
+      description: Retorna materiales de estudio. Se puede filtrar por curso o por título exacto.
+      parameters:
+        - in: query
+          name: id_curso
+          schema:
+            type: integer
+          description: Filtrar por ID de curso
+        - in: query
+          name: titulo
+          schema:
+            type: string
+          description: Filtrar por título exacto del material
+      responses:
+        "200":
+          description: Lista de materiales obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      materials:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Material"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Materials
+      summary: Crear un material
+      description: Agrega un nuevo material de estudio a un curso. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaterialCreate"
+      responses:
+        "201":
+          description: Material creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Material creado.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /materials/{id_material}:
+    delete:
+      tags:
+        - Materials
+      summary: Eliminar un material
+      description: Elimina un material por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_material
+          required: true
+          schema:
+            type: integer
+          description: ID del material a eliminar
+      responses:
+        "200":
+          description: Material eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Material con ID 5 eliminado correctamente
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# ROLES
+
+  /roles:
+    get:
+      tags:
+        - Roles
+      summary: Obtener roles
+      description: >
+        Retorna todos los roles. Se puede filtrar por `id_roles`, `name` (nombre) o `admin_level`
+        (nivel de administración, entre 1 y 3). Si no hay resultados devuelve 204 sin cuerpo.
+      parameters:
+        - in: query
+          name: id_roles
+          schema:
+            type: integer
+          description: ID del rol (debe ser > 0)
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Nombre del rol
+        - in: query
+          name: admin_level
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 3
+          description: Nivel de administración (1, 2 o 3)
+      responses:
+        "200":
+          description: Lista de roles obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      roles encontrados:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Role"
+        "204":
+          description: No se encontraron roles con los filtros indicados
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Roles
+      summary: Crear un rol
+      description: >
+        Crea un nuevo rol. El campo `nivel_administracion` debe ser un entero entre 1 y 3.
+        Si ya existe un rol con el mismo nombre y nivel devuelve 409. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleCreate"
+      responses:
+        "201":
+          description: Rol creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: El rol ha sido creado exitosamente
+                      id:
+                        type: integer
+                        example: 4
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /roles/{id}:
+    delete:
+      tags:
+        - Roles
+      summary: Eliminar un rol
+      description: >
+        Elimina un rol por su ID. Devuelve 204 sin cuerpo si se elimina correctamente.
+        Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del rol a eliminar (debe ser > 0)
+      responses:
+        "204":
+          description: Rol eliminado correctamente (sin cuerpo)
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# ALUMNOS
+
+  /students:
+    get:
+      tags:
+        - Students
+      summary: Obtener alumnos
+      description: >
+        Retorna alumnos con paginación y filtros opcionales. Soporta ordenamiento
+        mediante `order_by` y `order`. Si no hay resultados devuelve 204.
+        Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Número de página (default 1)
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            default: 10
+          description: Cantidad de resultados por página (default 10)
+        - in: query
+          name: nombre
+          schema:
+            type: string
+          description: Filtrar por nombre exacto
+        - in: query
+          name: apellido
+          schema:
+            type: string
+          description: Filtrar por apellido exacto
+        - in: query
+          name: mail
+          schema:
+            type: string
+          description: Filtrar por correo exacto
+        - in: query
+          name: id_curso
+          schema:
+            type: integer
+          description: Filtrar por ID de curso
+        - in: query
+          name: order_by
+          schema:
+            type: string
+          description: Campo por el cual ordenar (ej. `apellido`, `nombre`)
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Dirección del ordenamiento
+      responses:
+        "200":
+          description: Lista de alumnos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      students:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Student"
+                      total:
+                        type: integer
+                        description: Total de registros que coinciden con los filtros (sin paginación)
+                        example: 87
+        "204":
+          description: No se encontraron alumnos con los filtros indicados
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Students
+      summary: Crear un alumno
+      description: >
+        Crea un nuevo alumno. Devuelve 409 si ya existe un alumno con el mismo
+        correo o padrón. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentCreate"
+      responses:
+        "201":
+          description: Alumno creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Alumno creado correctamente
+                      id:
+                        type: integer
+                        example: 42
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /students/import:
+    post:
+      tags:
+        - Students
+      summary: Importar alumnos desde CSV
+      description: >
+        Importa alumnos en lote desde un archivo `.csv` enviado como `multipart/form-data`
+        en el campo `file`. El CSV debe incluir los campos requeridos de cada alumno más
+        `id_rol` (entero).
+
+
+        El status de respuesta varía según el resultado:
+        - `201` si todos los alumnos se crearon correctamente.
+        - `207 Multi-Status` si hubo creaciones y también errores.
+        - `400` si no se creó ninguno.
+
+
+        Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Archivo CSV con los datos de los alumnos
+      responses:
+        "201":
+          description: Todos los alumnos importados correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResult"
+        "207":
+          description: Importación parcial — algunos alumnos se crearon y otros fallaron
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /students/{id}:
+    get:
+      tags:
+        - Students
+      summary: Obtener un alumno por ID
+      description: Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del alumno (debe ser > 0)
+      responses:
+        "200":
+          description: Alumno encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      student:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Student"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# MATERIAS
+
+  /subjects:
+    get:
+      tags:
+        - Subjects
+      summary: Obtener todas las materias
+      description: Retorna todas las materias disponibles.
+      responses:
+        "200":
+          description: Lista de materias obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      subjects:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Subject"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Subjects
+      summary: Crear una materia
+      description: >
+        Crea una materia nueva. Devuelve 409 si ya existe una materia con el mismo
+        `codigo`. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubjectCreate"
+      responses:
+        "201":
+          description: Materia creada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Materia creada exitosamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /subjects/{subject_id}:
+    get:
+      tags:
+        - Subjects
+      summary: Obtener una materia por ID
+      parameters:
+        - in: path
+          name: subject_id
+          required: true
+          schema:
+            type: integer
+          description: ID de la materia (debe ser > 0)
+      responses:
+        "200":
+          description: Materia encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      subject:
+                        $ref: "#/components/schemas/Subject"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# EQUIPOS
+
+  /equipos:
+    get:
+      tags:
+        - Teams
+      summary: Obtener equipos
+      description: >
+        Retorna todos los equipos. Se puede filtrar por curso y/o por alumno.
+        Si se filtra por `id_alumno` se hace un JOIN con la tabla `equipo_alumno`.
+        Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: id_alumno
+          schema:
+            type: integer
+          description: Filtrar por ID de alumno (trae solo los equipos donde participa ese alumno)
+        - in: query
+          name: id_curso
+          schema:
+            type: integer
+          description: Filtrar por ID de curso
+      responses:
+        "200":
+          description: Lista de equipos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      teams:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Team"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Teams
+      summary: Crear un equipo
+      description: Crea un nuevo equipo dentro de un curso. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamCreate"
+      responses:
+        "201":
+          description: Equipo creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id_equipo:
+                        type: integer
+                        example: 12
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /equipos/{id_team}:
+    get:
+      tags:
+        - Teams
+      summary: Obtener un equipo por ID
+      description: Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_team
+          required: true
+          schema:
+            type: integer
+          description: ID del equipo
+      responses:
+        "200":
+          description: Equipo encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      team:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Team"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags:
+        - Teams
+      summary: Actualizar un equipo
+      description: Modifica `nombre_equipo` y/o `id_curso` de un equipo. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_team
+          required: true
+          schema:
+            type: integer
+          description: ID del equipo a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamPatch"
+      responses:
+        "200":
+          description: Equipo actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Equipo actualizado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    delete:
+      tags:
+        - Teams
+      summary: Eliminar un equipo
+      description: Elimina un equipo por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_team
+          required: true
+          schema:
+            type: integer
+          description: ID del equipo a eliminar
+      responses:
+        "200":
+          description: Equipo eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Equipo con ID 12 eliminado correctamente
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# USUARIOS
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Obtener usuarios
+      description: >
+        Retorna usuarios del sistema. Se puede filtrar por `id_usuario`, `nombre`,
+        `apellido`, `correo`, `created_at` o `id_rol`. No requiere autenticación.
+      parameters:
+        - in: query
+          name: id_usuario
+          schema:
+            type: integer
+          description: Filtrar por ID de usuario
+        - in: query
+          name: nombre
+          schema:
+            type: string
+          description: Filtrar por nombre exacto
+        - in: query
+          name: apellido
+          schema:
+            type: string
+          description: Filtrar por apellido exacto
+        - in: query
+          name: correo
+          schema:
+            type: string
+          description: Filtrar por correo exacto
+        - in: query
+          name: created_at
+          schema:
+            type: string
+            format: date
+          description: Filtrar por fecha de creación (YYYY-MM-DD)
+        - in: query
+          name: id_rol
+          schema:
+            type: integer
+          description: Filtrar por ID de rol
+      responses:
+        "200":
+          description: Lista de usuarios obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/User"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Users
+      summary: Crear un usuario
+      description: >
+        Crea un nuevo usuario. La contraseña se almacena hasheada (Werkzeug).
+        Devuelve 409 si el correo ya está registrado. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: Usuario creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: usuario creado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /users/{id_user}:
+    get:
+      tags:
+        - Users
+      summary: Obtener un usuario por ID
+      description: No requiere autenticación.
+      parameters:
+        - in: path
+          name: id_user
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario
+      responses:
+        "200":
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    patch:
+      tags:
+        - Users
+      summary: Actualizar parcialmente un usuario
+      description: >
+        Modifica uno o más campos de un usuario. Si se envía `contraseña`,
+        se almacena en texto plano (sin hashear en el PATCH actual — revisar).
+        Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_user
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPatch"
+      responses:
+        "200":
+          description: Usuario actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Usuario actualizado con exito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Users
+      summary: Eliminar un usuario
+      description: Elimina un usuario por su ID. Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id_user
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario a eliminar
+      responses:
+        "200":
+          description: Usuario eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Usuario con ID 5 eliminado correctamente
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# COMPONENTES
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    Advertisement:
+      type: object
+      properties:
+        id_aviso:
+          type: integer
+          example: 1
+        id_usuario:
+          type: integer
+          example: 10
+        id_curso:
+          type: integer
+          example: 3
+        titulo:
+          type: string
+          example: Recordatorio de examen
+        mensaje:
+          type: string
+          example: El examen parcial es el viernes a las 18hs.
+        fecha:
+          type: string
+          format: date
+          example: "2026-06-10"
+        emisor:
+          type: string
+          example: Juan Pérez
+
+    AdvertisementCreate:
+      type: object
+      required:
+        - id_usuario
+        - id_curso
+        - titulo
+        - mensaje
+      properties:
+        id_usuario:
+          type: integer
+          example: 10
+        id_curso:
+          type: integer
+          example: 3
+        titulo:
+          type: string
+          example: Recordatorio de examen
+        mensaje:
+          type: string
+          example: El examen parcial es el viernes a las 18hs.
+
+    AdvertisementPatch:
+      type: object
+      description: Al menos un campo debe estar presente.
+      properties:
+        id_usuario:
+          type: integer
+          example: 10
+        titulo:
+          type: string
+          example: Nuevo título
+        mensaje:
+          type: string
+          example: Mensaje actualizado.
+        fecha:
+          type: string
+          format: date
+          example: "2026-06-15"
+
+    Attendance:
+      type: object
+      properties:
+        id_asistencia:
+          type: integer
+          example: 42
+        id_alumno:
+          type: integer
+          example: 7
+        id_clase:
+          type: integer
+          example: 5
+        presente:
+          type: boolean
+          example: true
+
+    AttendanceCreate:
+      type: object
+      required:
+        - id_alumno
+        - id_clase
+        - latitud
+        - longitud
+      properties:
+        id_alumno:
+          type: integer
+          example: 7
+        id_clase:
+          type: integer
+          example: 5
+        latitud:
+          type: number
+          format: float
+          description: Latitud GPS del alumno al momento de registrar asistencia
+          example: -34.6177
+        longitud:
+          type: number
+          format: float
+          description: Longitud GPS del alumno al momento de registrar asistencia
+          example: -58.3682
+        presente:
+          type: boolean
+          default: true
+          example: true
+
+    Class:
+      type: object
+      properties:
+        id_clase:
+          type: integer
+          example: 12
+        fecha:
+          type: string
+          format: date
+          example: "2026-04-15"
+        temas:
+          type: string
+          example: Introducción a punteros y memoria dinámica
+        tipo:
+          type: string
+          example: Teórica
+        modalidad:
+          type: string
+          example: Presencial
+        semana:
+          type: integer
+          example: 3
+        id_curso:
+          type: integer
+          example: 1
+
+    ClassCreate:
+      type: object
+      required:
+        - fecha
+        - semana
+        - id_curso
+      properties:
+        fecha:
+          type: string
+          format: date
+          example: "2026-04-15"
+        temas:
+          type: string
+          example: Introducción a punteros y memoria dinámica
+        semana:
+          type: integer
+          example: 3
+        tipo:
+          type: string
+          example: Teórica
+        modalidad:
+          type: string
+          example: Presencial
+        id_curso:
+          type: integer
+          example: 1
+
+    ClassPatch:
+      type: object
+      description: Al menos uno de los campos permitidos debe estar presente.
+      properties:
+        fecha:
+          type: string
+          format: date
+          example: "2026-04-20"
+        temas:
+          type: string
+          example: Recursión y backtracking
+        semana:
+          type: integer
+          example: 4
+        tipo:
+          type: string
+          example: Práctica
+        modalidad:
+          type: string
+          example: Virtual
+        id_curso:
+          type: integer
+          example: 2
+
+    Course:
+      type: object
+      properties:
+        id_curso:
+          type: integer
+          example: 2
+        materia:
+          type: string
+          example: Introducción al Desarrollo de Software
+        catedra:
+          type: string
+          example: Cátedra Medina
+        cuatrimestre:
+          type: integer
+          example: 1
+        anio:
+          type: integer
+          example: 2026
+        slack_url:
+          type: string
+          example: https://app.slack.com/client/T000/C000
+        youtube_url:
+          type: string
+          example: https://www.youtube.com/@IntroDsSfiuba
+
+    CourseCreate:
+      type: object
+      required:
+        - id_materia
+        - catedra
+        - cuatrimestre
+        - anio
+        - id_profesor
+      properties:
+        id_materia:
+          type: integer
+          example: 5
+        catedra:
+          type: string
+          example: Cátedra Medina
+        cuatrimestre:
+          type: integer
+          example: 1
+        anio:
+          type: integer
+          example: 2026
+        id_profesor:
+          type: integer
+          example: 3
+
+    CoursePatch:
+      type: object
+      description: Al menos uno de los campos debe estar presente.
+      properties:
+        id_materia:
+          type: integer
+          example: 5
+        catedra:
+          type: string
+          example: Cátedra Pérez
+        cuatrimestre:
+          type: integer
+          example: 2
+        anio:
+          type: integer
+          example: 2026
+        id_profesor:
+          type: integer
+          example: 7
+
+    Exam:
+      type: object
+      properties:
+        id_evaluacion:
+          type: integer
+          example: 1
+        id_tipo:
+          type: integer
+          example: 2
+        id_curso:
+          type: integer
+          example: 1
+        id_usuario:
+          type: integer
+          example: 10
+        fecha:
+          type: string
+          format: date
+          example: "2026-05-20"
+        nombre:
+          type: string
+          description: Nombre del tipo de evaluación (join con tipos_evaluacion)
+          example: Parcial 1
+
+    ExamDetail:
+      type: object
+      properties:
+        id_tipo:
+          type: integer
+          example: 2
+        id_usuario:
+          type: integer
+          example: 10
+        fecha:
+          type: string
+          format: date
+          example: "2026-05-20"
+
+    ExamCreate:
+      type: object
+      required:
+        - nombre
+        - id_curso
+      properties:
+        nombre:
+          type: string
+          description: Nombre del tipo de evaluación. Se crea automáticamente si no existe.
+          example: Parcial 1
+        id_curso:
+          type: integer
+          example: 1
+        id_usuario:
+          type: integer
+          description: ID del usuario que crea la evaluación. Si se omite, se usa el primer usuario disponible.
+          example: 10
+        fecha:
+          type: string
+          format: date
+          example: "2026-05-20"
+        asociacion:
+          type: string
+          description: Indica si la evaluación es individual o grupal.
+          enum: [Individual, Grupal]
+          default: Individual
+          example: Individual
+
+    ExamPatch:
+      type: object
+      description: Al menos uno de los campos debe estar presente.
+      properties:
+        id_tipo:
+          type: integer
+          example: 3
+        id_usuario:
+          type: integer
+          example: 10
+        fecha:
+          type: string
+          format: date
+          example: "2026-06-01"
+
+    SaveNotes:
+      type: object
+      required:
+        - id_evaluacion
+        - notas
+      properties:
+        id_evaluacion:
+          type: integer
+          example: 1
+        notas:
+          type: object
+          description: Mapa de `id_alumno` (como string) → nota numérica
+          additionalProperties:
+            type: number
+          example:
+            "7": 8.5
+            "12": 6.0
+            "23": 9.0
+        correctores:
+          type: object
+          description: Mapa opcional de `id_alumno` (como string) → nombre libre del corrector
+          additionalProperties:
+            type: string
+          example:
+            "7": "Prof. García"
+            "12": "Prof. López"
+
+    StudentNotesReport:
+      type: object
+      properties:
+        id_alumno:
+          type: integer
+          example: 7
+        nombre:
+          type: string
+          example: María
+        apellido:
+          type: string
+          example: González
+        padron:
+          type: string
+          example: "107345"
+        estado_alumno:
+          type: boolean
+          example: true
+        equipo:
+          type: string
+          nullable: true
+          example: Equipo Alpha
+        notas_raw:
+          type: string
+          description: Notas en formato `id_evaluacion:nota` separadas por coma
+          example: "1:8.5,2:7.0,3:9.0"
+        correctores_raw:
+          type: string
+          description: Correctores en formato `id_evaluacion:nombre` separadas por coma
+          example: "1:Prof. García,2:,3:Prof. López"
+
+    Student:
+      type: object
+      properties:
+        id_alumno:
+          type: integer
+          example: 42
+        nombre:
+          type: string
+          example: Laura
+        apellido:
+          type: string
+          example: Fernández
+        padron:
+          type: string
+          example: "108234"
+        correo:
+          type: string
+          example: lfernandez@fi.uba.ar
+        id_curso:
+          type: integer
+          example: 1
+        estado_alumno:
+          type: boolean
+          example: true
+
+    StudentCreate:
+      type: object
+      required:
+        - nombre
+        - apellido
+        - padron
+        - correo
+        - id_curso
+      properties:
+        nombre:
+          type: string
+          example: Laura
+        apellido:
+          type: string
+          example: Fernández
+        padron:
+          type: string
+          example: "108234"
+        correo:
+          type: string
+          example: lfernandez@fi.uba.ar
+        id_curso:
+          type: integer
+          example: 1
+
+    ImportResult:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            creados:
+              type: integer
+              example: 28
+            errores:
+              type: integer
+              example: 2
+            detalle_creados:
+              type: array
+              items:
+                type: object
+                properties:
+                  fila:
+                    type: integer
+                    example: 3
+                  id:
+                    type: integer
+                    example: 43
+            detalle_errores:
+              type: array
+              items:
+                type: object
+                properties:
+                  fila:
+                    type: integer
+                    example: 7
+                  status:
+                    type: integer
+                    example: 409
+                  error:
+                    type: string
+                    example: El alumno ya existe (correo o padrón duplicado)
+
+    Subject:
+      type: object
+      properties:
+        id_materia:
+          type: integer
+          example: 3
+        nombre:
+          type: string
+          example: Introducción al Desarrollo de Software
+        codigo:
+          type: string
+          example: "75.40"
+
+    SubjectCreate:
+      type: object
+      required:
+        - nombre
+        - codigo
+      properties:
+        nombre:
+          type: string
+          example: Algoritmos y Programación I
+        codigo:
+          type: string
+          example: "75.41"
+
+    ExamType:
+      type: object
+      properties:
+        id_tipo:
+          type: integer
+          example: 2
+        nombre:
+          type: string
+          example: Parcial 1
+        descripcion:
+          type: string
+          nullable: true
+          example: Primer examen parcial del cuatrimestre
+
+    ExamTypeCreate:
+      type: object
+      required:
+        - nombre
+      properties:
+        nombre:
+          type: string
+          example: Parcial 2
+        descripcion:
+          type: string
+          example: Segundo examen parcial del cuatrimestre
+
+    ExamTypePatch:
+      type: object
+      description: Solo se aceptan los campos `nombre` y/o `descripcion`. Cualquier otro campo devuelve 400.
+      properties:
+        nombre:
+          type: string
+          example: TP Final
+        descripcion:
+          type: string
+          example: Trabajo práctico integrador final
+
+    Mark:
+      type: object
+      properties:
+        id_nota:
+          type: integer
+          example: 15
+        id_alumno:
+          type: integer
+          example: 7
+        id_evaluacion:
+          type: integer
+          example: 1
+        nota:
+          type: number
+          format: float
+          example: 8.5
+
+    MarkCreate:
+      type: object
+      required:
+        - id_alumno
+        - id_evaluacion
+        - nota
+      properties:
+        id_alumno:
+          type: integer
+          example: 7
+        id_evaluacion:
+          type: integer
+          example: 1
+        nota:
+          type: number
+          format: float
+          example: 8.5
+        id_equipo:
+          type: integer
+          nullable: true
+          example: 3
+        id_corrector:
+          type: integer
+          nullable: true
+          example: 10
+
+    MarkPatch:
+      type: object
+      description: Al menos uno de los campos debe estar presente.
+      properties:
+        id_alumno:
+          type: integer
+          example: 7
+        id_evaluacion:
+          type: integer
+          example: 1
+        id_equipo:
+          type: integer
+          example: 3
+        nota:
+          type: number
+          format: float
+          example: 9.0
+        id_corrector:
+          type: integer
+          example: 10
+
+    Material:
+      type: object
+      properties:
+        id_material:
+          type: integer
+          example: 8
+        titulo:
+          type: string
+          example: Guía de ejercicios - Recursión
+        descripcion:
+          type: string
+          nullable: true
+          example: Ejercicios de práctica sobre recursión y backtracking
+        url_externo:
+          type: string
+          nullable: true
+          example: https://drive.google.com/file/d/abc123
+        id_curso:
+          type: integer
+          example: 1
+
+    MaterialCreate:
+      type: object
+      required:
+        - titulo
+        - id_curso
+      properties:
+        titulo:
+          type: string
+          example: Guía de ejercicios - Recursión
+        descripcion:
+          type: string
+          example: Ejercicios de práctica sobre recursión y backtracking
+        url_externo:
+          type: string
+          example: https://drive.google.com/file/d/abc123
+        id_curso:
+          type: integer
+          example: 1
+
+    Role:
+      type: object
+      properties:
+        id_rol:
+          type: integer
+          example: 2
+        nombre:
+          type: string
+          example: Docente
+        nivel_administracion:
+          type: integer
+          minimum: 1
+          maximum: 3
+          example: 2
+
+    RoleCreate:
+      type: object
+      required:
+        - nombre
+        - nivel_administracion
+      properties:
+        nombre:
+          type: string
+          example: Ayudante
+        nivel_administracion:
+          type: integer
+          minimum: 1
+          maximum: 3
+          example: 1
+
+    Team:
+      type: object
+      properties:
+        id_equipo:
+          type: integer
+          example: 12
+        nombre_equipo:
+          type: string
+          example: Grupo Alpha
+        id_curso:
+          type: integer
+          example: 1
+
+    TeamCreate:
+      type: object
+      required:
+        - nombre_equipo
+        - id_curso
+      properties:
+        nombre_equipo:
+          type: string
+          example: Grupo Alpha
+        id_curso:
+          type: integer
+          example: 1
+
+    TeamPatch:
+      type: object
+      description: Al menos uno de los campos debe estar presente.
+      properties:
+        nombre_equipo:
+          type: string
+          example: Grupo Beta
+        id_curso:
+          type: integer
+          example: 2
+
+    User:
+      type: object
+      properties:
+        id_usuario:
+          type: integer
+          example: 5
+        nombre:
+          type: string
+          example: Carlos
+        apellido:
+          type: string
+          example: Rodríguez
+        correo:
+          type: string
+          example: crodriguez@fi.uba.ar
+        contraseña:
+          type: string
+          description: Hash de la contraseña (Werkzeug)
+          example: pbkdf2:sha256:600000$...
+        creado:
+          type: string
+          format: date-time
+          example: "2026-03-01T10:00:00Z"
+        id_rol:
+          type: integer
+          example: 2
+
+    UserCreate:
+      type: object
+      required:
+        - nombre
+        - apellido
+        - correo
+        - contraseña
+        - id_rol
+      properties:
+        nombre:
+          type: string
+          example: Carlos
+        apellido:
+          type: string
+          example: Rodríguez
+        correo:
+          type: string
+          example: crodriguez@fi.uba.ar
+        contraseña:
+          type: string
+          description: Contraseña en texto plano. Se hashea automáticamente antes de almacenarse.
+          example: MiPassword123
+        id_rol:
+          type: integer
+          example: 2
+
+    UserPatch:
+      type: object
+      description: Al menos uno de los campos debe estar presente.
+      properties:
+        nombre:
+          type: string
+          example: Carlos
+        apellido:
+          type: string
+          example: Rodríguez
+        correo:
+          type: string
+          example: nuevo@fi.uba.ar
+        contraseña:
+          type: string
+          description: >
+            Contraseña nueva en texto plano. Atención: el PATCH actual NO hashea
+            la contraseña antes de guardarla, a diferencia del POST.
+          example: NuevoPassword456
+        id_rol:
+          type: integer
+          example: 3
+
+    ErrorResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        code:
+          type: integer
+          example: 404
+        message:
+          type: string
+          example: Not Found
+        description:
+          type: string
+          example: No existe un aviso con ID 99
+
+  responses:
+    BadRequest:
+      description: Solicitud inválida o campos faltantes
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            ok: false
+            code: 400
+            message: Bad Request
+            description: Los campos 'id_alumno' e 'id_clase' son obligatorios
+
+    Unauthorized:
+      description: Token de autenticación ausente o inválido
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            ok: false
+            code: 401
+            message: Unauthorized
+            description: Token inválido o expirado
+
+    Forbidden:
+      description: Acceso denegado (alumno inactivo o fuera del rango GPS)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            ok: false
+            code: 403
+            message: Forbidden
+            description: Ubicación fuera del rango permitido
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            ok: false
+            code: 404
+            message: Not Found
+            description: No existe un aviso con ID 99
+
+    Conflict:
+      description: El recurso ya existe (conflicto de duplicado)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            ok: false
+            code: 409
+            message: Conflict
+            description: El rol ya existe
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            ok: false
+            code: 500
+            message: Internal Server Error
+            description: Unexpected error
