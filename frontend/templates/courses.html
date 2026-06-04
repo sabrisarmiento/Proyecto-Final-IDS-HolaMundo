@@ -8,7 +8,7 @@
 
 {% block content %}
   <section class="courses" >
-    <h2>Cursos</h2>
+    <h2>Gestión de Cursos</h2>
     <div class="courses-container">
       {% for course in courses %}
         <article class="course" onclick="window.location.href='/cursos/{{ course.id_curso }}'">
