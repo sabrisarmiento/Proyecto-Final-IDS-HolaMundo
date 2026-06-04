@@ -4,7 +4,7 @@ def get_all_teams(filters):
     try:
         id_student = filters.get("id_alumno")
         id_course = filters.get("id_curso")
-        sql = sql = """
+        sql = """
         SELECT
             e.id_equipo,
             e.nombre_equipo,
