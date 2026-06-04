@@ -42,7 +42,7 @@ def modify_exam(id):
  
  
 @exam_bp.route("/evaluaciones/<int:id>", methods=["DELETE"])
-@require_auth
+# @require_auth # descomentar cuando el auth este listo
 def delete_exam(id):
     return delete_exam_service(id)
  
