@@ -29,6 +29,5 @@ def public_materials():
         subject=SUBJECT,
         sections=sections,
         cursos=courses,
-        selected_course=id_curso,
         active_page="materials"
     )

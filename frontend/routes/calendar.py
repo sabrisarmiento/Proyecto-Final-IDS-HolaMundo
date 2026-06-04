@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, session, request
 from services.subjects_service import get_subjects, get_subject_by_id
-from services.calendar_frontend_service import CalendarFrontendService
-from services.course_frontend_service import CourseFrontendService
+from services.calendar_frontend_service import calendar_get_all
+from services.course_frontend_service import course_get_all
 from services.courses_service import get_courses
 
 calendar_bp = Blueprint('calendar', __name__)
@@ -25,7 +25,7 @@ def calendar():
         cursos_by_subject = [c for c in cursos if c.get("materia") == subject.get("nombre")]
 
         for curso in cursos_by_subject:
-            clases_api = CalendarFrontendService.get_all(curso["id_curso"])
+            clases_api = calendar_get_all(curso["id_curso"])
             for clase in clases_api:
                 week_num = clase.get('semana')
                 if week_num is not None:
@@ -54,33 +54,35 @@ def calendar():
         active_page='calendar'
     )
 
-    # id_curso = session.get("selected_course")
+"""
+    id_curso = session.get("selected_course")
 
-    # clases_api = CalendarFrontendService.get_all(id_curso)
+    clases_api = calendar_get_all(id_curso)
 
-    # schedule = {}
+    schedule = {}
 
-    # for clase in clases_api:
-    #     week_num = clase.get('semana')
+    for clase in clases_api:
+        week_num = clase.get('semana')
 
-    #     if week_num is not None:
+        if week_num is not None:
 
-    #         if week_num not in schedule:
-    #             schedule[week_num] = []
+            if week_num not in schedule:
+                schedule[week_num] = []
 
-    #         schedule[week_num].append(clase)
+            schedule[week_num].append(clase)
 
-    # sorted_schedule = [
-    #     {"week": w, "classes": schedule[w]}
-    #     for w in sorted(schedule.keys())
-    # ]
+    sorted_schedule = [
+        {"week": w, "classes": schedule[w]}
+        for w in sorted(schedule.keys())
+    ]
 
-    # cursos = CourseFrontendService.get_all()
+    cursos = calendar_get_all()
 
-    # return render_template(
-    #     'calendar.html',
-    #     schedule=sorted_schedule,
-    #     cursos=cursos,
-    #     selected_course=id_curso,
-    #     active_page='calendar'
-    # )
+    return render_template(
+        'calendar.html',
+        schedule=sorted_schedule,
+        cursos=cursos,
+        selected_course=id_curso,
+        active_page='calendar'
+    )
+"""

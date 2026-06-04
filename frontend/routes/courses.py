@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 
 import requests
- 
+
 courses_bp = Blueprint('courses', __name__)
 
 #Cursos (todos)
@@ -64,6 +64,9 @@ def course_detail(course_id):
   per_page = 10
   order_by = request.args.get('order_by')
   order = request.args.get('order')
+
+  token = session.get('token')
+  headers = {'Authorization': f'Bearer {token}'}
 
   try:
       course_res = requests.get(f'http://127.0.0.1:5000/courses/{course_id}')
