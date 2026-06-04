@@ -4,7 +4,21 @@ def get_all_teams(filters):
     try:
         id_student = filters.get("id_alumno")
         id_course = filters.get("id_curso")
-        sql = """SELECT e.id_equipo, e.nombre_equipo, e.id_curso FROM equipos e"""
+        sql = sql = """
+        SELECT
+            e.id_equipo,
+            e.nombre_equipo,
+            e.id_curso,
+            a.id_alumno,
+            a.nombre,
+            a.apellido,
+            a.padron
+        FROM equipos e
+        LEFT JOIN equipo_alumno ea
+            ON e.id_equipo = ea.id_equipo
+        LEFT JOIN alumnos a
+            ON ea.id_alumno = a.id_alumno
+        """
         condition = " WHERE 1=1 "
         params = []
         if id_student is not None:
@@ -15,9 +29,26 @@ def get_all_teams(filters):
             condition += " AND e.id_curso = %s"
             params.append(int(id_course))
         result = query_db(sql + condition, params)
+        equipos = {}
+        for row in result:
+            id_equipo = row["id_equipo"]
+            if id_equipo not in equipos:
+                equipos[id_equipo] = {
+                    "id_equipo": row["id_equipo"],
+                    "nombre_equipo": row["nombre_equipo"],
+                    "id_curso": row["id_curso"],
+                    "alumnos": []
+                }
+            if row["id_alumno"] is not None:
+                equipos[id_equipo]["alumnos"].append({
+                    "id_alumno": row["id_alumno"],
+                    "nombre": row["nombre"],
+                    "apellido": row["apellido"],
+                    "padron": row["padron"]
+                })
         return {
             "ok": True,
-            "data": result
+            "data": list(equipos.values())
         }
     except Exception as e:
         return {
