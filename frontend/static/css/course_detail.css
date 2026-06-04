@@ -58,12 +58,15 @@
 .course-detail-content {
   width: 97dvw;
   margin: 0 auto;
+  padding-top: 1.5rem !important;
+  margin-top: 0.5rem !important;
 }
 
 .course-nav {
   display: flex;
   width: fit-content;
   margin-left: 1.5rem;
+  margin-top: 1.25rem;
 }
 
 .nav-btn {
@@ -92,10 +95,12 @@
 
 .tab-content {
   padding: 0 1rem;
-  padding-bottom: 1rem;
   border: 3px solid var(--color-65);
   border-radius: 0.7rem;
   background: var(--color-45);
+  font-size: 1.02rem;
+  padding-top: 1rem;
+  padding-bottom: 1.25rem;
 }
 
 .tab-panel {
@@ -159,16 +164,16 @@
   padding: 0.75rem 1rem;
   background: var(--color-9);
   color: var(--color-5);
-  font-size: 0.85rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  font-size: 0.9rem;
 }
 
 .tab-table td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--color-6);
   color: var(--color-1);
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .tab-table tbody tr:hover {
@@ -194,7 +199,7 @@
 }
 
 .mgmt-wrapper {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .mgmt-card {
@@ -228,7 +233,7 @@
 }
 
 .mgmt-hint {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   color: var(--color-8);
   margin: 0 0 0.85rem;
 }
@@ -340,11 +345,19 @@
 }
 
 .qg-subtitle {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
 }
 .tab-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--color-45);
+  border: 1.5px dashed var(--color-6);
+  border-radius: 10px;
+  padding: 0.85rem 1.2rem;
+  margin: 1.5rem 0;
   color: var(--color-8);
-  margin: 0;
+  font-size: 0.95rem;
 }
 
 .qg-right-controls {
@@ -573,7 +586,7 @@
 }
 
 .planilla-subtitle {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   color: var(--color-8);
   margin: 0;
 }
@@ -602,7 +615,7 @@
 .planilla-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.88rem;
+  font-size: 0.93rem;
   min-width: 600px;
 }
 
@@ -614,11 +627,11 @@
 .planilla-table th {
   padding: 0.65rem 0.9rem;
   text-align: left;
-  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   white-space: nowrap;
+  font-size: 0.8rem;
 }
 
 .th-eval { min-width: 120px; }
