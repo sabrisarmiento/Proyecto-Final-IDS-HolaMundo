@@ -147,6 +147,77 @@
     </div>
 
     <div id="tab-marks" class="tab-panel {% if active_tab != 'marks' %}hidden{% endif %}">
+
+      <div class="promo-config-block">
+        <div class="promo-config-title-row">
+          <div>
+            <label class="promo-config-title">CONFIGURACIÓN DE PROMOCIÓN</label>
+            <p class="promo-config-subtitle">Define si la materia es promocionable y qué evaluaciones cuentan para promocionar</p>
+          </div>
+          <div class="promo-toggle-group">
+            <span class="promo-toggle-label">¿La materia es promocionable?</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-promocionable"
+                {% if curso_es_promocionable %}checked{% endif %}
+                onchange="togglePromocionable(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div id="promo-table-wrapper" {% if not curso_es_promocionable %}class="hidden"{% endif %}>
+          <form action="/cursos/{{ course.id_curso }}/promocion/guardar" method="POST" id="form-promo">
+            <input type="hidden" name="es_promocionable" value="1">
+            {% for eval in evaluaciones %}
+              <input type="hidden" name="eval_ids" value="{{ eval.id_evaluacion }}">
+            {% endfor %}
+
+            {% if evaluaciones %}
+            <table class="promo-table">
+              <thead>
+                <tr>
+                  <th>Evaluación</th>
+                  <th>¿Cuenta para promoción?</th>
+                  <th>Nota mínima</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for eval in evaluaciones %}
+                {% set cfg = promo_config.get(eval.id_evaluacion, {}) %}
+                <tr>
+                  <td class="promo-eval-name">{{ eval.nombre or 'Evaluación ' ~ eval.id_evaluacion }}</td>
+                  <td class="promo-check-cell">
+                    <input type="checkbox"
+                      name="cuenta_{{ eval.id_evaluacion }}"
+                      class="promo-checkbox"
+                      data-id="{{ eval.id_evaluacion }}"
+                      {% if cfg.get('cuenta') %}checked{% endif %}
+                      onchange="toggleNotaMinima(this)">
+                  </td>
+                  <td class="promo-min-cell">
+                    <input type="number"
+                      name="nota_minima_{{ eval.id_evaluacion }}"
+                      class="promo-min-input {% if not cfg.get('cuenta') %}hidden{% endif %}"
+                      id="min-{{ eval.id_evaluacion }}"
+                      value="{{ cfg.get('nota_minima', '') }}"
+                      placeholder="—"
+                      min="0" max="10" step="0.5">
+                    <span class="promo-dash {% if cfg.get('cuenta') %}hidden{% endif %}" id="dash-{{ eval.id_evaluacion }}">—</span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="promo-save-row">
+              <button type="submit" class="btn-guardar-promo">Guardar configuración de promoción</button>
+            </div>
+            {% else %}
+              <p class="tab-empty" style="margin-top:1rem;">Creá evaluaciones primero para configurar la promoción.</p>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+
       <div class="mgmt-wrapper">
         <div class="mgmt-card">
 
@@ -185,7 +256,7 @@
           </div>
 
           <div class="mgmt-box mgmt-box--right">
-            <label class="mgmt-label">2. CREAR UN NUEVO TIPO DE EVALUACIÓN</label>
+            <label class="mgmt-label">CREAR UN NUEVO TIPO DE EVALUACIÓN</label>
             <p class="mgmt-hint">Se incorporará una nueva columna interactiva en la planilla inferior al instante.</p>
             <form action="/cursos/{{ course.id_curso }}/evaluaciones/crear" method="POST" class="create-form">
               <input type="text" name="nombre_eval" placeholder="Ej: TP1, Defensa oral, Recuperatorio..." required>
@@ -230,7 +301,7 @@
           <div class="grade-grid" id="grade-grid">
             {% for s in students %}
             {% if s.estado_alumno %}
-            {% set nota_actual = s.notas_todas.get(eval_seleccionada.id_evaluacion, '') if s.notas_todas else '' %}
+            {% set nota_actual = s.notas_todas.get(eval_seleccionada.id_evaluacion|string, s.notas_todas.get(eval_seleccionada.id_evaluacion, '')) if s.notas_todas else '' %}
             <div class="grade-card" data-equipo="{{ s.equipo or 'sin-equipo' }}">
               <div class="card-left">
                 <strong class="card-name">{{ s.nombre }} {{ s.apellido }}</strong>
@@ -280,8 +351,55 @@
             <span class="promedio-val-big">{{ promedio_general }}</span>
           </div>
         </div>
+
+        <div class="planilla-filters">
+          <select id="filtro-planilla-equipo" class="filter-select-planilla" onchange="filtrarPlanilla()">
+            <option value="">Todos los equipos</option>
+            {% set equipos_planilla = [] %}
+            {% for s in students %}
+              {% if s.estado_alumno and s.equipo and s.equipo not in equipos_planilla %}
+                {% set _ = equipos_planilla.append(s.equipo) %}
+                <option value="{{ s.equipo }}">{{ s.equipo }}</option>
+              {% endif %}
+            {% endfor %}
+            <option value="__sin_equipo__">Sin equipo</option>
+          </select>
+
+          <select id="filtro-planilla-corrector" class="filter-select-planilla" onchange="filtrarPlanilla()">
+            <option value="">Todos los correctores</option>
+            {% set correctores_planilla = [] %}
+            {% for s in students %}
+              {% if s.estado_alumno %}
+                {% for corr in s.correctores_todas.values() %}
+                  {% if corr and corr not in correctores_planilla %}
+                    {% set _ = correctores_planilla.append(corr) %}
+                    <option value="{{ corr }}">{{ corr }}</option>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </select>
+
+          {% if curso_es_promocionable %}
+          <select id="filtro-planilla-estado" class="filter-select-planilla" onchange="filtrarPlanilla()">
+            <option value="">Todos</option>
+            <option value="promociona">Promociona</option>
+            <option value="final">Final</option>
+            <option value="recursa">Recursa</option>
+          </select>
+          {% else %}
+          <select id="filtro-planilla-estado" class="filter-select-planilla" onchange="filtrarPlanilla()">
+            <option value="">Todos</option>
+            <option value="final">Final</option>
+            <option value="recursa">Recursa</option>
+          </select>
+          {% endif %}
+        </div>
+
         <div class="table-scroll">
-          <table class="planilla-table">
+          <table class="planilla-table" id="planilla-table"
+            data-es-promocionable="{{ '1' if curso_es_promocionable else '0' }}"
+            data-promo-config='{{ promo_config | tojson }}'>
             <thead>
               <tr>
                 <th class="th-padron">PADRÓN ID</th>
@@ -302,23 +420,29 @@
                   </div>
                 </th>
                 {% endfor %}
-                <th class="th-final">NOTA FINAL</th>
+                <th class="th-final">PROMEDIO</th>
+                <th class="th-estado">ESTADO</th>
               </tr>
             </thead>
             <tbody>
               {% for s in students %}
               {% if s.estado_alumno %}
-              <tr>
+              {% set correctores_csv = s.correctores_todas.values() | list | join(',') | lower %}
+              <tr class="planilla-body-row"
+                  data-equipo="{{ (s.equipo or '') | lower }}"
+                  data-correctores="{{ correctores_csv }}"
+                  data-notas='{{ s.notas_json | tojson }}'
+                  data-estado="">
                 <td class="td-padron">{{ s.padron }}</td>
                 <td class="td-nombre">{{ s.nombre }} {{ s.apellido }}</td>
                 <td class="td-comision"><span class="team-badge">{{ s.equipo or 'Sin Equipo' }}</span></td>
                 {% for eval in evaluaciones %}
                 <td class="td-nota">
-                  {% set nota = s.notas_todas.get(eval.id_evaluacion, None) if s.notas_todas else None %}
+                  {% set nota = s.notas_todas.get(eval.id_evaluacion|string, s.notas_todas.get(eval.id_evaluacion, None)) if s.notas_todas else None %}
                   {% if nota is not none and nota != '' %}
                     <div class="nota-cell {% if nota|float >= 4 %}nota-cell--ok{% else %}nota-cell--mal{% endif %}">
                       <span class="nota-num">{{ nota }}</span>
-                      {% set corr_col = s.correctores_todas.get(eval.id_evaluacion, '') if s.correctores_todas else '' %}
+                      {% set corr_col = s.correctores_todas.get(eval.id_evaluacion|string, s.correctores_todas.get(eval.id_evaluacion, '')) if s.correctores_todas else '' %}
                       {% if corr_col %}
                       <span class="nota-by">por {{ corr_col }}</span>
                       {% endif %}
@@ -337,6 +461,7 @@
                     <span class="nota-vacia">—</span>
                   {% endif %}
                 </td>
+                <td class="td-estado-final"></td>
               </tr>
               {% endif %}
               {% endfor %}
@@ -344,6 +469,7 @@
           </table>
         </div>
       </div>
+
     </div>
 
     <div id="tab-ads" class="tab-panel {% if active_tab != 'ads' %}hidden{% endif %}">

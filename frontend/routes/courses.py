@@ -119,6 +119,7 @@ def course_detail(course_id):
           except ValueError:
             pass
     s['notas_todas'] = notas_dict
+    s['notas_json'] = {str(k): v for k, v in notas_dict.items()}
   
     correctores_dict = {}
     raw_corr = s.get('correctores_raw') or ""
@@ -181,6 +182,26 @@ def course_detail(course_id):
   except Exception as e:
       print(f"Error loading teams: {e}")
       teams = []
+
+  try:
+    promo_res = requests.get(
+      f'http://127.0.0.1:5000/cursos/{course_id}/promocion',
+      headers=headers
+    )
+    promo_json = promo_res.json()
+    promo_data = promo_json.get('config', {})
+    curso_es_promocionable = promo_data.get('es_promocionable', False)
+    promo_evals = promo_data.get('evaluaciones', [])
+    promo_config = {}
+    for p in promo_evals:
+        promo_config[p['id_evaluacion']] = {
+            'cuenta': bool(p.get('cuenta_para_promocion')),
+            'nota_minima': p.get('nota_minima')
+        }
+  except Exception as e:
+    print(f"Error cargando config promo: {e}")
+    curso_es_promocionable = False
+    promo_config = {}
       
   return render_template(
     'course_detail.html',
@@ -196,6 +217,8 @@ def course_detail(course_id):
     eval_seleccionada=eval_seleccionada,
     promedio_eval=promedio_eval,
     promedio_general=promedio_general,
+    curso_es_promocionable=curso_es_promocionable,
+    promo_config=promo_config,
   )
  
 
@@ -280,4 +303,43 @@ def eliminar_evaluacion(course_id, eval_id):
     if session.get('eval_seleccionada') == eval_id:
         session.pop('eval_seleccionada', None)
  
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
+
+
+@courses_bp.route('/cursos/<int:course_id>/promocion/guardar', methods=['POST'])
+def guardar_promocion(course_id):
+
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('auth.login'))
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    es_promocionable = request.form.get('es_promocionable') == '1'
+
+    evaluaciones = []
+    eval_ids = request.form.getlist('eval_ids')
+    for eval_id_str in eval_ids:
+        id_eval = int(eval_id_str)
+        cuenta = f'cuenta_{id_eval}' in request.form
+        nota_raw = request.form.get(f'nota_minima_{id_eval}', '')
+        nota_minima = float(nota_raw) if nota_raw != '' else None
+        evaluaciones.append({
+            'id_evaluacion': id_eval,
+            'cuenta': cuenta,
+            'nota_minima': nota_minima
+        })
+
+    try:
+        requests.post(
+            f'http://127.0.0.1:5000/cursos/{course_id}/promocion',
+            json={
+                'es_promocionable': es_promocionable,
+                'evaluaciones': evaluaciones
+            },
+            headers=headers
+        )
+    except Exception as e:
+        print(f"Error guardando promo: {e}")
+
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))

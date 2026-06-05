@@ -6,11 +6,14 @@ from services.exam_service import (
     patch_exam_service,
     delete_exam_service,
     save_exam_notes_service,
-    students_notes_report_service
+    students_notes_report_service,
+    get_promocion_config_service,
+    save_promocion_config_service,
 )
 from middleware.auth_middleware import require_auth
  
 exam_bp = Blueprint('exam', __name__)
+
 @exam_bp.route("/evaluaciones", methods=["GET"])
 def obtain_exams_params():
     filters = {
@@ -66,3 +69,15 @@ def save_notes():
 def obtain_students_report():
     id_curso = request.args.get('id_curso')
     return students_notes_report_service(id_curso)
+
+# PROMOCIÓN
+
+@exam_bp.route("/cursos/<int:id_curso>/promocion", methods=["GET"])
+def get_promocion_config(id_curso):
+    return get_promocion_config_service(id_curso)
+
+
+@exam_bp.route("/cursos/<int:id_curso>/promocion", methods=["POST"])
+# @require_auth # descomentar cuando el auth este listo
+def save_promocion_config(id_curso):
+    return save_promocion_config_service(id_curso, request.get_json(silent=True))

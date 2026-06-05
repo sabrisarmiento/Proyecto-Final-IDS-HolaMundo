@@ -157,3 +157,22 @@ CREATE TABLE notas (
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
     FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
+
+-- configuracion promocion --
+CREATE TABLE configuracion_promocion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_curso INT NOT NULL,
+    es_promocionable BOOLEAN NOT NULL DEFAULT FALSE,
+    id_evaluacion INT NOT NULL,
+    cuenta_para_promocion BOOLEAN NOT NULL DEFAULT FALSE,
+    nota_minima DECIMAL(4, 2) NULL,
+    CONSTRAINT uq_curso_evaluacion UNIQUE (id_curso, id_evaluacion),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion) ON DELETE CASCADE
+);
+
+CREATE TABLE curso_promocion_config (
+    id_curso INT PRIMARY KEY,
+    es_promocionable BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
+);
