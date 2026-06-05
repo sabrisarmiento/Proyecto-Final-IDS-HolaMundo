@@ -5,8 +5,8 @@ from controllers.subject_controller import (
     create_subject
 )
 
-def subjects_service():
-  result = get_all_subjects()
+def subjects_service(filters):
+  result = get_all_subjects(filters)
   if not result["ok"]:
     return error_response(result)
   return success_response({

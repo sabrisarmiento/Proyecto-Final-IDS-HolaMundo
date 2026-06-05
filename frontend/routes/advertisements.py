@@ -1,46 +1,31 @@
-from flask import Blueprint, render_template, session, request
+from flask import Blueprint, render_template, request
 #from services.advertisement_frontend_service import AdvertisementFrontendService
-from services.course_frontend_service import course_get_all
 #from services.slack_advertisement_frontend_service import SlackAdvertisementFrontendService
-from services.advertisement_frontend_service import get_all_combined_advertisements
-from services.courses_service import get_courses
-from services.subjects_service import get_subject_by_id, get_subjects
+from services.subjects_service import get_subjects
+from services.advertisments_service import get_advertisements_by_subject
 
 advertisements_bp = Blueprint('advertisements', __name__)
 
 @advertisements_bp.route('/avisos')
 def public_advertisements():
-    id_subject = request.args.get("subject")
-    avisos = []
-    cursos = []
-    cursos_by_subject = []
-    subjects = []
+  avisos = []
+  view = request.args.get("subject")
 
-    if id_subject:
-        id_subject = int(id_subject)
-        cursos = get_courses()
-        subject = get_subject_by_id(id_subject).get("subject", {})
-        cursos_by_subject = [c for c in cursos if c.get("materia") == subject.get("nombre")]
-
-        for curso in cursos_by_subject:
-            avisos.extend(get_all_combined_advertisements(curso["id_curso"]))
-
+  if view is not None:
     try:
-        subjects = get_subjects()
+      avisos = get_advertisements_by_subject(int(view))
     except Exception as e:
-        print(f"Error al obtener materias: {e}")
-
-    subject = get_subject_by_id(id_subject).get("subject", {}) if id_subject else {}
-
-    return render_template(
-        "advertisements.html",
-        avisos=avisos,
-        cursos=cursos_by_subject,
-        subject=subject,
-        subjects=subjects,
-        selected_subject=id_subject,
-        active_page="advertisements"
-    )
+      print(f"Error al obtener avisos para la materia {view}: {e}")
+  
+  subjects = get_subjects()
+  
+  return render_template(
+    "advertisements.html",
+    active_page="advertisements",
+    avisos=avisos,
+    subjects=subjects,
+    selected_subject=int(view) if view else None
+  )
 
 
 # @advertisements_bp.route('/avisos/slack')

@@ -4,7 +4,8 @@ from services.advertisement_service import (
   advertisement_service,
   create_advertisement_service,
   patch_advertisement_service,
-  delete_advertisement_service
+  delete_advertisement_service,
+  advertisements_by_subject_service
 )
 from services.slack_advertisement_service import slack_advertisements_service
 from middleware.auth_middleware import require_auth
@@ -46,4 +47,8 @@ def update_advertisement(id_advertisement):
 @advertisements_bp.route('/advertisements/<id_advertisement>', methods=['DELETE'])
 @require_auth
 def delete_advertisement(id_advertisement):
-  return delete_advertisement_service(id_advertisement)  
+  return delete_advertisement_service(id_advertisement)
+
+@advertisements_bp.route('/advertisements/subject/<int:id_materia>', methods=['GET'])
+def get_advertisements_by_subject_route(id_materia):
+    return advertisements_by_subject_service(id_materia)

@@ -1,8 +1,16 @@
 from database.db import query_db, modify_db
 
-def get_all_subjects():
+def get_all_subjects(filters):
   try:
-    result = query_db("SELECT * FROM materias")
+    name=filters.get("name")
+
+    sql = "SELECT id_materia, nombre, codigo FROM materias"
+    condition = " WHERE 1=1"
+    params = []
+    if name is not None:
+      condition += " AND nombre = %s"
+      params.append(name)
+    result = query_db(sql + condition, params)
     return {
       "ok": True,
       "data": result

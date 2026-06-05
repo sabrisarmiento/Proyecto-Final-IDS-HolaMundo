@@ -1,5 +1,5 @@
 from helpers.responses import error_response, success_response
-from controllers.advertisement_controller import get_all_advertisements, create_advertisement, get_advertisement_by_id, patch_advertisement_by_id, delete_advertisement_by_id
+from controllers.advertisement_controller import get_all_advertisements, create_advertisement, get_advertisement_by_id, patch_advertisement_by_id, delete_advertisement_by_id, get_advertisements_by_subject
 
 def advertisements_service(filters):
   result = get_all_advertisements(filters)
@@ -40,3 +40,11 @@ def delete_advertisement_service(id_advertisement):
   return success_response({
       "message": result["message"]
   })
+
+def advertisements_by_subject_service(id_materia):
+    result = get_advertisements_by_subject(id_materia)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({
+        "advertisements": result["data"]
+    })

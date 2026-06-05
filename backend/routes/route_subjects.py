@@ -10,7 +10,12 @@ subjects_bp = Blueprint('subjects', __name__)
 
 @subjects_bp.route('/subjects', methods=['GET'])
 def get_subjects():
-  return subjects_service()
+
+  filters = {
+    "name" : request.args.get('nombre')
+  }
+
+  return subjects_service(filters)
 
 @subjects_bp.route('/subjects/<int:subject_id>', methods=['GET'])
 def get_subject(subject_id):
