@@ -6,7 +6,9 @@ from controllers.exam_controller import (
     patch_exam_by_id,
     delete_exam_by_id,
     save_notes_to_db,
-    get_students_with_notes_db
+    get_students_with_notes_db,
+    get_promocion_config_db,
+    save_promocion_config_db,
 )
  
  
@@ -80,3 +82,30 @@ def students_notes_report_service(id_curso):
     if not result["ok"]:
         return error_response(result)
     return success_response({"data": result['data']})
+
+# PROMOCION
+
+def get_promocion_config_service(id_curso):
+    if not id_curso:
+        return error_response({
+            "ok": False, "code": 400,
+            "message": "Bad Request", "description": "id_curso requerido"
+        })
+    result = get_promocion_config_db(id_curso)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({"config": result["data"]})
+
+
+def save_promocion_config_service(id_curso, data):
+    if not id_curso or not data:
+        return error_response({
+            "ok": False, "code": 400,
+            "message": "Bad Request", "description": "Datos requeridos"
+        })
+    es_promocionable = data.get("es_promocionable", False)
+    evaluaciones     = data.get("evaluaciones", [])
+    result = save_promocion_config_db(id_curso, es_promocionable, evaluaciones)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({"message": result["message"]})

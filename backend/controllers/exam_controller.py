@@ -221,11 +221,6 @@ def delete_exam_by_id(id_exam):
 
 
 def save_notes_to_db(id_exam, notes_dict, id_corrector, correctores_dict=None):
-    """
-    Guarda las notas.
-    - correctores_dict: {id_alumno: "nombre libre"} texto escrito por el docente.
-    - id_corrector: int del usuario logueado (fallback si no hay texto libre).
-    """
     try:
         if correctores_dict is None:
             correctores_dict = {}
@@ -297,4 +292,82 @@ def get_students_with_notes_db(id_curso):
             "code": 500,
             "message": "Internal Server Error",
             "description": f"Error al obtener reporte: {str(e)}"
+        }
+
+# PROMOCION
+
+def get_promocion_config_db(id_curso):
+    try:
+        flag = query_db(
+            "SELECT es_promocionable FROM curso_promocion_config WHERE id_curso = %s",
+            (id_curso,)
+        )
+        es_promocionable = flag[0]['es_promocionable'] if flag else False
+
+        detalle = query_db(
+            """
+            SELECT id_evaluacion, cuenta_para_promocion, nota_minima
+            FROM configuracion_promocion
+            WHERE id_curso = %s
+            """,
+            (id_curso,)
+        )
+
+        return {
+            "ok": True,
+            "data": {
+                "es_promocionable": bool(es_promocionable),
+                "evaluaciones": detalle or []
+            }
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
+
+
+def save_promocion_config_db(id_curso, es_promocionable, evaluaciones):
+    try:
+        modify_db(
+            """
+            INSERT INTO curso_promocion_config (id_curso, es_promocionable)
+            VALUES (%s, %s)
+            ON DUPLICATE KEY UPDATE es_promocionable = VALUES(es_promocionable)
+            """,
+            (id_curso, bool(es_promocionable))
+        )
+
+        for ev in evaluaciones:
+            id_eval = ev.get('id_evaluacion')
+            cuenta = bool(ev.get('cuenta', ev.get('cuenta_para_promocion', False)))
+            nota_min = ev.get('nota_minima', None)
+            if nota_min is not None:
+                try:
+                    nota_min = float(nota_min)
+                except (ValueError, TypeError):
+                    nota_min = None
+
+            modify_db(
+                """
+                INSERT INTO configuracion_promocion
+                    (id_curso, id_evaluacion, es_promocionable, cuenta_para_promocion, nota_minima)
+                VALUES (%s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                    cuenta_para_promocion = VALUES(cuenta_para_promocion),
+                    nota_minima           = VALUES(nota_minima),
+                    es_promocionable      = VALUES(es_promocionable)
+                """,
+                (id_curso, id_eval, bool(es_promocionable), cuenta, nota_min)
+            )
+
+        return {"ok": True, "message": "Configuración de promoción guardada correctamente"}
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
         }
