@@ -99,3 +99,9 @@ window.addEventListener('DOMContentLoaded', function () {
     });
     recalcularPromedio();
 });
+
+function toggleTeam(teamId) {
+    const div = document.getElementById(`team-${teamId}`);
+    if (!div) return;
+    div.classList.toggle('hidden');
+}

@@ -172,10 +172,21 @@ def course_detail(course_id):
 
   total_pages = max(1, (total + per_page - 1) // per_page)
 
+  try:
+    token = session.get('token')
+    headers = {'Authorization': f'Bearer {token}'}
+    teams_res = requests.get( f'http://127.0.0.1:5000/equipos?id_curso={course_id}', headers=headers)
+    teams_json = teams_res.json()
+    teams = (teams_json.get("teams") or teams_json.get("data") or [])
+  except Exception as e:
+      print(f"Error loading teams: {e}")
+      teams = []
+      
   return render_template(
     'course_detail.html',
     course=course,
     students=students_data,
+    teams=teams,
     active_page='courses',
     page=page,
     total_pages=total_pages,
