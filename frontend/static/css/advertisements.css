@@ -88,3 +88,14 @@
     border-radius: 12px;
     font-size: 1rem;
 }
+
+.prints{
+    display: flex;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.print{
+    display: flex;
+    flex-direction: column;
+}
