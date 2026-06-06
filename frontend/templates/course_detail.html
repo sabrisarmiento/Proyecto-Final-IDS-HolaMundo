@@ -142,9 +142,70 @@
       {% endif %}
     </div>
 
-    <div id="tab-calendar" class="tab-panel {% if active_tab != 'calendar' %}hidden{% endif %}">
-      <p class="tab-empty">Aca va Calendario</p>
+
+
+<div id="tab-calendar" class="tab-panel {% if active_tab != 'calendar' %}hidden{% endif %}">
+
+  <form class="calendar-form" onsubmit="event.preventDefault();">
+    <div>
+      <label for="fecha-clase">
+        Fecha:
+      </label>
+      <input
+        type="date"
+        id="fecha-clase"
+        name="fecha_clase"
+      >
     </div>
+
+    <div>
+      <label for="semana-clase">
+        Semana:</label>
+      <input
+        type="number"
+        id="semana-clase"
+        name="semana"
+        placeholder="Indicar semana..."
+      >
+    </div>
+
+    <div>
+      <label for="temas-clase">
+        Temas:
+      </label>
+      <input
+        type="text"
+        id="temas-clase"
+        name="temas"
+        placeholder="Escribir temas..."
+      >
+    </div>
+
+    <div>
+      <label for="tipo-clase">Tipo:</label>
+      <select id="tipo-clase" name="tipo">
+        <option value="Teórica">Teórica</option>
+        <option value="Práctica">Práctica</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="modalidad-clase">Modalidad:</label>
+      <select id="modalidad-clase" name="modalidad">
+        <option value="Presencial">Presencial</option>
+        <option value="Virtual">Virtual</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-primary">
+      Agregar clase
+    </button>
+
+  </form>
+
+</div>
+
+
 
     <div id="tab-marks" class="tab-panel {% if active_tab != 'marks' %}hidden{% endif %}">
 
