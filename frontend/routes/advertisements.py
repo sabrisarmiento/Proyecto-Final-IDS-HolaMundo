@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session, redirect, url_for
 #from services.advertisement_frontend_service import AdvertisementFrontendService
 #from services.slack_advertisement_frontend_service import SlackAdvertisementFrontendService
 from services.subjects_service import get_subjects
-from services.advertisments_service import get_advertisements_by_subject
+from services.advertisements_service import get_advertisements_by_subject, create_advertisement
 
 advertisements_bp = Blueprint('advertisements', __name__)
 
@@ -27,7 +27,31 @@ def public_advertisements():
     selected_subject=int(view) if view else None
   )
 
+@advertisements_bp.route('/cursos/<int:id_curso>/avisos/nuevo', methods=['GET', 'POST'])
+def create_advertisement_front(id_curso):
+  if request.method == 'POST':
+    title = request.form.get("titulo")
+    message = request.form.get("mensaje")
+    token = session.get("token")
 
+    if not token:
+      return redirect(url_for("auth.login"))
+
+    result = create_advertisement(id_curso, title, message, token)
+
+    if result["ok"]:
+      return redirect(url_for("advertisements.public_advertisements"))
+
+    return render_template(
+      "create_advertisement.html",
+      id_curso=id_curso,
+      error="No se pudo crear el aviso"
+    )
+
+  return render_template(
+    "create_advertisement.html",
+    id_curso=id_curso
+  )
 # @advertisements_bp.route('/avisos/slack')
 # def slack_advertisements():
 

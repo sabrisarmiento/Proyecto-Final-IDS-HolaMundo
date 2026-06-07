@@ -1,4 +1,5 @@
 from database.db import query_db, modify_db
+from helpers.user_belongs import user_belongs_to_course
 
 def get_all_advertisements(filters):
   try:
@@ -84,13 +85,27 @@ def get_advertisement_by_id(id_advertisement):
       "description": str(e)
     }
 
-def create_advertisement(data):
+def create_advertisement(data, user):
   try:
-    id_user = data.get("id_usuario")
+    id_user = user["id_usuario"]
     id_course = data.get("id_curso")
     title = data.get("titulo")
     message = data.get("mensaje")
 
+    if not id_course or not title or not message:
+      return {
+        "ok": False,
+        "code": 400,
+        "message": "Bad Request",
+        "description": "Faltan datos obligatorios"
+      }
+    if not user_belongs_to_course(id_user, id_course):
+      return {
+        "ok": False,
+        "code": 403,
+        "message": "Forbidden",
+        "description": "No tenés permisos para crear avisos en este curso"
+      }
     sql = """
       INSERT INTO avisos (id_usuario, id_curso, titulo, mensaje)
       VALUES (%s, %s, %s, %s)
