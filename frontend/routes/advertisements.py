@@ -22,8 +22,8 @@ def public_advertisements():
   return render_template(
     "advertisements.html",
     active_page="advertisements",
-    avisos=avisos,
     subjects=subjects,
+    avisos=avisos,
     selected_subject=int(view) if view else None
   )
 
