@@ -107,25 +107,26 @@
             Crear equipo
         </button>
         {% call modal("create-team-modal", "Crear Equipo") %}
-            <form
-                action="{{ url_for('courses.create_team', course_id=course.id_curso) }}"
-                method="POST"
+          <form
+              action="{{ url_for('courses.create_team', course_id=course.id_curso) }}"
+              method="POST"
+          >
+            <label>Nombre del equipo:</label>
+            <input
+                type="text"
+                name="nombre_equipo"
+                required
             >
-                <label>Nombre del equipo:</label>
-                <input
-                    type="text"
-                    name="nombre_equipo"
-                    required
-                >
-                <button type="submit">
-                    Crear
-                </button>
-            </form>
+            <button type="submit">
+              Crear
+            </button>
+          </form>
         {% endcall %}
-    </section>
+      </section>
       {% if teams %}
           {% for team in teams %}
             <div class="team-card">
+              <div class="team-header-row">
                 <button
                     type="button"
                     class="team-header"
@@ -133,33 +134,48 @@
                 >
                     {{ team.nombre_equipo }}
                 </button>
-                  <div
-                      id="team-{{ team.id_equipo }}"
-                      class="team-members hidden"
-                  >
-                      {% if team.alumnos %}
-                          <table class="tab-table">
-                              <thead>
-                                  <tr>
-                                      <th>Nombre</th>
-                                      <th>Apellido</th>
-                                      <th>Padrón</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  {% for alumno in team.alumnos %}
-                                  <tr>
-                                      <td>{{ alumno.nombre }}</td>
-                                      <td>{{ alumno.apellido }}</td>
-                                      <td>{{ alumno.padron }}</td>
-                                  </tr>
-                                  {% endfor %}
-                              </tbody>
-                          </table>
-                      {% else %}
-                          <p>Este equipo no tiene integrantes.</p>
-                      {% endif %}
-                  </div>
+                <form method="POST">
+                    <input
+                        type="hidden"
+                        name="delete_team"
+                        value="{{ team.id_equipo }}"
+                    >
+
+                    <button
+                        type="submit"
+                        onclick="return confirm('¿Eliminar equipo?')"
+                    >
+                        🗑️
+                    </button>
+                </form>
+              </div>
+              <div
+                  id="team-{{ team.id_equipo }}"
+                  class="team-members hidden"
+              >
+                {% if team.alumnos %}
+                    <table class="tab-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Padrón</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alumno in team.alumnos %}
+                            <tr>
+                                <td>{{ alumno.nombre }}</td>
+                                <td>{{ alumno.apellido }}</td>
+                                <td>{{ alumno.padron }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Este equipo no tiene integrantes.</p>
+                {% endif %}
+              </div>
             </div>
           {% endfor %}
       {% else %}

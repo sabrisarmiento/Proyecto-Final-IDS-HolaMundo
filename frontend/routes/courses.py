@@ -37,6 +37,15 @@ def set_general():
 @courses_bp.route('/cursos/<int:course_id>', methods=['GET', 'POST'])
 def course_detail(course_id):
   if request.method == 'POST':
+    if request.form.get("delete_team"):
+      team_id = request.form.get("delete_team")
+      try:
+          token = session.get("token")
+          headers = {"Authorization": f"Bearer {token}"}
+          requests.delete(f"http://127.0.0.1:5000/equipos/{team_id}", headers=headers)
+      except Exception as e:
+          print(f"Error deleting team: {e}")
+      return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
     try:
       token = session.get('token')
       headers = {'Authorization': f'Bearer {token}'}
