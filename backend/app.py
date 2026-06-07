@@ -2,7 +2,7 @@ from flask import Flask
 from routes import (
     advertisements_bp, attendance_bp, exam_bp, classes_bp, exam_types_bp,
     marks_bp, roles_bp, students_bp, users_bp, teams_bp, materials_bp,
-    auth_bp, courses_bp, subjects_bp, dashboard_course_bp
+    auth_bp, courses_bp, subjects_bp, dashboard_course_bp, dashboard_general_bp
 )
 app = Flask(__name__)
 
@@ -25,6 +25,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(courses_bp)
 app.register_blueprint(subjects_bp)
 app.register_blueprint(dashboard_course_bp)
+app.register_blueprint(dashboard_general_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)
