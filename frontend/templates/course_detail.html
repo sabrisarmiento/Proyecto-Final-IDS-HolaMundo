@@ -643,11 +643,43 @@
       </div>
 
     </div>
-
+    <!-- 
     <div id="tab-ads" class="tab-panel {% if active_tab != 'ads' %}hidden{% endif %}">
       <p class="tab-empty">Aca va Avisos</p>
     </div>
+    -->
+    <div id="tab-ads" class="tab-panel {% if active_tab != 'ads' %}hidden{% endif %}">
 
+      <div class="ads-header">
+        <h2>Avisos del curso</h2>
+
+        <a 
+          class="btn-crear"
+          href="{{ url_for('advertisements.create_advertisement_front', id_curso=course['id_curso']) }}"
+        >
+          + Crear aviso
+        </a>
+      </div>
+
+    {% if advertisements %}
+      <div class="advertisements-list">
+        {% for aviso in advertisements %}
+          <article class="advertisement-card">
+            <div class="advertisement-card-header">
+              <span>{{ aviso.fecha }}</span>
+              <span>Publicado por: {{ aviso.emisor }}</span>
+            </div>
+
+          <h3>{{ aviso.titulo }}</h3>
+          <p>{{ aviso.mensaje }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="tab-empty">No hay avisos cargados para este curso.</p>
+  {% endif %}
+
+</div>
   </div>
 </section>
 
