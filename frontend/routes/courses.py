@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 
 import requests
 
@@ -343,3 +343,16 @@ def guardar_promocion(course_id):
         print(f"Error guardando promo: {e}")
 
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
+
+@courses_bp.route('/cursos/<int:course_id>/dashboard-data', methods=['GET'])
+def course_dashboard_data(course_id):
+    try:
+        token = session.get('token')
+        headers = {'Authorization': f'Bearer {token}'} if token else {}
+        res = requests.get(
+            f'http://127.0.0.1:5000/cursos/{course_id}/dashboard',
+            headers=headers
+        )
+        return jsonify(res.json()), res.status_code
+    except Exception as e:
+        return jsonify({"error": str(e)}), 502

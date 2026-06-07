@@ -10,6 +10,8 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/course_detail.css') }}"
 />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_course.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 {% block content %}
 <section class="course-detail-header">
@@ -30,11 +32,120 @@
 
   <div class="tab-content">
 
-    <div id="tab-general" class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
-      <p><strong>Materia:</strong> {{ course.materia }}</p>
-      <p><strong>Cátedra:</strong> {{ course.catedra }}</p>
-      <p><strong>Cuatrimestre:</strong> {{ course.cuatrimestre }}</p>
-      <p><strong>Año:</strong> {{ course.anio }}</p>
+    <div id="tab-general"
+        class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
+ 
+
+        <div id="dash-curso-root" data-course-id="{{ course.id_curso }}">
+ 
+            <div id="dash-curso-loading" class="dash-loading">
+                <span class="dash-spinner"></span>
+                <p>Cargando estadisticas…</p>
+            </div>
+ 
+            <p id="dash-curso-error" class="dash-error hidden"></p>
+ 
+            <div id="dash-curso-content" class="hidden">
+ 
+                <section class="dash-info-row">
+                    <div class="dash-info-item">
+                        <span class="dash-info-label">Materia</span>
+                        <span class="dash-info-value">{{ course.materia }}</span>
+                    </div>
+                    <div class="dash-info-item">
+                        <span class="dash-info-label">Cátedra</span>
+                        <span class="dash-info-value">{{ course.catedra }}</span>
+                    </div>
+                    <div class="dash-info-item">
+                        <span class="dash-info-label">Cuatrimestre</span>
+                        <span class="dash-info-value">{{ course.cuatrimestre }} — {{ course.anio }}</span>
+                    </div>
+                </section>
+
+                <section class="dash-stats-grid">
+ 
+                    <div class="dash-stat-card dash-stat--primary">
+                        <span class="dash-stat-label">Total Inscriptos</span>
+                        <strong class="dash-stat-num" id="dash-total-alumnos">—</strong>
+                        <span class="dash-stat-sub">
+                            <span id="dash-activos">—</span> activos ·
+                            <span id="dash-abandonaron">—</span> abandonaron
+                        </span>
+                    </div>
+ 
+                    <div class="dash-stat-card">
+                        <span class="dash-stat-label">Equipos</span>
+                        <strong class="dash-stat-num" id="dash-equipos">—</strong>
+                        <span class="dash-stat-sub">grupos de trabajo</span>
+                    </div>
+ 
+                    <div class="dash-stat-card dash-stat--accent">
+                        <span class="dash-stat-label">Promedio General</span>
+                        <strong class="dash-stat-num" id="dash-promedio">—</strong>
+                        <span class="dash-stat-sub">escala 0 – 10</span>
+                    </div>
+ 
+                    <div class="dash-stat-card">
+                        <span class="dash-stat-label">Promocionan</span>
+                        <strong class="dash-stat-num dash-stat-num--green" id="dash-promocionados">—</strong>
+                        <span class="dash-stat-sub">alumnos</span>
+                    </div>
+ 
+                    <div class="dash-stat-card">
+                        <span class="dash-stat-label">Van a Final</span>
+                        <strong class="dash-stat-num" id="dash-van-final">—</strong>
+                        <span class="dash-stat-sub">alumnos</span>
+                    </div>
+ 
+                    <div class="dash-stat-card dash-stat--warn">
+                        <span class="dash-stat-label">Recursantes</span>
+                        <strong class="dash-stat-num" id="dash-recursantes">—</strong>
+                        <span class="dash-stat-sub">alumnos</span>
+                    </div>
+ 
+                </section>
+ 
+                <section class="dash-charts-grid">
+
+                    <div class="dash-chart-card dash-chart-card--wide">
+                        <h4 class="dash-chart-title">Rendimiento por Evaluación</h4>
+                        <p class="dash-chart-subtitle">Promedio de notas</p>
+                        <div class="dash-chart-wrap" style="height:220px;">
+                            <canvas id="chart-rendimiento"></canvas>
+                        </div>
+                        <p class="dash-chart-empty hidden">Sin evaluaciones cargadas</p>
+                    </div>
+ 
+                    <div class="dash-chart-card">
+                        <h4 class="dash-chart-title">Asistencia</h4>
+                        <p class="dash-chart-subtitle">Regularidad de asistencia</p>
+                        <div class="dash-asist-badges">
+                            <span class="dash-asist-badge dash-asist-badge--ok">
+                                <strong id="dash-asist-regulares">—</strong> regulares
+                            </span>
+                            <span class="dash-asist-badge dash-asist-badge--risk">
+                                <strong id="dash-asist-en-riesgo">—</strong> en riesgo
+                            </span>
+                        </div>
+                        <div class="dash-chart-wrap" style="height:180px;">
+                            <canvas id="chart-asistencia"></canvas>
+                        </div>
+                        <p class="dash-chart-empty hidden">Sin datos de asistencia</p>
+                    </div>
+ 
+                    <div class="dash-chart-card">
+                        <h4 class="dash-chart-title">Estado de la Cursada</h4>
+                        <p class="dash-chart-subtitle">Distribución actual del alumnado</p>
+                        <div class="dash-chart-wrap" style="height:180px;">
+                            <canvas id="chart-estado"></canvas>
+                        </div>
+                        <p class="dash-chart-empty hidden">Sin notas cargadas</p>
+                    </div>
+ 
+                </section>
+ 
+            </div>
+        </div>
     </div>
 
     <div id="tab-students" class="tab-panel {% if active_tab != 'students' %}hidden{% endif %}">
@@ -546,10 +657,11 @@
     <p class="modal-body" id="modal-msg">¿Estás seguro de que querés eliminar esta evaluación?</p>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="document.getElementById('delete-modal').close()">Cancelar</button>
-      <button class="btn-modal-confirm" id="modal-confirm-btn">Sí, eliminar</button>
+      <button class="btn-modal-confirm" id="modal-confirm-btn">Si, eliminar</button>
     </div>
   </div>
 </dialog>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/course_detail.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard_course.js') }}"></script>
 {% endblock %}
