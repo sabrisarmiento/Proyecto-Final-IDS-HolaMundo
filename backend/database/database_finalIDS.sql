@@ -176,3 +176,15 @@ CREATE TABLE curso_promocion_config (
     es_promocionable BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
+
+
+-- 1. Insertar materia
+INSERT INTO materias (nombre) VALUES ('Introducción al Desarrollo de Software');
+
+-- 2. Insertar curso (usando id_materia=1)
+INSERT INTO cursos (id_materia, catedra, cuatrimestre, anio)
+VALUES (1, 'Lanzillota', '1C', 2026);
+
+-- 3. Recién ahí insertar alumnos
+INSERT INTO alumnos (nombre, apellido, padron, correo, estado_alumno, id_curso)
+VALUES ('bautista', 'rago', 115781, 'bautirago2005@gmail.com', 1, 1);
