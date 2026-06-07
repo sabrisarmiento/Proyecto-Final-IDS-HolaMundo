@@ -12,6 +12,7 @@ from .route_materials import materials_bp
 from .route_auth import auth_bp
 from .route_courses import courses_bp
 from .route_subjects import subjects_bp
+from .route_team_student import team_student_bp
 
 __all__ = ["advertisements_bp", 
           "attendance_bp", 
@@ -26,5 +27,6 @@ __all__ = ["advertisements_bp",
           "materials_bp",
           "auth_bp",
           "courses_bp",
-          "subjects_bp"
+          "subjects_bp",
+          "team_student_bp"
 ]
