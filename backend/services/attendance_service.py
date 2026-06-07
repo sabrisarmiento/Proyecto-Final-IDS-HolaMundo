@@ -74,11 +74,15 @@ def generate_qr_service(id_clase):
         if not alumnos:
             return jsonify({"message": "No se encontraron alumnos activos para esta clase"}), 404
 
+        enviados = 0
         for alumno in alumnos:
             raw_data = f"{alumno['id_alumno']}-{id_clase}-2026-secret"
             qr_hash = hashlib.sha256(raw_data.encode()).hexdigest()
 
             qr_url = f"https://introds-web.vercel.app/presente?id_alumno={alumno['id_alumno']}&id_clase={id_clase}&code={qr_hash}"
+            
+            if send_attendance_email(alumno['correo'], alumno['nombre'], qr_url):
+                enviados += 1
 
             print(f"Enviando QR a {alumno['correo']}: {qr_url}")
 
