@@ -4,10 +4,12 @@ from datetime import datetime
 
 def get_general_dashboard():
     try:
-        total_usuarios = query_db("SELECT COUNT(*) AS total FROM usuarios")[0]["total"]
         anio_actual = datetime.now().year
-        mes_actual = datetime.now().month
+        mes_actual  = datetime.now().month
         cuatrimestre_actual = 1 if mes_actual <= 7 else 2
+
+        total_usuarios = query_db("SELECT COUNT(*) AS total FROM usuarios")[0]["total"]
+
         cursos_activos = query_db(
             "SELECT COUNT(*) AS total FROM cursos WHERE anio = %s AND cuatrimestre = %s",
             (anio_actual, cuatrimestre_actual)
@@ -25,7 +27,9 @@ def get_general_dashboard():
             """
         )
 
-        roles = query_db("SELECT id_rol, nombre, nivel_administracion FROM roles ORDER BY nivel_administracion DESC")
+        roles = query_db(
+            "SELECT id_rol, nombre, nivel_administracion FROM roles ORDER BY nivel_administracion DESC"
+        )
 
         rendimiento_historico = query_db(
             """
@@ -58,18 +62,38 @@ def get_general_dashboard():
             (anio_actual, cuatrimestre_actual)
         )
 
+        logs_recientes = query_db(
+            """
+            SELECT
+                l.id_log,
+                l.fecha,
+                COALESCE(l.nombre_usuario, CONCAT(u.nombre, ' ', u.apellido), 'Usuario eliminado') AS usuario,
+                l.accion,
+                l.descripcion,
+                m.nombre  AS materia,
+                c.catedra
+            FROM logs_sistema l
+            LEFT JOIN usuarios u ON l.id_usuario = u.id_usuario
+            LEFT JOIN cursos   c ON l.id_curso   = c.id_curso
+            LEFT JOIN materias m ON c.id_materia  = m.id_materia
+            ORDER BY l.fecha DESC
+            LIMIT 50
+            """
+        )
+
         return {
             "ok": True,
             "data": {
-                "total_usuarios": total_usuarios,
-                "cursos_activos": cursos_activos,
-                "total_alumnos": total_alumnos,
-                "usuarios": usuarios,
-                "roles": roles,
+                "total_usuarios":        total_usuarios,
+                "cursos_activos":        cursos_activos,
+                "total_alumnos":         total_alumnos,
+                "usuarios":              usuarios,
+                "roles":                 roles,
                 "rendimiento_historico": rendimiento_historico,
-                "cursos_stats": cursos_stats,
-                "anio_actual": anio_actual,
-                "cuatrimestre_actual": cuatrimestre_actual,
+                "cursos_stats":          cursos_stats,
+                "logs_recientes":        logs_recientes,
+                "anio_actual":           anio_actual,
+                "cuatrimestre_actual":   cuatrimestre_actual,
             }
         }
 

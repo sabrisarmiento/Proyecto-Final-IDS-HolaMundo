@@ -11,6 +11,7 @@ from services.exam_service import (
     save_promocion_config_service,
 )
 from middleware.auth_middleware import require_auth
+from helpers.logger import log_action
  
 exam_bp = Blueprint('exam', __name__)
 
@@ -57,13 +58,26 @@ def save_notes():
     id_exam = data.get('id_evaluacion')
     notes = data.get('notas', {})
     correctores = data.get('correctores', {})
- 
+    
     id_corrector = None
     if hasattr(request, 'user') and request.user:
         id_corrector = request.user.get('id_usuario')
- 
-    return save_exam_notes_service(id_exam, notes, id_corrector, correctores)
- 
+
+    result = save_exam_notes_service(id_exam, notes, id_corrector, correctores)
+
+    if result[1] == 200:
+        nombre_u = ""
+        if hasattr(request, "user") and request.user:
+            nombre_u = f"{request.user.get('nombre','')} {request.user.get('apellido','')}".strip() or request.user.get("correo", "")
+        log_action(
+            accion="GUARDAR_NOTAS",
+            descripcion=f"Se guardaron notas de la evaluación ID {id_exam} ({len(notes)} alumnos)",
+            id_usuario=id_corrector,
+            nombre_usuario=nombre_u,
+            id_curso=int(data.get("id_curso", 0)) or None,
+        )
+
+    return result
  
 @exam_bp.route("/students_with_notes", methods=["GET"])
 def obtain_students_report():

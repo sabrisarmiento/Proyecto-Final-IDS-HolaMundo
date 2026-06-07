@@ -28,9 +28,9 @@
       <span class="dg-kpi-label">Cursos activos este cuatrimestre</span>
     </div>
     <div class="dg-kpi">
-      <span class="dg-kpi-icon">Alumnos históricos</span>
+      <span class="dg-kpi-icon">Total de alumnos</span>
       <strong class="dg-kpi-num">{{ data.total_alumnos or 0 }}</strong>
-      <span class="dg-kpi-label">Total de alumnos históricos</span>
+      <span class="dg-kpi-label">Alumnos históricos</span>
     </div>
   </section>
 
@@ -70,7 +70,6 @@
         </div>
         <button class="dg-btn dg-btn--primary" id="btn-abrir-crear-usuario">+ Nuevo usuario</button>
       </div>
-
       {% if data.usuarios %}
       <div class="dg-table-wrap">
         <table class="dg-table" id="tabla-usuarios">
@@ -98,9 +97,7 @@
               <td>
                 {% set nivel = u.nivel_administracion or 1 %}
                 <span class="dg-rol-badge dg-rol-badge--nivel{{ nivel }}">
-                  {% if nivel == 3 %}Superadmin
-                  {% elif nivel == 2 %}Profesor
-                  {% else %}Ayudante{% endif %}
+                  {% if nivel == 3 %}Superadmin{% elif nivel == 2 %}Profesor{% else %}Ayudante{% endif %}
                 </span>
               </td>
               <td>{{ u.nivel_administracion or '—' }}</td>
@@ -122,7 +119,7 @@
       <div class="dg-card-header-row">
         <div>
           <h2 class="dg-card-title">Roles del sistema</h2>
-          <p class="dg-card-sub">Control de acceso (RBAC) | Nivel 3 = Superadmin | Nivel 2 = Profesor | Nivel 1 = Ayudante</p>
+          <p class="dg-card-sub">Nivel 3 = Superadmin | Nivel 2 = Profesor | Nivel 1 = Ayudante</p>
         </div>
         <button class="dg-btn dg-btn--primary" id="btn-abrir-crear-rol">+ Nuevo rol</button>
       </div>
@@ -132,9 +129,7 @@
         <div class="dg-rol-row" id="rol-row-{{ r.id_rol }}" data-id="{{ r.id_rol }}" data-nombre="{{ r.nombre }}">
           <div class="dg-rol-info">
             <span class="dg-rol-badge dg-rol-badge--nivel{{ r.nivel_administracion }}">
-              {% if r.nivel_administracion == 3 %}Superadmin
-              {% elif r.nivel_administracion == 2 %}Profesor
-              {% else %}Ayudante{% endif %}
+              {% if r.nivel_administracion == 3 %}Superadmin{% elif r.nivel_administracion == 2 %}Profesor{% else %}Ayudante{% endif %}
             </span>
             <span class="dg-rol-nombre">{{ r.nombre }}</span>
             <span class="dg-rol-nivel">Nivel {{ r.nivel_administracion }}</span>
@@ -145,6 +140,75 @@
       </div>
       {% else %}
       <p class="dg-empty">No hay roles definidos</p>
+      {% endif %}
+    </section>
+
+    <section class="dg-card dg-card--wide" id="seccion-logs">
+      <div class="dg-card-header-row">
+        <div>
+          <h2 class="dg-card-title">Log de actividad</h2>
+          <p class="dg-card-sub">Últimas 50 acciones registradas en el sistema</p>
+        </div>
+        <div class="dg-logs-filtros">
+          <input type="text" id="filtro-logs-usuario" placeholder="Filtrar por usuario..." class="dg-filtro-input">
+          <select id="filtro-logs-accion" class="dg-filtro-select">
+            <option value="">Todas las acciones</option>
+            <option value="CREAR_USUARIO">Crear usuario</option>
+            <option value="EDITAR_USUARIO">Editar usuario</option>
+            <option value="ELIMINAR_USUARIO">Eliminar usuario</option>
+            <option value="CREAR_ROL">Crear rol</option>
+            <option value="ELIMINAR_ROL">Eliminar rol</option>
+            <option value="CREAR_AVISO">Crear aviso</option>
+            <option value="EDITAR_AVISO">Editar aviso</option>
+            <option value="ELIMINAR_AVISO">Eliminar aviso</option>
+            <option value="CONSULTA_SLACK">Consulta Slack</option>
+            <option value="GUARDAR_NOTAS">Guardar notas</option>
+            <option value="IMPORTAR_ALUMNOS_CSV">Importar CSV</option>
+            <option value="CREAR_CURSO">Crear curso</option>
+            <option value="ELIMINAR_CURSO">Eliminar curso</option>
+          </select>
+        </div>
+      </div>
+
+      {% if data.logs_recientes %}
+      <div class="dg-table-wrap">
+        <table class="dg-table dg-table--logs" id="tabla-logs">
+          <thead>
+            <tr>
+              <th>Fecha y hora</th>
+              <th>Usuario</th>
+              <th>Acción</th>
+              <th>Descripción</th>
+              <th>Curso</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in data.logs_recientes %}
+            <tr class="log-row"
+                data-usuario="{{ log.usuario | lower }}"
+                data-accion="{{ log.accion }}">
+              <td class="dg-log-fecha">{{ log.fecha }}</td>
+              <td class="dg-log-usuario">{{ log.usuario }}</td>
+              <td>
+                <span class="dg-log-badge dg-log-badge--{{ log.accion | lower | replace('_', '-') }}">
+                  {{ log.accion | replace('_', ' ') }}
+                </span>
+              </td>
+              <td class="dg-log-desc">{{ log.descripcion }}</td>
+              <td class="dg-log-curso">
+                {% if log.materia %}
+                  <span class="dg-log-curso-text">{{ log.materia }}<br><small>{{ log.catedra }}</small></span>
+                {% else %}
+                  <span class="dg-empty-inline">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="dg-empty">No hay actividad registrada todavía</p>
       {% endif %}
     </section>
 
@@ -177,9 +241,7 @@
       <select id="cu-rol">
         {% for r in data.roles %}
         <option value="{{ r.id_rol }}">
-          {% if r.nivel_administracion == 3 %}Superadmin
-          {% elif r.nivel_administracion == 2 %}Profesor
-          {% else %}Ayudante{% endif %}
+          {% if r.nivel_administracion == 3 %}Superadmin{% elif r.nivel_administracion == 2 %}Profesor{% else %}Ayudante{% endif %}
           — {{ r.nombre }}
         </option>
         {% endfor %}
@@ -216,9 +278,7 @@
       <select id="eu-rol">
         {% for r in data.roles %}
         <option value="{{ r.id_rol }}">
-          {% if r.nivel_administracion == 3 %}Superadmin
-          {% elif r.nivel_administracion == 2 %}Profesor
-          {% else %}Ayudante{% endif %}
+          {% if r.nivel_administracion == 3 %}Superadmin{% elif r.nivel_administracion == 2 %}Profesor{% else %}Ayudante{% endif %}
           — {{ r.nombre }}
         </option>
         {% endfor %}

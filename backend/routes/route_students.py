@@ -6,6 +6,7 @@ from services.student_service import (
     import_students_service,
 )
 from middleware.auth_middleware import require_auth
+from helpers.logger import log_action
 
 students_bp = Blueprint('students', __name__)
 
@@ -48,4 +49,15 @@ def create_student_route():
 @students_bp.route("/students/import", methods=["POST"])
 @require_auth
 def import_students_route():
-    return import_students_service(request.files)
+    result = import_students_service(request.files)
+
+    if result[1] == 200:
+        user = getattr(request, "user", {})
+        log_action(
+            accion="IMPORTAR_ALUMNOS_CSV",
+            descripcion=f"Importación CSV: {result['data']['creados']} creados, {result['data']['errores']} errores",
+            id_usuario=user.get("id_usuario"),
+            nombre_usuario=user.get("correo", ""),
+        )
+
+    return result

@@ -7,6 +7,7 @@ from services.courses_service import (
     delete_course_service
 )
 from middleware.auth_middleware import require_auth
+from helpers.logger import log_action
 
 courses_bp = Blueprint('courses', __name__)
 
@@ -27,7 +28,17 @@ def get_course(id_course):
 @require_auth
 def create_course_route():
     data = request.get_json()
-    return create_course_service(data)
+    result = create_course_service(data)
+
+    if result[1] == 201:
+        log_action(
+            accion="CREAR_CURSO",
+            descripcion=f"Se creó un curso (materia ID {data.get('id_materia')}, {data.get('anio')} {data.get('cuatrimestre')}C)",
+            id_usuario=request.user.get("id_usuario"),
+            nombre_usuario=f"{request.user.get('nombre','')} {request.user.get('apellido','')}".strip(),
+        )
+
+    return result
 
 @courses_bp.route('/courses/<int:id_course>', methods=['PATCH'])
 @require_auth
@@ -38,4 +49,15 @@ def patch_course_route(id_course):
 @courses_bp.route('/courses/<int:id_course>', methods=['DELETE'])
 @require_auth
 def delete_course_route(id_course):
-    return delete_course_service(id_course)
+    result = delete_course_service(id_course)
+
+    if result[1] == 200:
+        log_action(
+            accion="ELIMINAR_CURSO",
+            descripcion=f"Se eliminó el curso ID {id_course}",
+            id_usuario=request.user.get("id_usuario"),
+            nombre_usuario=f"{request.user.get('nombre','')} {request.user.get('apellido','')}".strip(),
+            id_curso=id_course,
+        )
+
+    return result

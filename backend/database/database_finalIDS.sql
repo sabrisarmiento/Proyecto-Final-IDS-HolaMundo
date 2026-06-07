@@ -176,3 +176,15 @@ CREATE TABLE curso_promocion_config (
     es_promocionable BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
+
+CREATE TABLE logs_sistema (
+    id_log INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    nombre_usuario VARCHAR(200),
+    id_curso INT,
+    accion VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE SET NULL
+);
