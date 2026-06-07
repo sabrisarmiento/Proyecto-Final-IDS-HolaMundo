@@ -1,6 +1,4 @@
 from flask import Blueprint, render_template, request
-#from services.advertisement_frontend_service import AdvertisementFrontendService
-#from services.slack_advertisement_frontend_service import SlackAdvertisementFrontendService
 from services.subjects_service import get_subjects
 from services.advertisments_service import get_advertisements_by_subject
 
@@ -22,8 +20,8 @@ def public_advertisements():
   return render_template(
     "advertisements.html",
     active_page="advertisements",
-    avisos=avisos,
     subjects=subjects,
+    avisos=avisos,
     selected_subject=int(view) if view else None
   )
 
