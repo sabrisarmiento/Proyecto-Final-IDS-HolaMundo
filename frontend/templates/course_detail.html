@@ -98,6 +98,31 @@
     </div>
 
     <div id="tab-teams" class="tab-panel {% if active_tab != 'teams' %}hidden{% endif %}">
+      <section>
+        <button
+            type="button"
+            class="btn-create-student"
+            onclick="openModal('create-team-modal')"
+        >
+            Crear equipo
+        </button>
+        {% call modal("create-team-modal", "Crear Equipo") %}
+            <form
+                action="{{ url_for('courses.create_team', course_id=course.id_curso) }}"
+                method="POST"
+            >
+                <label>Nombre del equipo:</label>
+                <input
+                    type="text"
+                    name="nombre_equipo"
+                    required
+                >
+                <button type="submit">
+                    Crear
+                </button>
+            </form>
+        {% endcall %}
+    </section>
       {% if teams %}
           {% for team in teams %}
             <div class="team-card">

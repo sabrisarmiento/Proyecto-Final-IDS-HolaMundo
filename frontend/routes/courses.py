@@ -221,6 +221,32 @@ def course_detail(course_id):
     promo_config=promo_config,
   )
  
+@courses_bp.route('/cursos/<int:course_id>/equipos/crear', methods=['POST'])
+def create_team(course_id):
+    try:
+        token = session.get('token')
+        headers = {
+            'Authorization': f'Bearer {token}'
+        }
+        data = {
+            "nombre_equipo": request.form.get("nombre_equipo"),
+            "id_curso": course_id
+        }
+        requests.post(
+            "http://127.0.0.1:5000/equipos",
+            headers=headers,
+            json=data
+        )
+    except Exception as e:
+        print("Error creando equipo:", e)
+    return redirect(
+        url_for(
+            'courses.course_detail',
+            course_id=course_id,
+            tab='teams'
+        )
+    )
+
 
 @courses_bp.route('/cambiar-evaluacion', methods=['POST'])
 def cambiar_evaluacion():
