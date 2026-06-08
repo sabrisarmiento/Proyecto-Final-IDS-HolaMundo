@@ -107,6 +107,17 @@ def course_detail(course_id):
       students_data = []
       total = 0
 
+  try:
+     clases_res = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
+
+     clases_json = clases_res.json()
+
+     clases = clases_json.get("classes", [])
+
+  except Exception as e:
+    print(f"Error cargando clases: {e}")
+    clases = []
+
   for s in students_data:
     notas_dict = {}
     raw_string = s.get('notas_raw') or ""
@@ -208,6 +219,7 @@ def course_detail(course_id):
     course=course,
     students=students_data,
     teams=teams,
+    clases=clases,
     active_page='courses',
     page=page,
     total_pages=total_pages,
@@ -220,6 +232,8 @@ def course_detail(course_id):
     curso_es_promocionable=curso_es_promocionable,
     promo_config=promo_config,
   )
+
+
  
 
 @courses_bp.route('/cambiar-evaluacion', methods=['POST'])
@@ -356,3 +370,48 @@ def course_dashboard_data(course_id):
         return jsonify(res.json()), res.status_code
     except Exception as e:
         return jsonify({"error": str(e)}), 502
+    
+
+@courses_bp.route('/cursos/<int:course_id>/clases/crear', methods=['POST'])
+def crear_clase(course_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('auth.login'))
+ 
+    headers = {'Authorization': f'Bearer {token}'}
+ 
+    data = request.get_json()
+    data['id_curso'] = course_id
+    response = requests.post(
+        'http://127.0.0.1:5000/clases',
+        json=data,
+        headers=headers
+    )
+
+    response = requests.post(
+    'http://127.0.0.1:5000/clases',
+    json=data,
+    headers=headers
+)
+
+    print("STATUS:", response.status_code)
+    print("RESPUESTA:", response.text)
+
+    return response.json(), response.status_code
+
+
+@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/eliminar',methods=['DELETE'])
+def eliminar_clase(course_id, id_clase):
+
+    token = session.get('token')
+
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    response = requests.delete(
+        f'http://127.0.0.1:5000/clases/{id_clase}',
+        headers=headers
+    )
+
+    return response.json(), response.status_code

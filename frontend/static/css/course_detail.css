@@ -1119,3 +1119,19 @@
 .estado-badge {
   display: inline-block;
 }
+
+.calendar-form-group {
+  color:var(--color-15);
+  padding: 0.4rem;
+}
+
+.calendar-table{
+  padding:2rem;
+}
+
+.calendar-header{
+  color:black;
+}
+.calendar-columns{
+  color:black;
+}
