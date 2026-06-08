@@ -2,24 +2,29 @@
 
 {% block title %}Crear aviso{% endblock %}
 
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create_advertisement.css') }}">
+{% endblock %}
+
 {% block content %}
 <section class="course-detail-header">
-  <h1>Crear aviso</h1>
+  <h1 class="advertisement-title">Crear aviso</h1>
 </section>
 
 <section class="course-detail-content">
   {% if error %}
-    <p class="tab-empty">{{ error }}</p>
+    <p class="advertisement-error">{{ error }}</p>
   {% endif %}
 
-  <form method="POST">
+  <form method="POST" class="advertisement-form">
     <label for="titulo">Título</label>
     <input type="text" id="titulo" name="titulo" required>
 
     <label for="mensaje">Mensaje</label>
     <textarea id="mensaje" name="mensaje" required></textarea>
 
-    <button type="submit" class="btn-crear">Publicar aviso</button>
+    <button type="submit" class="btn-action btn-publicar">Publicar aviso</button>
   </form>
 </section>
 {% endblock %}

@@ -9,7 +9,7 @@
 
 .course-detail-header p {
   margin-top: 0.3rem;
-  color: var(--color-3);
+  color: var(--color-8);
 }
 
 .course-cuatrimestre {
@@ -38,7 +38,7 @@
 .course-detail-header h1 {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--color-1);
+  color: var(--color-15);
   margin: 0 0 0.25rem;
 }
 
@@ -72,13 +72,13 @@
 .nav-btn {
   border: none;
   padding: 0.5rem 1.5rem;
-  color: var(--color-6);
   border-radius: 0.7rem 0.7rem 0 0;
   margin: 0 0.7rem;
   border-top: 3px solid var(--color-6);
   border-left: 3px solid var(--color-6);
   border-right: 3px solid var(--color-6);
   background: var(--color-5);
+  color: var(--color-8);
   cursor: pointer;
 }
 
@@ -89,7 +89,7 @@
   border-right: 3px solid var(--color-65);
   translate: 0 3px;
   background: var(--color-45);
-  color: var(--color-3);
+  color: var(--color-2);
   font-weight: bold;
 }
 
@@ -172,7 +172,7 @@
 .tab-table td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--color-6);
-  color: var(--color-1);
+  color: var(--color-15);
   font-size: 1rem;
 }
 
@@ -250,7 +250,7 @@
   border: 1.5px solid var(--color-6);
   border-radius: 8px;
   background: var(--color-45);
-  color: var(--color-1);
+  color: var(--color-15);
   font-size: 0.9rem;
   cursor: pointer;
   outline: none;
@@ -287,7 +287,7 @@
   border: 1.5px solid var(--color-6);
   border-radius: 8px;
   font-size: 0.9rem;
-  color: var(--color-1);
+  color: var(--color-15);
   background: var(--color-45);
   outline: none;
   transition: border-color 0.15s;
@@ -299,7 +299,7 @@
 
 .btn-crear {
   background: var(--color-3);
-  color: var(--color-45);
+  color: var(--color-10);
   border: none;
   border-radius: 8px;
   padding: 0.5rem 1.1rem;
@@ -335,7 +335,7 @@
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  color: var(--color-1);
+  color: var(--color-15);
   text-transform: uppercase;
   margin: 0 0 0.3rem;
 }
@@ -405,7 +405,7 @@
   border: 1.5px solid var(--color-6);
   border-radius: 8px;
   background: var(--color-45);
-  color: var(--color-1);
+  color: var(--color-15);
   font-size: 0.85rem;
   cursor: pointer;
   outline: none;
@@ -442,7 +442,7 @@
 .card-name {
   display: block;
   font-size: 0.9rem;
-  color: var(--color-1);
+  color: var(--color-15);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -476,7 +476,7 @@
   font-size: 1rem;
   font-weight: 700;
   text-align: center;
-  color: var(--color-1);
+  color: var(--color-15);
   background: var(--color-5);
   outline: none;
   transition: border-color 0.15s, 0.15s;
@@ -519,7 +519,7 @@
   border: 1.5px solid var(--color-6);
   border-radius: 8px;
   font-size: 0.8rem;
-  color: var(--color-1);
+  color: var(--color-15);
   background: var(--color-5);
   outline: none;
   transition: border-color 0.15s;
@@ -580,7 +580,7 @@
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  color: var(--color-1);
+  color: var(--color-15);
   text-transform: uppercase;
   margin: 0 0 0.3rem;
 }
@@ -640,7 +640,7 @@
 .planilla-table td {
   padding: 0.6rem 0.9rem;
   border-bottom: 1px solid var(--color-6);
-  color: var(--color-1);
+  color: var(--color-15);
   vertical-align: middle;
 }
 
@@ -755,6 +755,7 @@
   border: none;
   border-radius: 14px;
   padding: 0;
+  background: var(--color-45);
   box-shadow: 0 8px 40px rgba(0,0,0,0.18);
   max-width: 420px;
   width: 90%;
@@ -777,7 +778,7 @@
 
 .modal-body {
   font-size: 0.95rem;
-  color: var(--color-1);
+  color: var(--color-15);
   margin: 0 0 1.5rem;
   line-height: 1.5;
 }
@@ -793,7 +794,7 @@
   border: 1.5px solid var(--color-6);
   border-radius: 8px;
   background: var(--color-5);
-  color: var(--color-1);
+  color: var(--color-15);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -1075,7 +1076,7 @@
 
 .promo-config-title { color: var(--color-2); }
 .promo-config-subtitle { color: var(--color-8); }
-.promo-toggle-label { color: var(--color-1); }
+.promo-toggle-label { color: var(--color-15); }
 
 .toggle-slider { background: var(--color-6); }
 .toggle-switch input:checked + .toggle-slider { background: var(--color-3); }
@@ -1083,13 +1084,13 @@
 .promo-table thead th { color: var(--color-8); border-bottom: 1px solid var(--color-6); }
 .promo-table tbody tr:hover { background: var(--color-5); }
 .promo-table td { border-bottom: 1px solid var(--color-6); }
-.promo-eval-name { color: var(--color-1); }
+.promo-eval-name { color: var(--color-15); }
 
 .promo-checkbox { accent-color: var(--color-3); }
 
 .promo-min-input {
   border: 1px solid var(--color-6);
-  color: var(--color-1);
+  color: var(--color-15);
   background: var(--color-45);
 }
 .promo-min-input:focus { border-color: var(--color-3); }
@@ -1101,7 +1102,7 @@
 .filter-select-planilla {
   background-color: var(--color-45);
   border: 1.5px solid var(--color-6);
-  color: var(--color-1);
+  color: var(--color-15);
 }
 .filter-select-planilla:hover,
 .filter-select-planilla:focus { border-color: var(--color-7); }
@@ -1174,4 +1175,58 @@
 }
 .form-message--error {
   color: #c0392b;
+}
+
+/* ===== ADS TAB (avisos del curso) ===== */
+.ads-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ads-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-15);
+}
+
+.advertisements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.advertisement-card {
+  background: var(--color-45);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.advertisement-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-6);
+  font-size: 0.8rem;
+  color: var(--color-8);
+}
+
+.advertisement-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+  color: var(--color-9);
+}
+
+.advertisement-card p {
+  margin: 0;
+  color: var(--color-15);
+  line-height: 1.5;
 }

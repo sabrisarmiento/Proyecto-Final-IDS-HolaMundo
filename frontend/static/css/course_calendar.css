@@ -1,0 +1,65 @@
+/* ===== CALENDAR TAB ===== */
+
+.calendar-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.25rem;
+  padding: 1.4rem 1.5rem;
+  background: var(--color-5);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+}
+
+/* Each field: label stacked over its input */
+.calendar-form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.calendar-form label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-8);
+}
+
+.calendar-form input,
+.calendar-form select {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.8rem;
+  color: var(--color-15);
+  background: var(--color-45);
+  border: 1.5px solid var(--color-6);
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendar-form input::placeholder {
+  color: var(--color-8);
+}
+
+.calendar-form input:focus,
+.calendar-form select:focus {
+  border-color: var(--color-3);
+  box-shadow: 0 0 0 3px var(--color-16);
+}
+
+.calendar-form select {
+  cursor: pointer;
+  appearance: none;
+}
+
+/* Submit button: sits on the same baseline, never shrinks */
+.calendar-form .btn-primary {
+  flex: 0 0 auto;
+  align-self: flex-end;
+}

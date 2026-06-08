@@ -54,7 +54,7 @@
 .dash-info-value {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--color-1);
+  color: var(--color-15);
 }
 
 .dash-stats-grid {
@@ -144,7 +144,7 @@
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--color-1);
+  color: var(--color-15);
   margin: 0 0 0.15rem;
 }
 

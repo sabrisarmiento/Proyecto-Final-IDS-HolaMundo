@@ -12,6 +12,7 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.05s ease;
+  margin-bottom: 1rem;
 }
 
 .btn-action:hover {
