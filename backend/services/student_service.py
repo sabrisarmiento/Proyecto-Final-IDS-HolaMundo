@@ -4,6 +4,7 @@ from controllers.students_controller import (
     get_student_by_id,
     create_student,
     import_students_from_csv,
+    update_student
 )
 
 def students_service(filters):
@@ -40,3 +41,12 @@ def import_students_service(files):
     if not result["ok"]:
         return error_response(result)
     return success_response(result["data"], result.get("status", 201))
+
+def update_student_service(student_id, data):
+    result = update_student(student_id, data)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({
+        "message": result["message"],
+        "id": result["id"],
+    }, 200)

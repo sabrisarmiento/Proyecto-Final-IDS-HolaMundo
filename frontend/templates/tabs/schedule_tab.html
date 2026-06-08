@@ -1,0 +1,75 @@
+<form class="calendar-form" onsubmit="event.preventDefault()">
+  <div class="calendar-form-group">
+    <label for="fecha-clase"> Fecha: </label>
+    <input type="date" id="fecha-clase" name="fecha_clase" />
+  </div>
+
+  <div class="calendar-form-group">
+    <label for="semana-clase"> Semana: </label>
+    <input
+      type="number"
+      id="semana-clase"
+      name="semana"
+      placeholder="Indicar semana..."
+    />
+  </div>
+
+  <div class="calendar-form-group">
+    <label for="temas-clase"> Temas: </label>
+    <input
+      type="text"
+      id="temas-clase"
+      name="temas"
+      placeholder="Escribir temas..."
+    />
+  </div>
+
+  <div class="calendar-form-group">
+    <label for="tipo-clase"> Tipo: </label>
+    <select id="tipo-clase" name="tipo">
+      <option value="Teórica">Teórica</option>
+      <option value="Práctica">Práctica</option>
+    </select>
+  </div>
+
+  <div class="calendar-form-group">
+    <label for="modalidad-clase"> Modalidad: </label>
+    <select id="modalidad-clase" name="modalidad">
+      <option value="Presencial">Presencial</option>
+      <option value="Virtual">Virtual</option>
+    </select>
+  </div>
+
+  <button type="button" class="btn-primary" onclick="createClass()">
+    Agregar clase
+  </button>
+</form>
+
+{% if clases %}
+<table class="calendar-table">
+  <thead>
+    <tr class="calendar-header">
+      <th>Semana</th>
+      <th>Fecha</th>
+      <th>Temas</th>
+      <th>Tipo</th>
+      <th>Modalidad</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for clase in clases %}
+    <tr class="calendar-columns">
+      <td>{{ clase.semana }}</td>
+      <td>{{ clase.fecha }}</td>
+      <td>{{ clase.temas }}</td>
+      <td>{{ clase.tipo }}</td>
+      <td>{{ clase.modalidad }}</td>
+      <td>
+        <button onclick="deleteClass({{ clase.id_clase }})">Eliminar</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}

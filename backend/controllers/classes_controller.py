@@ -62,6 +62,37 @@ def get_class_id(id_clase):
             "message": "Internal Server Error",
             "description": str(e)
         }
+    
+def get_classes_by_subject(id_subject):
+    try:
+        sql = """
+            SELECT
+                c.id_clase,
+                c.fecha,
+                c.temas,
+                c.tipo,
+                c.modalidad,
+                c.semana,
+                c.id_curso
+            FROM clases c
+            JOIN cursos co ON c.id_curso = co.id_curso
+            WHERE co.id_materia = %s
+            ORDER BY c.semana ASC, c.fecha ASC
+        """
+        result = query_db(sql, (id_subject,))
+        
+        return {
+            "ok": True,
+            "data": result
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
 
 def create_class(data):
     try:

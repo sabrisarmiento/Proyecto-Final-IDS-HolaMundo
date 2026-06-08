@@ -9,8 +9,8 @@ def advertisements_service(filters):
       "advertisements": result["data"]
   })
 
-def create_advertisement_service(data):
-  result = create_advertisement(data)
+def create_advertisement_service(data, user):
+  result = create_advertisement(data, user)
   if not result["ok"]:
       return error_response(result)
   return success_response({

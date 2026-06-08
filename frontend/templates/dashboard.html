@@ -1,290 +1,270 @@
 {% extends "base_private.html" %}
-
-{% block title %}Panel FIUBA - Dashboard{% endblock %}
+{% block title %}Panel FIUBA — Dashboard General{% endblock %}
 
 {% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_general.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 
 {% block content %}
+<div class="dg-root">
 
-<main class="dashboard-container">
-
-    <section class="dashboard-header">
-        <div>
-            <h1>Dashboard</h1>
-            <p>Panel de consultas para profesores y ayudantes</p>
-        </div>
-        <button class="dashboard-button" id="btnExportar">
-            Exportar informes
-        </button>
-    </section>
-
-    <section class="stats-grid">
-        <div class="stat-card">
-            <span>Total alumnos</span>
-            <h2>{{ stats.total_alumnos }}</h2>
-        </div>
-        <div class="stat-card">
-            <span>Equipos</span>
-            <h2>{{ stats.equipos }}</h2>
-        </div>
-        <div class="stat-card">
-            <span>Asistencia promedio</span>
-            <h2>{{ stats.asistencia_promedio }}</h2>
-        </div>
-        <div class="stat-card">
-            <span>Aprobados</span>
-            <h2>{{ stats.aprobados }}</h2>
-        </div>
-        <div class="stat-card">
-            <span>Desaprobados</span>
-            <h2>{{ stats.desaprobados }}</h2>
-        </div>
-        <div class="stat-card">
-            <span>Promedio general</span>
-            <h2>{{ stats.promedio_general }}</h2>
-        </div>
-    </section>
-
-    <section class="dashboard-grid">
-
-        <section class="dashboard-card">
-            <div class="card-header">
-                <div>
-                    <h3>Informe de alumnos</h3>
-                    <p>Listado completo de estudiantes</p>
-                </div>
-            </div>
-
-            <div class="filters-container">
-                <input type="text" placeholder="Buscar alumno...">
-                <select>
-                    <option>Todos</option>
-                    <option>Aprobados</option>
-                    <option>Desaprobados</option>
-                </select>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Padrón</th>
-                        <th>Asistencia</th>
-                        <th>Parcial 1</th>
-                        <th>Parcial 2</th>
-                        <th>TP</th>
-                        <th>Condición</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for alumno in alumnos %}
-                    <tr>
-                        <td>{{ alumno.nombre }}</td>
-                        <td>{{ alumno.apellido }}</td>
-                        <td>{{ alumno.padron }}</td>
-                        <td>
-                            <span class="
-                                {% if alumno.asistencia|replace('%', '')|int >= 75 %}
-                                    status-approved
-                                {% else %}
-                                    status-failed
-                                {% endif %}
-                            ">
-                                {{ alumno.asistencia }}
-                            </span>
-                        </td>
-                        <td>{{ alumno.parcial1 }}</td>
-                        <td>{{ alumno.parcial2 }}</td>
-                        <td>{{ alumno.tp }}</td>
-                        <td>
-                        <span class="
-                            {% if alumno.activo %}
-                                status-active
-                            {% else %}
-                                status-inactive
-                            {% endif %}
-                        ">
-                            {% if alumno.activo %}
-                                Activo
-                            {% else %}
-                                Baja
-                            {% endif %}
-                        </span>
-                    </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </section>
-
-        <section class="dashboard-card">
-            <div class="card-header">
-                <div>
-                    <h3>Informe de equipos</h3>
-                    <p>Equipos registrados en la cursada</p>
-                </div>
-            </div>
-            <div class="filters-container">
-                <input
-                    type="text"
-                    id="teamSearch"
-                    placeholder="Buscar equipo o integrante..."
-                >
-            </div>
-            <div class="teams-list" id="teamsList">
-                {% for equipo in equipos %}
-                <div
-                    class="team-item"
-                    data-search="{{ equipo.nombre }} {{ equipo.integrantes }}"
-                >
-                    <div class="team-top">
-                        <h4>{{ equipo.nombre }}</h4>
-                        <span>3 integrantes</span>
-                    </div>
-                    <p>{{ equipo.integrantes }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section class="dashboard-card qr-card"> 
-            <div class="card_header">
-                <div>
-                    <h3>
-                        Control de asistencia
-                    </h3>
-                    <p>
-                        Genere un QR dinámico para registrar la asistencia de los alumnos
-                    </p>
-                </div>
-                <div class="qr-container">
-                    <form class="qr-form" onsubmit="event.preventDefault();">
-                        <div>
-                            <label for="fecha-clase">
-                                Seleccione la fecha de la clase
-                            </label>
-                            <input 
-                            type="date" 
-                            id="fecha-clase" 
-                            name="fecha_clase"
-                            >
-                        </div>
-                        <div>
-                            <button type="submit" class="btn-primary">
-                                Generar QR dinámico y Enviar por Mail
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-    </section>
-    <section class="dashboard-grid">
-            <section class="dashboard-card" style="margin-top: 2rem;">
-                <div class="card-header">
-                    <h2>Usuarios</h2>
-                </div>
-                <div class="card-header">       
-                <h3>Profesor</h3>
-                </div> 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>nombre</th>
-                            <th>apellido</th>
-                            <th>correo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for usuario in Profesor %}
-                        <tr>
-                            <td>{{usuario.nombre}}</td>
-                            <td>{{usuario.apellido}}</td>
-                            <td>{{usuario.correo}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <div class="card-header">
-                <h3>Ayudantes</h3>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>nombre</th>
-                            <th>apellido</th>
-                            <th>correo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for usuario in Ayudantes %}
-                        <tr>
-                            <td>{{usuario.nombre}}</td>
-                            <td>{{usuario.apellido}}</td>
-                            <td>{{usuario.correo}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                </div>
-                
-    </section>
-
-    <div id="modalExportar" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Configurar Reporte PDF</h3>
-                <span id="closeModal" class="modal-close">&times;</span>
-            </div>
-            
-            <form id="formExportar" action="http://localhost:5000/informes/alumnos" method="GET" target="_blank">
-                <p class="modal-instruction">Selecciona las columnas que deseas incluir en el documento:</p>
-                
-                <div class="modal-checkboxes">
-                    <label><input type="checkbox" name="inc_asistencia" value="1" checked> Columna Asistencia</label>
-                    <label><input type="checkbox" name="inc_parcial1" value="1" checked> Nota 1er Parcial</label>
-                    <label><input type="checkbox" name="inc_parcial2" value="1" checked> Nota 2do Parcial</label>
-                    <label><input type="checkbox" name="inc_tp" value="1" checked> Nota Trabajo Práctico</label>
-                    <label><input type="checkbox" name="inc_condicion" value="1" checked> Condición (Activo/Baja)</label>
-                </div>
-                
-                <div class="modal-actions">
-                    <button type="button" id="btnCancelar" class="btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn-primary">Generar PDF</button>
-                </div>
-            </form>
-        </div>
+  <header class="dg-header">
+    <div>
+      <h1 class="dg-title">Dashboard General</h1>
+      <p class="dg-subtitle">Vista global de la plataforma</p>
     </div>
+  </header>
 
-</main>
+  <section class="dg-kpis">
+    <div class="dg-kpi">
+      <span class="dg-kpi-icon">Usuarios activos</span>
+      <strong class="dg-kpi-num">{{ data.total_usuarios or 0 }}</strong>
+      <span class="dg-kpi-label">Usuarios del sistema</span>
+    </div>
+    <div class="dg-kpi dg-kpi--accent">
+      <span class="dg-kpi-icon">Cursos activos</span>
+      <strong class="dg-kpi-num">{{ data.cursos_activos or 0 }}</strong>
+      <span class="dg-kpi-label">Cursos activos este cuatrimestre</span>
+    </div>
+    <div class="dg-kpi">
+      <span class="dg-kpi-icon">Alumnos históricos</span>
+      <strong class="dg-kpi-num">{{ data.total_alumnos or 0 }}</strong>
+      <span class="dg-kpi-label">Total de alumnos históricos</span>
+    </div>
+  </section>
 
-<script>
-    const modal = document.getElementById('modalExportar');
-    const btnOpen = document.getElementById('btnExportar');
-    const btnClose = document.getElementById('closeModal');
-    const btnCancel = document.getElementById('btnCancelar');
+  <div class="dg-grid">
 
-    const openModalFunc = () => {
-        modal.classList.add('modal-active');
-    };
+    <section class="dg-card dg-card--wide">
+      <h2 class="dg-card-title">Cursada activa</h2>
+      <p class="dg-card-sub">Alumnos por curso en el cuatrimestre vigente</p>
+      {% if data.cursos_stats %}
+      <div class="dg-chart-wrap" style="height: 260px;">
+        <canvas id="chart-cursos"></canvas>
+      </div>
+      <script id="data-cursos" type="application/json">{{ data.cursos_stats | tojson }}</script>
+      {% else %}
+      <p class="dg-empty">No hay cursos activos con datos de alumnos</p>
+      {% endif %}
+    </section>
 
-    const closeModalFunc = () => {
-        modal.classList.remove('modal-active');
-    };
+    <section class="dg-card">
+      <h2 class="dg-card-title">Rendimiento histórico</h2>
+      <p class="dg-card-sub">Promedio general de notas por año</p>
+      {% if data.rendimiento_historico %}
+      <div class="dg-chart-wrap" style="height: 220px;">
+        <canvas id="chart-historico"></canvas>
+      </div>
+      <script id="data-historico" type="application/json">{{ data.rendimiento_historico | tojson }}</script>
+      {% else %}
+      <p class="dg-empty">Todavía no hay notas cargadas en el sistema</p>
+      {% endif %}
+    </section>
 
-    btnOpen.addEventListener('click', openModalFunc);
-    btnClose.addEventListener('click', closeModalFunc);
-    btnCancel.addEventListener('click', closeModalFunc);
+    <section class="dg-card dg-card--wide" id="seccion-usuarios">
+      <div class="dg-card-header-row">
+        <div>
+          <h2 class="dg-card-title">Equipo docente y administrativo</h2>
+          <p class="dg-card-sub">Usuarios registrados en el sistema con su rol asignado</p>
+        </div>
+        <button class="dg-btn dg-btn--primary" id="btn-abrir-crear-usuario">+ Nuevo usuario</button>
+      </div>
 
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeModalFunc();
-        }
-    });
-</script>
+      {% if data.usuarios %}
+      <div class="dg-table-wrap">
+        <table class="dg-table" id="tabla-usuarios">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Nivel</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in data.usuarios %}
+            <tr id="fila-usuario-{{ u.id_usuario }}"
+                data-id="{{ u.id_usuario }}"
+                data-nombre="{{ u.nombre }}"
+                data-apellido="{{ u.apellido }}"
+                data-correo="{{ u.correo }}"
+                data-id-rol="{{ u.id_rol or '' }}">
+              <td>{{ u.nombre }}</td>
+              <td>{{ u.apellido }}</td>
+              <td class="dg-correo">{{ u.correo }}</td>
+              <td>
+                {% set nivel = u.nivel_administracion or 1 %}
+                <span class="dg-rol-badge dg-rol-badge--nivel{{ nivel }}">
+                  {% if nivel == 3 %}Superadmin
+                  {% elif nivel == 2 %}Profesor
+                  {% else %}Ayudante{% endif %}
+                </span>
+              </td>
+              <td>{{ u.nivel_administracion or '—' }}</td>
+              <td class="dg-acciones">
+                <button class="dg-btn-icon js-editar-usuario" title="Editar usuario">✏️</button>
+                <button class="dg-btn-icon dg-btn-icon--danger js-eliminar-usuario" title="Eliminar">🗑️</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="dg-empty">No hay usuarios registrados</p>
+      {% endif %}
+    </section>
 
+    <section class="dg-card" id="seccion-roles">
+      <div class="dg-card-header-row">
+        <div>
+          <h2 class="dg-card-title">Roles del sistema</h2>
+          <p class="dg-card-sub">Control de acceso (RBAC) | Nivel 3 = Superadmin | Nivel 2 = Profesor | Nivel 1 = Ayudante</p>
+        </div>
+        <button class="dg-btn dg-btn--primary" id="btn-abrir-crear-rol">+ Nuevo rol</button>
+      </div>
+      {% if data.roles %}
+      <div class="dg-roles-list" id="lista-roles">
+        {% for r in data.roles %}
+        <div class="dg-rol-row" id="rol-row-{{ r.id_rol }}" data-id="{{ r.id_rol }}" data-nombre="{{ r.nombre }}">
+          <div class="dg-rol-info">
+            <span class="dg-rol-badge dg-rol-badge--nivel{{ r.nivel_administracion }}">
+              {% if r.nivel_administracion == 3 %}Superadmin
+              {% elif r.nivel_administracion == 2 %}Profesor
+              {% else %}Ayudante{% endif %}
+            </span>
+            <span class="dg-rol-nombre">{{ r.nombre }}</span>
+            <span class="dg-rol-nivel">Nivel {{ r.nivel_administracion }}</span>
+          </div>
+          <button class="dg-btn-icon dg-btn-icon--danger js-eliminar-rol" title="Eliminar rol">🗑️</button>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="dg-empty">No hay roles definidos</p>
+      {% endif %}
+    </section>
+
+  </div>
+</div>
+
+<div class="dg-modal-overlay hidden" id="modal-crear-usuario">
+  <div class="dg-modal">
+    <button class="dg-modal-close js-cerrar-modal" data-target="modal-crear-usuario">✕</button>
+    <h3>Nuevo usuario</h3>
+    <div id="msg-crear-usuario" class="dg-modal-msg hidden"></div>
+    <div class="dg-form-group">
+      <label>Nombre</label>
+      <input type="text" id="cu-nombre" placeholder="Nombre">
+    </div>
+    <div class="dg-form-group">
+      <label>Apellido</label>
+      <input type="text" id="cu-apellido" placeholder="Apellido">
+    </div>
+    <div class="dg-form-group">
+      <label>Correo</label>
+      <input type="email" id="cu-correo" placeholder="correo@fi.uba.ar">
+    </div>
+    <div class="dg-form-group">
+      <label>Contraseña</label>
+      <input type="password" id="cu-password" placeholder="Mínimo 8 caracteres">
+    </div>
+    <div class="dg-form-group">
+      <label>Rol</label>
+      <select id="cu-rol">
+        {% for r in data.roles %}
+        <option value="{{ r.id_rol }}">
+          {% if r.nivel_administracion == 3 %}Superadmin
+          {% elif r.nivel_administracion == 2 %}Profesor
+          {% else %}Ayudante{% endif %}
+          — {{ r.nombre }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="dg-modal-actions">
+      <button class="dg-btn dg-btn--ghost js-cerrar-modal" data-target="modal-crear-usuario">Cancelar</button>
+      <button class="dg-btn dg-btn--primary" id="btn-crear-usuario">Crear usuario</button>
+    </div>
+  </div>
+</div>
+
+<div class="dg-modal-overlay hidden" id="modal-editar-usuario">
+  <div class="dg-modal">
+    <button class="dg-modal-close js-cerrar-modal" data-target="modal-editar-usuario">✕</button>
+    <h3>Editar usuario</h3>
+    <p class="dg-modal-sub" id="eu-nombre-label"></p>
+    <div id="msg-editar-usuario" class="dg-modal-msg hidden"></div>
+    <input type="hidden" id="eu-id">
+    <div class="dg-form-group">
+      <label>Nombre</label>
+      <input type="text" id="eu-nombre" placeholder="Nombre">
+    </div>
+    <div class="dg-form-group">
+      <label>Apellido</label>
+      <input type="text" id="eu-apellido" placeholder="Apellido">
+    </div>
+    <div class="dg-form-group">
+      <label>Correo</label>
+      <input type="email" id="eu-correo" placeholder="correo@fi.uba.ar">
+    </div>
+    <div class="dg-form-group">
+      <label>Rol</label>
+      <select id="eu-rol">
+        {% for r in data.roles %}
+        <option value="{{ r.id_rol }}">
+          {% if r.nivel_administracion == 3 %}Superadmin
+          {% elif r.nivel_administracion == 2 %}Profesor
+          {% else %}Ayudante{% endif %}
+          — {{ r.nombre }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="dg-modal-actions">
+      <button class="dg-btn dg-btn--ghost js-cerrar-modal" data-target="modal-editar-usuario">Cancelar</button>
+      <button class="dg-btn dg-btn--primary" id="btn-editar-usuario">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<div class="dg-modal-overlay hidden" id="modal-crear-rol">
+  <div class="dg-modal dg-modal--sm">
+    <button class="dg-modal-close js-cerrar-modal" data-target="modal-crear-rol">✕</button>
+    <h3>Nuevo rol</h3>
+    <div id="msg-crear-rol" class="dg-modal-msg hidden"></div>
+    <div class="dg-form-group">
+      <label>Nombre del rol</label>
+      <input type="text" id="cr-nombre" placeholder="Ej: Jefe de trabajos prácticos">
+    </div>
+    <div class="dg-form-group">
+      <label>Nivel de administración</label>
+      <select id="cr-nivel">
+        <option value="3">3 — Superadmin</option>
+        <option value="2">2 — Profesor</option>
+        <option value="1" selected>1 — Ayudante</option>
+      </select>
+    </div>
+    <div class="dg-modal-actions">
+      <button class="dg-btn dg-btn--ghost js-cerrar-modal" data-target="modal-crear-rol">Cancelar</button>
+      <button class="dg-btn dg-btn--primary" id="btn-crear-rol">Crear rol</button>
+    </div>
+  </div>
+</div>
+
+<div class="dg-modal-overlay hidden" id="modal-confirmar">
+  <div class="dg-modal dg-modal--sm">
+    <h3 class="dg-modal-danger-title">Confirmar eliminación</h3>
+    <p id="modal-confirmar-msg" class="dg-modal-sub"></p>
+    <div class="dg-modal-actions">
+      <button class="dg-btn dg-btn--ghost js-cerrar-modal" data-target="modal-confirmar">Cancelar</button>
+      <button class="dg-btn dg-btn--danger" id="modal-confirmar-btn">Si, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard_general.js') }}"></script>
 {% endblock %}

@@ -249,42 +249,51 @@ def save_notes_to_db(id_exam, notes_dict, id_corrector, correctores_dict=None):
             }
 
 
-def get_students_with_notes_db(id_curso):
+def get_students_with_notes_db(id_curso, limit=None, offset=0, order_by=None, order='ASC'):
     try:
-        sql = """
+        allowed_order_fields = {'nombre', 'apellido', 'padron'}
+        order_clause = ""
+        if order_by and order_by in allowed_order_fields:
+            direction = 'DESC' if str(order).upper() == 'DESC' else 'ASC'
+            order_clause = f"ORDER BY a.{order_by} {direction}"
+        else:
+            order_clause = "ORDER BY a.apellido ASC, a.nombre ASC"
+
+        sql = f"""
             SELECT 
-                a.id_alumno,
-                a.nombre,
-                a.apellido,
-                a.padron,
+                a.id_alumno, a.nombre, a.apellido, a.padron, a.correo,
                 a.estado_alumno,
                 e.nombre_equipo AS equipo,
-                IFNULL(
-                    GROUP_CONCAT(
-                        CONCAT(n.id_evaluacion, ':', n.nota)
-                        ORDER BY n.id_evaluacion
-                        SEPARATOR ','
-                    ), ''
-                ) AS notas_raw,
-                IFNULL(
-                    GROUP_CONCAT(
-                        CONCAT(n.id_evaluacion, ':', IFNULL(n.corrector_nombre, ''))
-                        ORDER BY n.id_evaluacion
-                        SEPARATOR ','
-                    ), ''
-                ) AS correctores_raw
+                IFNULL(GROUP_CONCAT(
+                    CONCAT(n.id_evaluacion, ':', n.nota)
+                    ORDER BY n.id_evaluacion SEPARATOR ','
+                ), '') AS notas_raw,
+                IFNULL(GROUP_CONCAT(
+                    CONCAT(n.id_evaluacion, ':', IFNULL(n.corrector_nombre, ''))
+                    ORDER BY n.id_evaluacion SEPARATOR ','
+                ), '') AS correctores_raw
             FROM alumnos a
             LEFT JOIN equipo_alumno ea ON a.id_alumno = ea.id_alumno
             LEFT JOIN equipos e ON ea.id_equipo = e.id_equipo
             LEFT JOIN notas n ON a.id_alumno = n.id_alumno
             WHERE a.id_curso = %s
             GROUP BY a.id_alumno, a.nombre, a.apellido, a.padron, a.estado_alumno, e.nombre_equipo
-            ORDER BY a.apellido, a.nombre
+            {order_clause}
         """
-        result = query_db(sql, (id_curso,))
+
+        count_sql = "SELECT COUNT(*) as total FROM alumnos WHERE id_curso = %s"
+        total = query_db(count_sql, (id_curso,))[0]['total']
+
+        params = [id_curso]
+        if limit is not None:
+            sql += " LIMIT %s OFFSET %s"
+            params += [int(limit), int(offset)]
+
+        result = query_db(sql, params)
         return {
             "ok": True,
-            "data": result if result else []
+            "data": result if result else [],
+            "total": total
         }
     except Exception as e:
         return {
@@ -293,6 +302,50 @@ def get_students_with_notes_db(id_curso):
             "message": "Internal Server Error",
             "description": f"Error al obtener reporte: {str(e)}"
         }
+# def get_students_with_notes_db(id_curso):
+#     try:
+#         sql = """
+#             SELECT 
+#                 a.id_alumno,
+#                 a.nombre,
+#                 a.apellido,
+#                 a.padron,
+#                 a.estado_alumno,
+#                 e.nombre_equipo AS equipo,
+#                 IFNULL(
+#                     GROUP_CONCAT(
+#                         CONCAT(n.id_evaluacion, ':', n.nota)
+#                         ORDER BY n.id_evaluacion
+#                         SEPARATOR ','
+#                     ), ''
+#                 ) AS notas_raw,
+#                 IFNULL(
+#                     GROUP_CONCAT(
+#                         CONCAT(n.id_evaluacion, ':', IFNULL(n.corrector_nombre, ''))
+#                         ORDER BY n.id_evaluacion
+#                         SEPARATOR ','
+#                     ), ''
+#                 ) AS correctores_raw
+#             FROM alumnos a
+#             LEFT JOIN equipo_alumno ea ON a.id_alumno = ea.id_alumno
+#             LEFT JOIN equipos e ON ea.id_equipo = e.id_equipo
+#             LEFT JOIN notas n ON a.id_alumno = n.id_alumno
+#             WHERE a.id_curso = %s
+#             GROUP BY a.id_alumno, a.nombre, a.apellido, a.padron, a.estado_alumno, e.nombre_equipo
+#             ORDER BY a.apellido, a.nombre
+#         """
+#         result = query_db(sql, (id_curso,))
+#         return {
+#             "ok": True,
+#             "data": result if result else []
+#         }
+#     except Exception as e:
+#         return {
+#             "ok": False,
+#             "code": 500,
+#             "message": "Internal Server Error",
+#             "description": f"Error al obtener reporte: {str(e)}"
+#         }
 
 # PROMOCION
 

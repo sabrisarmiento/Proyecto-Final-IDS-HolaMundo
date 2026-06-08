@@ -35,12 +35,6 @@
           class="{% if active_page == 'courses' %}is-active{% endif %}"
           >Cursos</a
         >
-        <a href="#">Usuarios</a>
-        <a
-          href="{{ url_for('attendance.attendance') }}"
-          class="{% if active_page == 'attendance' %}is-active{% endif %}"
-          >Asistencia</a
-        >
       </nav>
 
       {% from "components/dropdown.html" import dropdown_settings %}
