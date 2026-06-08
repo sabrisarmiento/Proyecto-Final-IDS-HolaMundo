@@ -1,9 +1,10 @@
 from flask import Blueprint, request
 from services.student_service import (
-    fetch_students_service,
-    fetch_student_id_service,
+    students_service,
+    student_service,
     create_student_service,
     import_students_service,
+    update_student_service
 )
 from middleware.auth_middleware import require_auth
 
@@ -13,6 +14,10 @@ students_bp = Blueprint('students', __name__)
 @students_bp.route("/students", methods=["GET"])
 @require_auth
 def get_students():
+    per_page = request.args.get('per_page', 10, type=int)
+    page = request.args.get('page', 1, type=int)
+    offset = (page - 1) * per_page
+
     filters = {
         "nombre": request.args.get('nombre'),
         "apellido": request.args.get('apellido'),
@@ -21,14 +26,18 @@ def get_students():
         "id_rol": request.args.get('id_rol'),
         "created_at": request.args.get('created_at'),
         "id_curso": request.args.get('id_curso'),
+        "limit": per_page,
+        "offset": offset,
+        "order_by": request.args.get('order_by'),
+        "order": request.args.get('order')
     }
-    return fetch_students_service(filters)
+    return students_service(filters)
 
 
 @students_bp.route("/students/<int:id>", methods=["GET"])
 @require_auth
 def get_student(id):
-    return fetch_student_id_service(id)
+    return student_service(id)
 
 
 @students_bp.route("/students", methods=["POST"])
@@ -41,3 +50,8 @@ def create_student_route():
 @require_auth
 def import_students_route():
     return import_students_service(request.files)
+
+@students_bp.route("/students/<int:id>", methods=["PATCH"])
+@require_auth
+def update_student_route(id):
+    return update_student_service(id, request.get_json(silent=True))

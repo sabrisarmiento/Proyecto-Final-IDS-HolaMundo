@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}IDS Lanzillota - Materiales{% endblock %}
+{% block title %}Panel FIUBA - Materiales{% endblock %}
 
 {% block extra_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/materials.css') }}">
@@ -10,40 +10,55 @@
 <section class="materials-section">
     <div class="materials-container">
         <header class="materials-header">
-            <h1 class="materials-title">Materiales del Curso</h1>
-            <p class="materials-subtitle">Apuntes, slides y recursos oficiales de la Cátedra</p>
+            <h1 class="materials-title">{{ subject }}</h1>
+            <p class="materials-subtitle">Materiales de la materia, organizados por cátedra</p>
         </header>
 
-        <div class="materials-list">
-            {% if materiales %}
-                {% for material in materiales %}
-                <article class="material-card">
-                    <div class="material-content">
-                        <div class="material-icon">
-                            <i class="fas fa-file-pdf"></i>
-                        </div>
-                        <div class="material-text">
-                            <h3>{{ material.titulo }}</h3>
-                            <p>{{ material.descripcion }}</p>
+        {% if sections %}
+            <div class="chair-list">
+                {% for section in sections %}
+                <div class="chair">
+                    <!-- Cabecera clickeable: dispara el toggle del acordeón -->
+                    <button type="button" class="chair-header" onclick="toggleChair(this)">
+                        <span class="chair-name">{{ section.name }}</span>
+                        <span class="chair-count">{{ section.materials | length }} materiales</span>
+                        <i class="fas fa-chevron-down chair-arrow"></i>
+                    </button>
+
+                    <!-- Cuerpo desplegable: el div que se abre con los materiales -->
+                    <div class="chair-body">
+                        <div class="materials-list">
+                            {% for material in section.materials %}
+                            <article class="material-card">
+                                <div class="material-content">
+                                    <div class="material-icon">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div class="material-text">
+                                        <h3>{{ material.titulo }}</h3>
+                                        <p>{{ material.descripcion }}</p>
+                                    </div>
+                                </div>
+                                <div class="material-actions">
+                                    <a href="{{ material.url_externo }}" target="_blank" class="btn-material">
+                                        Ver Recurso <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </article>
+                            {% endfor %}
                         </div>
                     </div>
-                    <div class="material-actions">
-                        <a href="{{ material.url_externo }}" target="_blank" class="btn-material">
-                            Ver Recurso <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    </div>
-                </article>
-                {% endfor %}
-            {% else %}
-                <div class="material-empty">
-                    <i class="fas fa-folder-open"></i>
-                    <p>No hay materiales publicados en este momento para la vista pública.</p>
-                    <a href="https://drive.google.com/drive/u/5/folders/1EaowjueNp7y7_b0Qj_PyDmSJaaZOescM" target="_blank" class="btn-drive">
-                        Ir al Drive de la Cátedra
-                    </a>
                 </div>
-            {% endif %}
-        </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="material-empty">
+                <i class="fas fa-folder-open"></i>
+                <p>No hay materiales publicados en este momento.</p>
+            </div>
+        {% endif %}
     </div>
 </section>
+
+<script src="{{ url_for('static', filename='js/materials.js') }}"></script>
 {% endblock %}

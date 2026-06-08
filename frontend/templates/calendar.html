@@ -1,51 +1,53 @@
 {% extends "base.html" %}
 
-{% block title %}IDS Lanzillota - Cronograma{% endblock %}
+{% block title %}Panel FIUBA - Cronograma{% endblock %}
 
 {% block extra_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
 {% endblock %}
 
 {% block content %}
-<main class="calendar-container">
-    <section class="calendar-header">
-        <h1>Cronograma</h1>
-        <p>Fechas, temas y modalidades de cada clase del cuatrimestre actual</p>
-    </section>
-
-    <section class="calendar-schedule">
-        {% if schedule %}
-            {% for week in schedule %}
-            <div class="calendar-week-block">
-                <h2 class="calendar-week-title">Semana: {{ week.week }}</h2>
-
-                <div class="calendar-classes-grid">
-                    {% for class in week.classes %}
-                    <article class="calendar-class-card">
-                        <h3 class="calendar-class-title">
-                            {{ class.tipo }} ({{ class.fecha }})
-                        </h3>
-                        
-                        <div class="calendar-class-content">
-                            <ul class="calendar-class-topics">
-                                <li>{{ class.temas }}</li>
-                            </ul>
-                        </div>
-
-                        <span class="calendar-class-badge">
-                            {{ class.modalidad }}
-                        </span>
-                    </article>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="calendar-empty">
-                <p>El cronograma de clases todavia no fue publicado para este curso</p>
-                <i class="fas fa-calendar-times"></i>
-            </div>
-        {% endif %}
-    </section>
-</main>
+<section class="section-header-schedule">
+  <h1>Cronograma</h1>
+  <p>Fechas, temas y modalidades de cada clase del cuatrimestre actual</p>
+</section>
+<section class="section-schedule" >
+  <div>
+    {% if selected_subject%}
+    <select title="select-course" id="select-courses">
+      <option value="" selected>Seleccione una materia</option>
+      {% for course in courses %}
+      <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
+  </div>
+  <div>
+    {% if selected_subject %}
+    <p id="msg-select-course">
+      Por favor, selecciones una catedra para ver su cronograma.
+    </p>
+    <div id="classes-container" class="classes-container">
+      {% if schedule %}
+        {% for week in schedule %}
+        <div class="class" >
+          <h2>Semana: {{ week.week }}</h2>
+          {% for class in week.classes %}
+          <article data-course="{{ class.id_curso }}">
+            <h3>{{ class.tipo }} - {{ class.fecha }}</h3>
+            <p>{{ class.temas }}</p>
+            <span>{{ class.modalidad }}</span>
+          </article>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <p>Por favor, Selecciones una Materia</p>
+    {% endif %}
+  </div>
+</section>
+<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
 {% endblock %}

@@ -1,12 +1,26 @@
 {% macro dropdown_profile(user) %}
 <div class="dropdown">
-  <button type="button" class="dropdown-btn" onclick="toggleDropdown()">
+  <button type="button" class="dropdown-btn" onclick="toggleDropdown('dropdown-menu')">
     {{ user["nombre"] }}
   </button>
   <div class="dropdown-menu" id="dropdown-menu">
-    <a href="#">Perfil</a>
+    <a href="#" onclick="toggleDropdown('dropdown-menu'); openModal('profile-modal'); return false;">Perfil</a>
     <a href="#">Configuracion</a>
     <a href="{{ url_for('login.logout') }}">Cerrar sesion</a>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro dropdown_settings() %}
+<div class="dropdown">
+  <button type="button" class="settings-btn" onclick="toggleDropdown('dropdown-settings')">
+    ☾
+  </button>
+  <div class="dropdown-menu" id="dropdown-settings">
+    <label class="settings-option">
+      Modo oscuro
+      <input type="checkbox" id="checkbox">
+    </label>
   </div>
 </div>
 {% endmacro %}

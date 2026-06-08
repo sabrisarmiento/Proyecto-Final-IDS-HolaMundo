@@ -4,7 +4,8 @@ from services.class_service import (
     class_get_service, 
     create_class_service, 
     update_class_service, 
-    delete_class_service
+    delete_class_service,
+    classes_by_subject_service
 )
 from middleware.auth_middleware import require_auth
 
@@ -13,13 +14,18 @@ classes_bp = Blueprint('classes', __name__)
 @classes_bp.route('/clases', methods=['GET'])
 def get_classes_route():
     filters = {
-        "date": request.args.get("fecha")
+        "fecha": request.args.get("fecha"),
+        "id_curso": request.args.get("id_curso")
     }
     return class_service(filters)
-  
+
 @classes_bp.route('/clases/<int:id_clase>', methods=['GET'])
 def get_class_id_route(id_clase):
     return class_get_service(id_clase)
+
+@classes_bp.route('/clases/materia/<int:id_subject>', methods=['GET'])
+def get_classes_by_subject_route(id_subject):
+    return classes_by_subject_service(id_subject)
 
 
 @classes_bp.route('/clases', methods=['POST'])
@@ -39,3 +45,4 @@ def update_class_route(id_clase):
 @require_auth
 def delete_class_route(id_clase):
     return delete_class_service(id_clase)
+

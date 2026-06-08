@@ -1,80 +1,693 @@
-{% extends "base_private.html" %}
+{% extends "base_private.html" %} 
+{% block title %}Panel FIUBA - {{course['id_curso'] }}{% endblock %}
 
-{% block title %}IDS Lanzillota - {{ course[0].id_curso }}{% endblock %}
+{% from "components/pagination.html" import pagination %}
+{% from "components/modal.html" import modal %}
+{% from "components/table_sort_header.html" import sortable_th %}
 
 {% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}">
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/course_detail.css') }}"
+/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_course.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
-
 {% block content %}
-<section class="course-detail">
+<section class="course-detail-header">
+  <h1>
+    {{ course.materia }} ( {{ course.cuatrimestre }} — {{ course.anio }} )
+  </h1>
+  <p class="catedra-subtitle">{{ course.catedra }}</p>
+</section>
+<section class="course-detail-content">
+  <nav class="course-nav">
+    <a href="?tab=general" class="nav-btn {% if active_tab == 'general' %}active{% endif %}">General</a>
+    <a href="?tab=students" class="nav-btn {% if active_tab == 'students' %}active{% endif %}">Alumnos</a>
+    <a href="?tab=teams" class="nav-btn {% if active_tab == 'teams' %}active{% endif %}">Equipos</a>
+    <a href="?tab=calendar" class="nav-btn {% if active_tab == 'calendar' %}active{% endif %}">Calendario</a>
+    <a href="?tab=marks" class="nav-btn {% if active_tab == 'marks' %}active{% endif %}">Notas</a>
+    <a href="?tab=ads" class="nav-btn {% if active_tab == 'ads' %}active{% endif %}">Avisos</a>
+  </nav>
 
-    <div class="course-detail-header">
-        <h1>{{ course[0].nombre }}</h1>
-        <span class="course-cuatrimestre">{{ course[0].cuatrimestre }} — {{ course[0].anio }}</span>
+  <div class="tab-content">
+
+    <div id="tab-general"
+        class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
+ 
+
+        <div id="dash-curso-root" data-course-id="{{ course.id_curso }}">
+ 
+            <div id="dash-curso-loading" class="dash-loading">
+                <span class="dash-spinner"></span>
+                <p>Cargando estadisticas…</p>
+            </div>
+ 
+            <p id="dash-curso-error" class="dash-error hidden"></p>
+ 
+            <div id="dash-curso-content" class="hidden">
+ 
+                <section class="dash-info-row">
+                    <div class="dash-info-item">
+                        <span class="dash-info-label">Materia</span>
+                        <span class="dash-info-value">{{ course.materia }}</span>
+                    </div>
+                    <div class="dash-info-item">
+                        <span class="dash-info-label">Cátedra</span>
+                        <span class="dash-info-value">{{ course.catedra }}</span>
+                    </div>
+                    <div class="dash-info-item">
+                        <span class="dash-info-label">Cuatrimestre</span>
+                        <span class="dash-info-value">{{ course.cuatrimestre }} — {{ course.anio }}</span>
+                    </div>
+                </section>
+
+                <section class="dash-stats-grid">
+
+                    <div class="dash-stat-card dash-stat--primary">
+                        <span class="dash-stat-label">Total Inscriptos</span>
+                        <strong class="dash-stat-num" id="dash-total-alumnos">—</strong>
+                        <span class="dash-stat-sub">
+                            <span id="dash-activos">—</span> activos ·
+                            <span id="dash-abandonaron">—</span> abandonaron
+                        </span>
+                    </div>
+
+                    <div class="dash-stat-card">
+                        <span class="dash-stat-label">Equipos</span>
+                        <strong class="dash-stat-num" id="dash-equipos">—</strong>
+                        <span class="dash-stat-sub">grupos de trabajo</span>
+                    </div>
+
+                    <div class="dash-stat-card dash-stat--accent">
+                        <span class="dash-stat-label">Promedio General</span>
+                        <strong class="dash-stat-num" id="dash-promedio">—</strong>
+                        <span class="dash-stat-sub">escala 0 – 10</span>
+                    </div>
+
+                    <div class="dash-stat-card">
+                        <span class="dash-stat-label">Promocionan</span>
+                        <strong class="dash-stat-num dash-stat-num--green" id="dash-promocionados">—</strong>
+                        <span class="dash-stat-sub">alumnos</span>
+                    </div>
+
+                    <div class="dash-stat-card">
+                        <span class="dash-stat-label">Van a Final</span>
+                        <strong class="dash-stat-num" id="dash-van-final">—</strong>
+                        <span class="dash-stat-sub">alumnos</span>
+                    </div>
+ 
+                    <div class="dash-stat-card dash-stat--warn">
+                        <span class="dash-stat-label">Recursantes</span>
+                        <strong class="dash-stat-num" id="dash-recursantes">—</strong>
+                        <span class="dash-stat-sub">alumnos</span>
+                    </div>
+ 
+                </section>
+ 
+                <section class="dash-charts-grid">
+
+                    <div class="dash-chart-card dash-chart-card--wide">
+                        <h4 class="dash-chart-title">Rendimiento por Evaluación</h4>
+                        <p class="dash-chart-subtitle">Promedio de notas</p>
+                        <div class="dash-chart-wrap" style="height:220px;">
+                            <canvas id="chart-rendimiento"></canvas>
+                        </div>
+                        <p class="dash-chart-empty hidden">Sin evaluaciones cargadas</p>
+                    </div>
+ 
+                    <div class="dash-chart-card">
+                        <h4 class="dash-chart-title">Asistencia</h4>
+                        <p class="dash-chart-subtitle">Regularidad de asistencia</p>
+                        <div class="dash-asist-badges">
+                            <span class="dash-asist-badge dash-asist-badge--ok">
+                                <strong id="dash-asist-regulares">—</strong> regulares
+                            </span>
+                            <span class="dash-asist-badge dash-asist-badge--risk">
+                                <strong id="dash-asist-en-riesgo">—</strong> en riesgo
+                            </span>
+                        </div>
+                        <div class="dash-chart-wrap" style="height:180px;">
+                            <canvas id="chart-asistencia"></canvas>
+                        </div>
+                        <p class="dash-chart-empty hidden">Sin datos de asistencia</p>
+                    </div>
+ 
+                    <div class="dash-chart-card">
+                        <h4 class="dash-chart-title">Estado de la Cursada</h4>
+                        <p class="dash-chart-subtitle">Distribución actual del alumnado</p>
+                        <div class="dash-chart-wrap" style="height:180px;">
+                            <canvas id="chart-estado"></canvas>
+                        </div>
+                        <p class="dash-chart-empty hidden">Sin notas cargadas</p>
+                    </div>
+ 
+                </section>
+ 
+            </div>
+        </div>
     </div>
 
-    <nav class="course-subnav">
-        <button class="subnav-btn active" onclick="switchTab('general', this)">General</button>
-        <button class="subnav-btn" onclick="switchTab('students', this)">Alumnos</button>
-        <button class="subnav-btn" onclick="switchTab('teams', this)">Equipos</button>
-        <button class="subnav-btn" onclick="switchTab('calendar', this)">Calendario</button>
-        <button class="subnav-btn" onclick="switchTab('ads', this)">Avisos</button>
-    </nav>
+    <div id="tab-students" class="tab-panel {% if active_tab != 'students' %}hidden{% endif %}">
+      {% include "tabs/students_tab.html" %}
+    </div>
 
-    <div class="tab-content">
+    <div id="tab-teams" class="tab-panel {% if active_tab != 'teams' %}hidden{% endif %}">
+      {% if teams %}
+          {% for team in teams %}
+            <div class="team-card">
+                <button
+                    type="button"
+                    class="team-header"
+                    onclick="toggleTeam({{ team.id_equipo }})"
+                >
+                    {{ team.nombre_equipo }}
+                </button>
+                  <div
+                      id="team-{{ team.id_equipo }}"
+                      class="team-members hidden"
+                  >
+                      {% if team.alumnos %}
+                          <table class="tab-table">
+                              <thead>
+                                  <tr>
+                                      <th>Nombre</th>
+                                      <th>Apellido</th>
+                                      <th>Padrón</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for alumno in team.alumnos %}
+                                  <tr>
+                                      <td>{{ alumno.nombre }}</td>
+                                      <td>{{ alumno.apellido }}</td>
+                                      <td>{{ alumno.padron }}</td>
+                                  </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                      {% else %}
+                          <p>Este equipo no tiene integrantes.</p>
+                      {% endif %}
+                  </div>
+            </div>
+          {% endfor %}
+      {% else %}
+          <p class="tab-empty">No hay equipos registrados.</p>
+      {% endif %}
+    </div>
 
-        <div id="tab-general" class="tab-panel">
-            <p><strong>Nombre:</strong> {{ course[0].nombre }}</p>
-            <p><strong>Cuatrimestre:</strong> {{ course[0].cuatrimestre }}</p>
-            <p><strong>Año:</strong> {{ course[0].anio }}</p>
+
+
+<div id="tab-calendar" data-course-id="{{ course_id }}" class="tab-panel {% if active_tab != 'calendar' %}hidden{% endif %}">
+
+  <form class="calendar-form" onsubmit="event.preventDefault();">
+    <div class="calendar-form-group">
+      <label for="fecha-clase">
+        Fecha:
+      </label>
+      <input
+        type="date"
+        id="fecha-clase"
+        name="fecha_clase"
+      >
+    </div>
+
+    <div class="calendar-form-group">
+      <label for="semana-clase">
+        Semana:
+      </label>
+      <input
+        type="number"
+        id="semana-clase"
+        name="semana"
+        placeholder="Indicar semana..."
+      >
+    </div>
+
+    <div class="calendar-form-group">
+      <label for="temas-clase">
+        Temas:
+      </label>
+      <input
+        type="text"
+        id="temas-clase"
+        name="temas"
+        placeholder="Escribir temas..."
+      >
+    </div>
+
+    <div class="calendar-form-group">
+      <label for="tipo-clase">
+        Tipo:
+      </label>
+      <select id="tipo-clase" name="tipo">
+        <option value="Teórica">
+          Teórica
+        </option>
+        <option value="Práctica">
+          Práctica
+        </option>
+      </select>
+    </div>
+
+    <div class="calendar-form-group">
+      <label for="modalidad-clase">
+        Modalidad:
+      </label>
+      <select id="modalidad-clase" name="modalidad">
+        <option value="Presencial">
+          Presencial
+        </option>
+        <option value="Virtual">
+          Virtual
+        </option>
+      </select>
+    </div>
+
+    <button type="button" class="btn-primary" onclick="createClass()">
+      Agregar clase
+    </button>
+
+  </form>
+
+  {% if clases %}
+  <table class="calendar-table">
+    <thead>
+        <tr class="calendar-header">
+          <th>Semana</th>
+          <th>Fecha</th>
+          <th>Temas</th>
+          <th>Tipo</th>
+          <th>Modalidad</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for clase in clases %}
+        <tr class="calendar-columns">
+            <td>{{ clase.semana }}</td>
+            <td>{{ clase.fecha }}</td>
+            <td>{{ clase.temas }}</td>
+            <td>{{ clase.tipo }}</td>
+            <td>{{ clase.modalidad }}</td>
+        <td>
+          <button onclick="deleteClass({{ clase.id_clase }})">
+            Eliminar
+          </button>
+        </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+</div>
+
+
+
+    <div id="tab-marks" class="tab-panel {% if active_tab != 'marks' %}hidden{% endif %}">
+
+      <div class="promo-config-block">
+        <div class="promo-config-title-row">
+          <div>
+            <label class="promo-config-title">CONFIGURACIÓN DE PROMOCIÓN</label>
+            <p class="promo-config-subtitle">Define si la materia es promocionable y qué evaluaciones cuentan para promocionar</p>
+          </div>
+          <div class="promo-toggle-group">
+            <span class="promo-toggle-label">¿La materia es promocionable?</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-promocionable"
+                {% if curso_es_promocionable %}checked{% endif %}
+                onchange="togglePromocionable(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
         </div>
 
-        <div id="tab-students" class="tab-panel hidden">
-            {% if students %}
-                <table class="tab-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Padrón</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for s in students %}
-                        <tr>
-                            <td>{{ s.nombre }}</td>
-                            <td>{{ s.apellido }}</td>
-                            <td>{{ s.padron }}</td>
-                            <td>
-                                <span class="{% if s.estado_alumno %}status-active{% else %}status-inactive{% endif %}">
-                                    {% if s.estado_alumno %}Activo{% else %}Baja{% endif %}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div id="promo-table-wrapper" {% if not curso_es_promocionable %}class="hidden"{% endif %}>
+          <form action="/cursos/{{ course.id_curso }}/promocion/guardar" method="POST" id="form-promo">
+            <input type="hidden" name="es_promocionable" value="1">
+            {% for eval in evaluaciones %}
+              <input type="hidden" name="eval_ids" value="{{ eval.id_evaluacion }}">
+            {% endfor %}
+
+            {% if evaluaciones %}
+            <table class="promo-table">
+              <thead>
+                <tr>
+                  <th>Evaluación</th>
+                  <th>¿Cuenta para promoción?</th>
+                  <th>Nota mínima</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for eval in evaluaciones %}
+                {% set cfg = promo_config.get(eval.id_evaluacion, {}) %}
+                <tr>
+                  <td class="promo-eval-name">{{ eval.nombre or 'Evaluación ' ~ eval.id_evaluacion }}</td>
+                  <td class="promo-check-cell">
+                    <input type="checkbox"
+                      name="cuenta_{{ eval.id_evaluacion }}"
+                      class="promo-checkbox"
+                      data-id="{{ eval.id_evaluacion }}"
+                      {% if cfg.get('cuenta') %}checked{% endif %}
+                      onchange="toggleNotaMinima(this)">
+                  </td>
+                  <td class="promo-min-cell">
+                    <input type="number"
+                      name="nota_minima_{{ eval.id_evaluacion }}"
+                      class="promo-min-input {% if not cfg.get('cuenta') %}hidden{% endif %}"
+                      id="min-{{ eval.id_evaluacion }}"
+                      value="{{ cfg.get('nota_minima', '') }}"
+                      placeholder="—"
+                      min="0" max="10" step="0.5">
+                    <span class="promo-dash {% if cfg.get('cuenta') %}hidden{% endif %}" id="dash-{{ eval.id_evaluacion }}">—</span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="promo-save-row">
+              <button type="submit" class="btn-guardar-promo">Guardar configuración de promoción</button>
+            </div>
             {% else %}
-                <p class="tab-empty">No hay alumnos en este curso.</p>
+              <p class="tab-empty" style="margin-top:1rem;">Creá evaluaciones primero para configurar la promoción.</p>
             {% endif %}
+          </form>
+        </div>
+      </div>
+
+      <div class="mgmt-wrapper">
+        <div class="mgmt-card">
+
+          <div class="mgmt-box">
+            <label class="mgmt-label">SELECCIONAR TIPO DE EVALUACIÓN</label>
+            <p class="mgmt-hint">Modificarás únicamente las celdas de esta evaluación en el panel de carga de notas</p>
+            <div class="select-row">
+              <form action="/cambiar-evaluacion" method="POST" id="form-cambiar-eval">
+                <input type="hidden" name="course_id" value="{{ course.id_curso }}">
+                <select name="eval_activa" class="eval-select" onchange="document.getElementById('form-cambiar-eval').submit()">
+                  {% if not evaluaciones %}
+                    <option value="" disabled selected style="color: #aaa;">Seleccioná el tipo de evaluación</option>
+                  {% else %}
+                    {% for eval in evaluaciones %}
+                      <option value="{{ eval.id_evaluacion }}"
+                        {% if eval_seleccionada and eval.id_evaluacion == eval_seleccionada.id_evaluacion %}selected{% endif %}>
+                        {{ eval.nombre or 'Evaluación ' ~ eval.id_evaluacion }}
+                      </option>
+                    {% endfor %}
+                  {% endif %}
+                </select>
+              </form>
+
+              {% if eval_seleccionada %}
+              {% set nombre_eval_activa = eval_seleccionada.nombre if eval_seleccionada.nombre else 'Evaluación ' ~ eval_seleccionada.id_evaluacion %}
+              {% set cant_students = students | length %}
+              <form action="/cursos/{{ course.id_curso }}/evaluaciones/eliminar/{{ eval_seleccionada.id_evaluacion }}"
+                    method="POST"
+                    onsubmit="return confirmarEliminarEval(this.dataset.nombre, this.dataset.cant);"
+                    data-nombre="{{ nombre_eval_activa }}"
+                    data-cant="{{ cant_students }}">
+                <button type="submit" class="btn-del-eval" title="Eliminar evaluación seleccionada">🗑️</button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mgmt-box mgmt-box--right">
+            <label class="mgmt-label">CREAR UN NUEVO TIPO DE EVALUACIÓN</label>
+            <p class="mgmt-hint">Se incorporará una nueva columna interactiva en la planilla inferior al instante.</p>
+            <form action="/cursos/{{ course.id_curso }}/evaluaciones/crear" method="POST" class="create-form">
+              <input type="text" name="nombre_eval" placeholder="Ej: TP1, Defensa oral, Recuperatorio..." required>
+              <button type="submit" class="btn-crear">+ CREAR</button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+      {% if eval_seleccionada %}
+      <div class="quick-grade-section">
+        <div class="qg-header">
+          <div class="qg-title-block">
+            <h2 class="qg-title">CARGA DE NOTAS: <span class="highlight-eval">{{ eval_seleccionada.nombre or 'Eval ' ~ eval_seleccionada.id_evaluacion }}</span></h2>
+            <p class="qg-subtitle">Escribe directamente los números (escala 0-10) del alumno correspondiente</p>
+          </div>
+          <div class="qg-right-controls">
+            <div class="promedio-bubble">
+              <span class="promedio-label">PROMEDIO DE CLASE</span>
+              <span class="promedio-val" id="promedio-display">{{ promedio_eval }}</span>
+            </div>
+            <div class="filter-equipo">
+              <label class="filter-icon">✔</label>
+              <select id="filtro-equipo" class="filter-select" onchange="filtrarPorEquipo(this.value)">
+                <option value="">Todos los equipos</option>
+                {% set equipos_vistos = [] %}
+                {% for s in students %}
+                  {% if s.equipo and s.equipo not in equipos_vistos %}
+                    {% set _ = equipos_vistos.append(s.equipo) %}
+                    <option value="{{ s.equipo }}">{{ s.equipo }}</option>
+                  {% endif %}
+                {% endfor %}
+                <option value="sin-equipo">Sin equipo</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div id="tab-teams" class="tab-panel hidden">
-            <p class="tab-empty">Próximamente.</p>
+        <form action="/cursos/{{ course.id_curso }}/notas/guardar" method="POST" id="form-notas">
+          <input type="hidden" name="id_evaluacion" value="{{ eval_seleccionada.id_evaluacion }}">
+          <div class="grade-grid" id="grade-grid">
+            {% for s in students %}
+            {% if s.estado_alumno %}
+            {% set nota_actual = s.notas_todas.get(eval_seleccionada.id_evaluacion|string, s.notas_todas.get(eval_seleccionada.id_evaluacion, '')) if s.notas_todas else '' %}
+            <div class="grade-card" data-equipo="{{ s.equipo or 'sin-equipo' }}">
+              <div class="card-left">
+                <strong class="card-name">{{ s.nombre }} {{ s.apellido }}</strong>
+                <small class="card-meta">{{ s.padron }} — {{ s.equipo or 'Sin equipo' }}</small>
+              </div>
+              <div class="card-right">
+                <div class="nota-wrapper">
+                  <input
+                    type="number"
+                    name="nota_{{ s.id_alumno }}"
+                    value="{{ nota_actual }}"
+                    step="0.5" min="0" max="10"
+                    class="nota-input {% if nota_actual != '' %}{% if nota_actual|float >= 4 %}nota-aprobado{% else %}nota-reprobado{% endif %}{% endif %}"
+                    onchange="colorearNota(this)"
+                    placeholder="—">
+                  <span class="nota-dot {% if nota_actual != '' %}{% if nota_actual|float >= 4 %}dot-verde{% else %}dot-rojo{% endif %}{% endif %}" id="dot-{{ s.id_alumno }}"></span>
+                </div>
+                {% set corrector_activo = s.correctores_todas.get(eval_seleccionada.id_evaluacion, '') if s.correctores_todas else '' %}
+                <input
+                  type="text"
+                  name="corrector_{{ s.id_alumno }}"
+                  value="{{ corrector_activo }}"
+                  placeholder="Corrector"
+                  class="corrector-input">
+              </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          <div class="floating-bar">
+            <button type="submit" class="btn-guardar">GUARDAR CALIFICACIONES</button>
+          </div>
+        </form>
+      </div>
+      {% else %}
+        <p class="tab-empty">Creá una evaluación para empezar a cargar notas.</p>
+      {% endif %}
+
+      <div class="planilla-section">
+        <div class="planilla-header">
+          <div>
+            <h3 class="planilla-title">PLANILLA GENERAL DE CALIFICACIONES</h3>
+            <p class="planilla-subtitle">Planilla de notas cargadas oficial, incluye promedios automáticos por columna</p>
+          </div>
+          <div class="promedio-general-bubble">
+            <span class="promedio-label">PROMEDIO GENERAL DE LA CURSADA</span>
+            <span class="promedio-val-big">{{ promedio_general }}</span>
+          </div>
         </div>
 
-        <div id="tab-calendar" class="tab-panel hidden">
-            <p class="tab-empty">Próximamente.</p>
+        <div class="planilla-filters">
+          <select id="filtro-planilla-equipo" class="filter-select-planilla" onchange="filtrarPlanilla()">
+            <option value="">Todos los equipos</option>
+            {% set equipos_planilla = [] %}
+            {% for s in students %}
+              {% if s.estado_alumno and s.equipo and s.equipo not in equipos_planilla %}
+                {% set _ = equipos_planilla.append(s.equipo) %}
+                <option value="{{ s.equipo }}">{{ s.equipo }}</option>
+              {% endif %}
+            {% endfor %}
+            <option value="__sin_equipo__">Sin equipo</option>
+          </select>
+
+          <select id="filtro-planilla-corrector" class="filter-select-planilla" onchange="filtrarPlanilla()">
+            <option value="">Todos los correctores</option>
+            {% set correctores_planilla = [] %}
+            {% for s in students %}
+              {% if s.estado_alumno %}
+                {% for corr in s.correctores_todas.values() %}
+                  {% if corr and corr not in correctores_planilla %}
+                    {% set _ = correctores_planilla.append(corr) %}
+                    <option value="{{ corr }}">{{ corr }}</option>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </select>
+
+          {% if curso_es_promocionable %}
+          <select id="filtro-planilla-estado" class="filter-select-planilla" onchange="filtrarPlanilla()">
+            <option value="">Todos</option>
+            <option value="promociona">Promociona</option>
+            <option value="final">Final</option>
+            <option value="recursa">Recursa</option>
+          </select>
+          {% else %}
+          <select id="filtro-planilla-estado" class="filter-select-planilla" onchange="filtrarPlanilla()">
+            <option value="">Todos</option>
+            <option value="final">Final</option>
+            <option value="recursa">Recursa</option>
+          </select>
+          {% endif %}
         </div>
 
-        <div id="tab-ads" class="tab-panel hidden">
-            <p class="tab-empty">Próximamente.</p>
+        <div class="table-scroll">
+          <table class="planilla-table" id="planilla-table"
+            data-es-promocionable="{{ '1' if curso_es_promocionable else '0' }}"
+            data-promo-config='{{ promo_config | tojson }}'>
+            <thead>
+              <tr>
+                <th class="th-padron">PADRÓN ID</th>
+                <th class="th-alumno">ALUMNO</th>
+                <th class="th-comision">EQUIPO</th>
+                {% for eval in evaluaciones %}
+                {% set nombre_eval_col = eval.nombre if eval.nombre else 'Eval ' ~ eval.id_evaluacion %}
+                <th class="th-eval">
+                  <div class="th-eval-inner">
+                    <span>{{ nombre_eval_col }}</span>
+                    <form action="/cursos/{{ course.id_curso }}/evaluaciones/eliminar/{{ eval.id_evaluacion }}"
+                          method="POST"
+                          style="display:inline;"
+                          onsubmit="return confirmarEliminarEval(this.dataset.nombre, 1);"
+                          data-nombre="{{ nombre_eval_col }}">
+                      <button type="submit" class="btn-del-col" title="Eliminar columna">🗑️</button>
+                    </form>
+                  </div>
+                </th>
+                {% endfor %}
+                <th class="th-final">PROMEDIO</th>
+                <th class="th-estado">ESTADO</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in students %}
+              {% if s.estado_alumno %}
+              {% set correctores_csv = s.correctores_todas.values() | list | join(',') | lower %}
+              <tr class="planilla-body-row"
+                  data-equipo="{{ (s.equipo or '') | lower }}"
+                  data-correctores="{{ correctores_csv }}"
+                  data-notas='{{ s.notas_json | tojson }}'
+                  data-estado="">
+                <td class="td-padron">{{ s.padron }}</td>
+                <td class="td-nombre">{{ s.nombre }} {{ s.apellido }}</td>
+                <td class="td-comision"><span class="team-badge">{{ s.equipo or 'Sin Equipo' }}</span></td>
+                {% for eval in evaluaciones %}
+                <td class="td-nota">
+                  {% set nota = s.notas_todas.get(eval.id_evaluacion|string, s.notas_todas.get(eval.id_evaluacion, None)) if s.notas_todas else None %}
+                  {% if nota is not none and nota != '' %}
+                    <div class="nota-cell {% if nota|float >= 4 %}nota-cell--ok{% else %}nota-cell--mal{% endif %}">
+                      <span class="nota-num">{{ nota }}</span>
+                      {% set corr_col = s.correctores_todas.get(eval.id_evaluacion|string, s.correctores_todas.get(eval.id_evaluacion, '')) if s.correctores_todas else '' %}
+                      {% if corr_col %}
+                      <span class="nota-by">por {{ corr_col }}</span>
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <span class="nota-vacia">—</span>
+                  {% endif %}
+                </td>
+                {% endfor %}
+                <td class="td-final">
+                  {% if s.promedio_final %}
+                    <span class="nota-final {% if s.promedio_final|float >= 4 %}nota-cell--ok{% else %}nota-cell--mal{% endif %}">
+                      {{ s.promedio_final }}
+                    </span>
+                  {% else %}
+                    <span class="nota-vacia">—</span>
+                  {% endif %}
+                </td>
+                <td class="td-estado-final"></td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
 
     </div>
+    <!-- 
+    <div id="tab-ads" class="tab-panel {% if active_tab != 'ads' %}hidden{% endif %}">
+      <p class="tab-empty">Aca va Avisos</p>
+    </div>
+    -->
+    <div id="tab-ads" class="tab-panel {% if active_tab != 'ads' %}hidden{% endif %}">
+
+      <div class="ads-header">
+        <h2>Avisos del curso</h2>
+
+        <a 
+          class="btn-crear"
+          href="{{ url_for('advertisements.create_advertisement_front', id_curso=course['id_curso']) }}"
+        >
+          + Crear aviso
+        </a>
+        <a 
+          class="btn-crear"
+          href="{{ url_for('advertisements.connect_slack_front', id_curso=course['id_curso']) }}"
+        >
+          Conectar Slack
+</a>
+      </div>
+
+    {% if advertisements %}
+      <div class="advertisements-list">
+        {% for aviso in advertisements %}
+          <article class="advertisement-card">
+            <div class="advertisement-card-header">
+              <span>{{ aviso.fecha }}</span>
+              <span>Publicado por: {{ aviso.emisor }}</span>
+            </div>
+
+          <h3>{{ aviso.titulo }}</h3>
+          <p>{{ aviso.mensaje }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="tab-empty">No hay avisos cargados para este curso.</p>
+  {% endif %}
+
+</div>
+  </div>
 </section>
 
+<dialog id="delete-modal" class="confirm-modal">
+  <div class="modal-inner">
+    <h3 class="modal-title">Confirmar eliminación</h3>
+    <p class="modal-body" id="modal-msg">¿Estás seguro de que querés eliminar esta evaluación?</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="document.getElementById('delete-modal').close()">Cancelar</button>
+      <button class="btn-modal-confirm" id="modal-confirm-btn">Si, eliminar</button>
+    </div>
+  </div>
+</dialog>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/course_detail.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard_course.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,28 @@
+import requests
+
+def get_subjects():
+  try:
+    response = requests.get("http://localhost:5000/subjects")
+    response.raise_for_status()
+    return response.json().get("subjects", [])
+  except Exception as e:
+    print(f"Error al obtener las materias: {e}")
+    return []
+
+def get_subject_by_id(id_materia):
+    try:
+        response = requests.get(f"http://localhost:5000/subjects/{id_materia}")
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"Error al obtener la materia {id_materia}: {e}")
+        return []
+
+def get_subject_by_name(name):
+  try:
+    res = requests.get("http://localhost:5000/subjects", params={"nombre": str(name)})
+    res.raise_for_status()
+    return res.json()
+  except Exception as e:
+    print(f"Error al obtener la materia {name}: {e}")
+    return {}

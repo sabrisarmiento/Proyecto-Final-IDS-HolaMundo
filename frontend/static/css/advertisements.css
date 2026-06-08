@@ -82,9 +82,20 @@
 .advertisement-empty {
     text-align: center;
     background-color: var(--color-5);
-    border: 2px dashed var(--color-3);
+    border: 2px dashed var(--color-12);
     color: var(--color-8);
     padding: 3rem;
     border-radius: 12px;
     font-size: 1rem;
+}
+
+.prints{
+    display: flex;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.print{
+    display: flex;
+    flex-direction: column;
 }

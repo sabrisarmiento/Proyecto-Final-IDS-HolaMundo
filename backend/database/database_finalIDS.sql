@@ -8,24 +8,9 @@ CREATE TABLE roles (
     nivel_administracion INT NOT NULL
 );
 
--- cursos --
-CREATE TABLE cursos (
-    id_curso INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    cuatrimestre VARCHAR(20) NOT NULL,
-    anio INT NOT NULL
-);
-
--- tipos_evaluacion --
-CREATE TABLE tipos_evaluacion (
-    id_tipo INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) UNIQUE NOT NULL,
-    descripcion TEXT
-);
-
 -- usuarios --
 CREATE TABLE usuarios (
-    id_usuario int AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     correo VARCHAR(255) UNIQUE NOT NULL,
@@ -35,6 +20,44 @@ CREATE TABLE usuarios (
     FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
 );
 
+-- materias --
+CREATE TABLE materias (
+    id_materia INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    codigo VARCHAR(20) UNIQUE,
+    descripcion TEXT
+);
+
+-- cursos --
+CREATE TABLE cursos (
+    id_curso INT AUTO_INCREMENT PRIMARY KEY,
+    id_materia INT NOT NULL,
+    catedra VARCHAR(100) NOT NULL,
+    id_profesor INT,
+    cuatrimestre VARCHAR(20) NOT NULL,
+    anio INT NOT NULL,
+    slack_url VARCHAR(500),
+    youtube_url VARCHAR (500),
+    FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
+    FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
+);
+
+-- curso_ayudantes --
+CREATE TABLE curso_ayudantes (
+    id_curso INT NOT NULL,
+    id_usuario INT NOT NULL,
+    PRIMARY KEY (id_curso, id_usuario),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
+-- tipos_evaluacion --
+CREATE TABLE tipos_evaluacion (
+    id_tipo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) UNIQUE NOT NULL,
+    descripcion TEXT
+);
+
 -- alumnos --
 CREATE TABLE alumnos (
     id_alumno INT AUTO_INCREMENT PRIMARY KEY,
@@ -42,7 +65,7 @@ CREATE TABLE alumnos (
     apellido VARCHAR(100) NOT NULL,
     padron INT UNIQUE NOT NULL,
     correo VARCHAR(255) NOT NULL,
-    estado_alumno BOOLEAN DEFAULT FALSE,
+    estado_alumno BOOLEAN DEFAULT TRUE,
     id_curso INT NOT NULL,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
 );
@@ -62,7 +85,7 @@ CREATE TABLE clases (
     temas TEXT,
     semana INT NOT NULL,
     tipo VARCHAR(50),
-    modalidad VARCHAR(50)
+    modalidad VARCHAR(50),
     id_curso INT NOT NULL,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
@@ -77,7 +100,7 @@ CREATE TABLE materiales (
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
--- equipo_alumno -- tabla intermedia
+-- equipo_alumno --
 CREATE TABLE equipo_alumno (
     id_equipo INT NOT NULL,
     id_alumno INT NOT NULL,
@@ -93,27 +116,31 @@ CREATE TABLE asistencia (
     id_clase INT NOT NULL,
     presente BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) 
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase)
 );
 
--- aviso --
+-- avisos --
 CREATE TABLE avisos (
     id_aviso INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
+    id_curso INT NOT NULL,
     titulo VARCHAR(100) NOT NULL,
     mensaje TEXT NOT NULL,
     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
 );
 
 -- evaluaciones --
 CREATE TABLE evaluaciones (
     id_evaluacion INT AUTO_INCREMENT PRIMARY KEY,
     id_tipo INT NOT NULL,
+    id_curso INT NOT NULL,
     id_usuario INT NOT NULL,
     fecha DATE,
     asociacion ENUM('Individual', 'Equipo') NOT NULL,
     FOREIGN KEY (id_tipo) REFERENCES tipos_evaluacion(id_tipo),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
@@ -124,29 +151,57 @@ CREATE TABLE notas (
     id_evaluacion INT NOT NULL,
     id_equipo INT,
     nota DECIMAL(4, 2) NOT NULL,
-    id_corrector INT NOT NULL,
+    corrector_nombre VARCHAR(100) NULL,
+    CONSTRAINT uq_alumno_evaluacion UNIQUE (id_alumno, id_evaluacion),
     FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion),
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo),
-    FOREIGN KEY (id_corrector) REFERENCES usuarios(id_usuario)
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
 );
 
-CREATE TABLE calendario (
-    id_evento INT AUTO_INCREMENT PRIMARY KEY, 
-    titulo VARCHAR(100) NOT NULL,
-    tipo_clase VARCHAR(50) NOT NULL,
-    descripcion TEXT,
-    modalidad VARCHAR(100),
-    hipervinculo VARCHAR(255),
-    fecha_evento DATETIME NOT NULL,
-    id_profesor INT NOT NULL,
-    FOREIGN KEY (id_profesor) REFERENCES usuarios (id_usuario)
+-- configuracion promocion --
+CREATE TABLE configuracion_promocion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_curso INT NOT NULL,
+    es_promocionable BOOLEAN NOT NULL DEFAULT FALSE,
+    id_evaluacion INT NOT NULL,
+    cuenta_para_promocion BOOLEAN NOT NULL DEFAULT FALSE,
+    nota_minima DECIMAL(4, 2) NULL,
+    CONSTRAINT uq_curso_evaluacion UNIQUE (id_curso, id_evaluacion),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion) ON DELETE CASCADE
 );
 
-INSERT INTO ROLES (nombre, nivel_administracion) VALUES ('Profesor', 1);
+CREATE TABLE curso_promocion_config (
+    id_curso INT PRIMARY KEY,
+    es_promocionable BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
+);
 
-INSERT INTO USUARIOS (nombre, apellido, correo, contraseña, id_rol)
-VALUES ('Bruno', 'Profe', 'bruno@fiuba.com', '123456', 1);
+CREATE TABLE curso_slack_config (
+    id_curso INT PRIMARY KEY,
+    slack_team_id VARCHAR(100),
+    slack_channel_id VARCHAR(100),
+    slack_channel_name VARCHAR(100),
+    slack_bot_token VARCHAR(500),
+    slack_webhook_url VARCHAR(1000),
+    instalado_por INT,
+    creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (instalado_por) REFERENCES usuarios(id_usuario)
+);
 
-SELECT * FROM usuarios;
-SELECT * FROM roles;
+
+
+--CREATE TABLE slack_config_logs (
+--    id_log INT AUTO_INCREMENT PRIMARY KEY,
+--    id_curso INT NOT NULL,
+--    id_usuario INT,
+--  accion VARCHAR(50) NOT NULL,
+--    slack_team_id VARCHAR(100),
+--    slack_channel_id VARCHAR(100),
+--    slack_channel_name VARCHAR(100),
+--    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ --   FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+ --   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
+--);

@@ -1,6 +1,8 @@
 :root {
   --color-1: #1E1E24;
+  --color-15: rgba(146, 20, 12, 0.15);
   --color-2: #581918;
+  --color-25: #b3170f;
   --color-3: #92140C;
   --color-4: #C9867E;
   --color-45: #ffffff;
@@ -9,45 +11,92 @@
   --color-65: #FFDAAF;
   --color-7: #FFCF99;
   --color-8: #887672;
+  --color-85: #5f534f;
   --color-9: #111D4A;
+  --color-10:#ffffff;
+  --color-11:#ffffff;
+  --color-12:#92140C;
+  --color-13: #FFE4C5;
+  --color-14:#111D4A;
+  --color-15:#1E1E24;
+  --color-16:#92140c1f;
 }
+
+[data-theme="dark"] {
+  --color-3:#4f465f;
+  --color-5: #3f384c;
+  --color-45: #1d1d21;
+  --color-65: #3f384c;
+  --color-6: #2c2734;
+  --color-2: #a59dec;
+  --color-8: #e3e4e8;
+  --color-9: #b4adf9;
+  --color-10: #ffffff;
+  --color-11: #151517;
+  --color-12:#b4adf9;
+  --color-13: #ffffff;
+  --color-14:#837dbc;
+  --color-15:#ffffff;
+  --color-16:#18151d;
+  border-color: #262628;
+}
+
+[data-theme="dark"] .footer-private-info p {
+  color: var(--color-2);
+}
+
 
 body {
   margin: 0;
   background-color: var(--color-5);
   font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   /* font-family: 'PT Sans', sans-serif;
   font-family: 'Prompt', sans-serif;
   font-family: 'Red Hat Display', sans-serif; */
 }
 
-.header-private {
-display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 1rem 2rem;
-background: var(--color-45);
-border-bottom: 1px solid #e2e8f0;
+.main-private {
+  flex: 1;
 }
 
+.header-private {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: var(--color-45);
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+
 .header-private-logo {
-font-size: 1.25rem;
-font-weight: 700;
-color: var(--color-9);
-text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-9);
+  text-decoration: none;
+  flex-shrink: 1;
+  max-width: 150px;
+  line-height: 1.2;
+  margin-right: 2rem;
 }
 
 .header-private-nav {
-display: flex;
-gap: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
 }
 
 .header-private-nav a {
-color: var(--color-8);
-text-decoration: none;
-font-weight: 500;
-padding: 0.5rem 0.75rem;
-border-radius: 0.5rem;
+  color: var(--color-8);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
 }
 
 .header-private-nav a:hover {
@@ -81,7 +130,13 @@ border-radius: 0.5rem;
 }
 
 .header-private-nav a.is-active {
-  background-color: var(--color-6);
-  color: var(--color-2);
+  background-color: var(--color-2);
+  color: var(--color-13);
 }
 
+.config-box{
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+}

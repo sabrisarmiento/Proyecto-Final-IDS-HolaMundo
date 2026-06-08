@@ -1,26 +1,41 @@
 //modal
 function openModal(id) {
   document.getElementById(id).classList.add("active");
+  document.body.style.overflow = "hidden";
 }
 
 function closeModal(id) {
   document.getElementById(id).classList.remove("active");
+  document.body.style.overflow = "";
 }
 
-document.addEventListener("click", function(event){
+document.addEventListener("click", function (event) {
   if (event.target.classList.contains("modal-container")) {
-    event.target.classList.remove("active")
+    closeModal(event.target.id);
   }
-})
+});
 
 //dropdown
-function toggleDropdown() {
-  document.getElementById("dropdown-menu").classList.toggle("active")
+function toggleDropdown(id) {
+  document.getElementById(id).classList.toggle("active");
 }
 
-document.addEventListener("click", function(event){
-  const dropdown = document.querySelector(".dropdown")
-  if (dropdown && !dropdown.contains(event.target)) {
-    document.getElementById("dropdown-menu").classList.remove("active")
+document.addEventListener("click", function (event) {
+  document.querySelectorAll(".dropdown").forEach((dropdown) => {
+    if (!dropdown.contains(event.target)) {
+      const menu = dropdown.querySelector(".dropdown-menu");
+      if (menu) {
+        menu.classList.remove("active");
+      }
+    }
+  });
+});
+
+function changeSubject(id) {
+  if (id === "general") {
+    window.location.href = window.location.pathname
+  } else {
+    window.location.href = window.location.pathname + "?subject=" + id
   }
-})
+}
+

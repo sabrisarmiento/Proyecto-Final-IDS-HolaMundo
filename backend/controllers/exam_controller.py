@@ -1,168 +1,422 @@
 from database.db import query_db, modify_db
 
+
 def get_all_exams(filters):
     try:
-        id_type=filters.get('id_tipo')
-        id_user=filters.get('id_usuario')
-        date=filters.get('fecha')
+        id_curso = filters.get('id_curso')
 
-        sql = "SELECT id_tipo, id_user, fecha FROM evaluaciones"
-        condition= "WHERE 1=1"
+        sql = """
+            SELECT 
+                e.id_evaluacion,
+                e.id_tipo,
+                e.id_curso,
+                e.id_usuario,
+                e.fecha,
+                t.nombre AS nombre
+            FROM evaluaciones e
+            JOIN tipos_evaluacion t ON e.id_tipo = t.id_tipo
+        """
         params = []
 
-        if id_type is not None:
-            condition+="AND id_type=%s"
-            params.append(int(id_type))
+        if id_curso:
+            sql += " WHERE e.id_curso = %s"
+            params.append(id_curso)
+        
+        sql += " ORDER BY e.id_evaluacion ASC"
 
-        if id_user is not None:
-            condition*="AND id_user=%s"
-            params.append(int(id_user))
-        
-        if date is not None:
-            condition+="AND date=%s"
-            params.append(int(date))
-        
-        result=query_db(sql + condition, params)
+        result = query_db(sql, params)
+
         return {
-            "ok":True,
-            "data":result
-        }
+            "ok": True, 
+            "data": result if result else []
+            }
     except Exception as e:
         return {
-            "ok": False,
-            "code": 500,
-            "message": "Internal Server Error",
+            "ok": False, 
+            "code": 500, 
+            "message": "Internal Server Error", 
             "description": str(e)
-        }
-    
-
-#-----------------------------------------------------------
+            }
 
 
 def get_exam_by_id(id_exam):
     try:
-        sql="SELECT id_tipo, id_user, fecha FROM evaluaciones"
-        result=query_db(sql,(id_exam,))
+        sql = "SELECT id_tipo, id_usuario, fecha FROM evaluaciones WHERE id_evaluacion = %s"
+        result = query_db(sql, (id_exam,))
 
         if not result:
             return {
-                "ok": False,
-                "code": 404,
+                "ok": False, 
+                "code": 404, 
                 "message": "Not Found",
                 "description": f"No existe una evaluación con ID {id_exam}"
-            }
-        return {
-            "ok": True,
-            "data":result
-        }
+                }
+
+        return {"ok": True, "data": result}
     except Exception as e:
         return {
-            "ok": False,
-            "code": 500,
-            "message": "Internal Server Error",
+            "ok": False, 
+            "code": 500, 
+            "message": "Internal Server Error", 
             "description": str(e)
-        }
-
-
-#-----------------------------------------------------------
+            }
 
 
 def create_exam(data):
     try:
+        id_usuario = data.get('id_usuario')
+        fecha      = data.get('fecha')
+        id_curso   = data.get('id_curso')
+        nombre     = data.get('nombre')
+        asociacion = data.get('asociacion', 'Individual')  # default individual
 
-        id_type=data.get('id_tipo')
-        id_user=data.get('id_usuario')
-        date=data.get('fecha')
+        if not nombre:
+            return {
+                "ok": False, 
+                "code": 400, 
+                "message": "Bad Request",
+                "description": "El nombre de la evaluacion es requerido"
+                }
+        if not id_curso:
+            return {
+                "ok": False, 
+                "code": 400, 
+                "message": "Bad Request",
+                "description": "El id_curso es requerido"
+                }
+
+        sql_tipo = """
+            INSERT INTO tipos_evaluacion (nombre)
+            VALUES (%s)
+            ON DUPLICATE KEY UPDATE nombre = nombre
+        """
+        modify_db(sql_tipo, (nombre,))
+
+        result_tipo = query_db(
+            "SELECT id_tipo FROM tipos_evaluacion WHERE nombre = %s LIMIT 1",
+            (nombre,)
+        )
+        if not result_tipo:
+            return {
+                "ok": False, 
+                "code": 500, 
+                "message": "Internal Server Error",
+                "description": "No se pudo obtener el tipo de evaluacion"
+                }
+
+        id_tipo_real = result_tipo[0]['id_tipo']
+
+        if not id_usuario:
+            fallback = query_db("SELECT id_usuario FROM usuarios LIMIT 1", [])
+            id_usuario = fallback[0]['id_usuario'] if fallback else None
+
+        if not id_usuario:
+            return {
+                "ok": False, 
+                "code": 400, 
+                "message": "Bad Request",
+                "description": "No se pudo determinar el usuario que crea la evaluacion"
+                }
 
         sql = """
-            INSERT INTO evaluaciones (id_type, id_user, date)
+            INSERT INTO evaluaciones (id_tipo, id_usuario, fecha, id_curso, asociacion)
             VALUES (%s, %s, %s, %s, %s)
         """
-        modify_db(sql, (id_type, id_user, date))
+        modify_db(sql, (id_tipo_real, id_usuario, fecha, id_curso, asociacion))
+
+        return {
+            "ok": True, 
+            "message": "Evaluacion creada con exito"
+            }
+    except Exception as e:
+        return {
+            "ok": False, 
+            "code": 400, 
+            "message": "Bad Request", 
+            "description": str(e)
+            }
+
+
+def patch_exam_by_id(id_exam, data):
+    try:
+        id_type = data.get('id_tipo')
+        id_user = data.get('id_usuario')
+        date    = data.get('fecha')
+
+        updates = []
+        params  = []
+
+        if id_type is not None:
+            updates.append("id_tipo = %s")
+            params.append(id_type)
+        if id_user is not None:
+            updates.append("id_usuario = %s")
+            params.append(id_user)
+        if date is not None:
+            updates.append("fecha = %s")
+            params.append(date)
+
+        if not updates:
+            return {
+                "ok": False, 
+                "code": 400, 
+                "message": "Bad Request",
+                "description": "No se enviaron campos para actualizar"
+                }
+
+        sql = f"UPDATE evaluaciones SET {', '.join(updates)} WHERE id_evaluacion = %s"
+        params.append(id_exam)
+
+        modify_row = modify_db(sql, params)
+        if modify_row == 0:
+            return {
+                "ok": False, 
+                "code": 404, 
+                "message": "Not Found",
+                "description": f"No hay una evaluacion con el id {id_exam} para actualizar"
+                }
+
+        return {
+            "ok": True, 
+            "message": "Evaluacion actualizada con exito", 
+            "id_evaluacion": id_exam
+            }
+    except Exception as e:
+        return {
+            "ok": False, 
+            "code": 400, 
+            "message": 
+            "Bad Request", "description": str(e)
+            }
+
+
+def delete_exam_by_id(id_exam):
+    try:
+        modify_db("DELETE FROM notas WHERE id_evaluacion = %s", (id_exam,))
+
+        modify_row = modify_db(
+            "DELETE FROM evaluaciones WHERE id_evaluacion = %s",
+            (id_exam,)
+        )
+
+        if modify_row == 0:
+            return {
+                "ok": False, 
+                "code": 404, 
+                "message": "Not Found",
+                "description": f"No se encontro la evaluacion con el ID {id_exam}."
+                }
+
+        return {
+            "ok": True, 
+            "message": f"Evaluacion con ID {id_exam} eliminada correctamente"
+            }
+    except Exception as e:
+        return {
+            "ok": False, 
+            "code": 500, 
+            "message": "Internal Server Error", 
+            "description": str(e)
+            }
+
+
+def save_notes_to_db(id_exam, notes_dict, id_corrector, correctores_dict=None):
+    try:
+        if correctores_dict is None:
+            correctores_dict = {}
+
+        for id_alumno, nota in notes_dict.items():
+            corrector_texto = correctores_dict.get(str(id_alumno)) or None
+
+            sql = """
+                INSERT INTO notas (id_alumno, id_evaluacion, nota, corrector_nombre)
+                VALUES (%s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE 
+                    nota = VALUES(nota),
+                    corrector_nombre = VALUES(corrector_nombre)
+            """
+            modify_db(sql, (id_alumno, id_exam, nota, corrector_texto))
+
         return {
             "ok": True
             }
     except Exception as e:
         return {
-            "ok": False,
-            "code": 400,
-            "message": "Bad Request",
-            "description": str(e)
-        }
-
-
-#-----------------------------------------------------------
-
-def patch_exam_by_id(id_exam,data):
-    try:   
-        id_type=data.get('id_tipo')
-        id_user=data.get('id_usuario')
-        date=data.get('fecha')
-            
-        updates = []
-        params = []
-
-        if id_type is not None:
-            updates.append("id_alumno = %s")
-            params.append(int(id_type))
-        if id_user is not None:
-            updates.append("id_evaluacion = %s")
-            params.append(int(id_user))
-        if date is not None:
-            updates.append("id_equipo = %s")
-            params.append(int(date))
-
-        if not updates:
-            return {
-                "ok": False,
-                "code": 400,
-                "message": "Bad Request",
-                "description": "No se enviaron campos para actualizar"
+            "ok": False, 
+            "code": 500, 
+            "message": "Internal Server Error",
+            "description": f"Error al insertar notas en la DB: {str(e)}"
             }
 
-        sql = f"UPDATE evaluaciones SET {', '.join(updates)} WHERE id_evaluacion = %s"
-        params.append(id_exam)
-    
-        modify_row = modify_db(sql, params)
-        if modify_row == 0:
-            return {
-                "ok": False,
-                "code": 404,
-                "message": "Not Found",
-                "description": f"No hay una evaluacion con el id {id_exam} para actualizar"
-            }
+
+def get_students_with_notes_db(id_curso, limit=None, offset=0, order_by=None, order='ASC'):
+    try:
+        allowed_order_fields = {'nombre', 'apellido', 'padron'}
+        order_clause = ""
+        if order_by and order_by in allowed_order_fields:
+            direction = 'DESC' if str(order).upper() == 'DESC' else 'ASC'
+            order_clause = f"ORDER BY a.{order_by} {direction}"
+        else:
+            order_clause = "ORDER BY a.apellido ASC, a.nombre ASC"
+
+        sql = f"""
+            SELECT 
+                a.id_alumno, a.nombre, a.apellido, a.padron, a.correo,
+                a.estado_alumno,
+                e.nombre_equipo AS equipo,
+                IFNULL(GROUP_CONCAT(
+                    CONCAT(n.id_evaluacion, ':', n.nota)
+                    ORDER BY n.id_evaluacion SEPARATOR ','
+                ), '') AS notas_raw,
+                IFNULL(GROUP_CONCAT(
+                    CONCAT(n.id_evaluacion, ':', IFNULL(n.corrector_nombre, ''))
+                    ORDER BY n.id_evaluacion SEPARATOR ','
+                ), '') AS correctores_raw
+            FROM alumnos a
+            LEFT JOIN equipo_alumno ea ON a.id_alumno = ea.id_alumno
+            LEFT JOIN equipos e ON ea.id_equipo = e.id_equipo
+            LEFT JOIN notas n ON a.id_alumno = n.id_alumno
+            WHERE a.id_curso = %s
+            GROUP BY a.id_alumno, a.nombre, a.apellido, a.padron, a.estado_alumno, e.nombre_equipo
+            {order_clause}
+        """
+
+        count_sql = "SELECT COUNT(*) as total FROM alumnos WHERE id_curso = %s"
+        total = query_db(count_sql, (id_curso,))[0]['total']
+
+        params = [id_curso]
+        if limit is not None:
+            sql += " LIMIT %s OFFSET %s"
+            params += [int(limit), int(offset)]
+
+        result = query_db(sql, params)
         return {
             "ok": True,
-            "message": "Evaluacion actualizada con éxito",
-            "id_evaluacion": id_exam
+            "data": result if result else [],
+            "total": total
         }
     except Exception as e:
         return {
             "ok": False,
-            "code": 400,
-            "message": "Bad Request",
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": f"Error al obtener reporte: {str(e)}"
+        }
+# def get_students_with_notes_db(id_curso):
+#     try:
+#         sql = """
+#             SELECT 
+#                 a.id_alumno,
+#                 a.nombre,
+#                 a.apellido,
+#                 a.padron,
+#                 a.estado_alumno,
+#                 e.nombre_equipo AS equipo,
+#                 IFNULL(
+#                     GROUP_CONCAT(
+#                         CONCAT(n.id_evaluacion, ':', n.nota)
+#                         ORDER BY n.id_evaluacion
+#                         SEPARATOR ','
+#                     ), ''
+#                 ) AS notas_raw,
+#                 IFNULL(
+#                     GROUP_CONCAT(
+#                         CONCAT(n.id_evaluacion, ':', IFNULL(n.corrector_nombre, ''))
+#                         ORDER BY n.id_evaluacion
+#                         SEPARATOR ','
+#                     ), ''
+#                 ) AS correctores_raw
+#             FROM alumnos a
+#             LEFT JOIN equipo_alumno ea ON a.id_alumno = ea.id_alumno
+#             LEFT JOIN equipos e ON ea.id_equipo = e.id_equipo
+#             LEFT JOIN notas n ON a.id_alumno = n.id_alumno
+#             WHERE a.id_curso = %s
+#             GROUP BY a.id_alumno, a.nombre, a.apellido, a.padron, a.estado_alumno, e.nombre_equipo
+#             ORDER BY a.apellido, a.nombre
+#         """
+#         result = query_db(sql, (id_curso,))
+#         return {
+#             "ok": True,
+#             "data": result if result else []
+#         }
+#     except Exception as e:
+#         return {
+#             "ok": False,
+#             "code": 500,
+#             "message": "Internal Server Error",
+#             "description": f"Error al obtener reporte: {str(e)}"
+#         }
+
+# PROMOCION
+
+def get_promocion_config_db(id_curso):
+    try:
+        flag = query_db(
+            "SELECT es_promocionable FROM curso_promocion_config WHERE id_curso = %s",
+            (id_curso,)
+        )
+        es_promocionable = flag[0]['es_promocionable'] if flag else False
+
+        detalle = query_db(
+            """
+            SELECT id_evaluacion, cuenta_para_promocion, nota_minima
+            FROM configuracion_promocion
+            WHERE id_curso = %s
+            """,
+            (id_curso,)
+        )
+
+        return {
+            "ok": True,
+            "data": {
+                "es_promocionable": bool(es_promocionable),
+                "evaluaciones": detalle or []
+            }
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
             "description": str(e)
         }
 
-#-----------------------------------------------------------
 
-def delete_exam_by_id(id_exam):
-    try:    
-        sql = "DELETE FROM evaluaciones WHERE id_evaluacion= %s"
+def save_promocion_config_db(id_curso, es_promocionable, evaluaciones):
+    try:
+        modify_db(
+            """
+            INSERT INTO curso_promocion_config (id_curso, es_promocionable)
+            VALUES (%s, %s)
+            ON DUPLICATE KEY UPDATE es_promocionable = VALUES(es_promocionable)
+            """,
+            (id_curso, bool(es_promocionable))
+        )
 
-        modify_row = modify_db(sql, (id_exam,))
+        for ev in evaluaciones:
+            id_eval = ev.get('id_evaluacion')
+            cuenta = bool(ev.get('cuenta', ev.get('cuenta_para_promocion', False)))
+            nota_min = ev.get('nota_minima', None)
+            if nota_min is not None:
+                try:
+                    nota_min = float(nota_min)
+                except (ValueError, TypeError):
+                    nota_min = None
 
-        if modify_row == 0:
-            return {
-                "ok": False,
-                "code": 404,
-                "message": "Not Found",
-                "description": f"No se encontró la evaluacion con el ID {id_exam}."
-            }
-        return {
-            "ok": True,
-            "message": f"Evaluacion con ID {id_exam} eliminada correctamente"
-        }
+            modify_db(
+                """
+                INSERT INTO configuracion_promocion
+                    (id_curso, id_evaluacion, es_promocionable, cuenta_para_promocion, nota_minima)
+                VALUES (%s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                    cuenta_para_promocion = VALUES(cuenta_para_promocion),
+                    nota_minima           = VALUES(nota_minima),
+                    es_promocionable      = VALUES(es_promocionable)
+                """,
+                (id_curso, id_eval, bool(es_promocionable), cuenta, nota_min)
+            )
+
+        return {"ok": True, "message": "Configuración de promoción guardada correctamente"}
     except Exception as e:
         return {
             "ok": False,

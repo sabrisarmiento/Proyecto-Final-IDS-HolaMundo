@@ -1,0 +1,11 @@
+{% macro sortable_th(label, field, current_order_by, current_order, base_url) %}
+<th>
+  {% if current_order_by == field and current_order == 'asc' %}
+    <a href="{{ base_url }}&order_by={{ field }}&order=desc">{{ label }} (asc)</a>
+  {% elif current_order_by == field and current_order == 'desc' %}
+    <a href="{{ base_url }}">{{ label }} (desc)</a>
+  {% else %}
+    <a href="{{ base_url }}&order_by={{ field }}&order=asc">{{ label }}</a>
+  {% endif %}
+</th>
+{% endmacro %}
