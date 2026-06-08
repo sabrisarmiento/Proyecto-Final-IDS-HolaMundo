@@ -1,3 +1,5 @@
+#borrar achivo
+
 import requests
 
 # class AdvertisementFrontendService:

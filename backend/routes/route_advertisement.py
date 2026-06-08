@@ -35,7 +35,7 @@ def get_advertisement_by_id_route(id_advertisement):
 @require_auth
 def create_advertisement():
   data = request.get_json()
-  return create_advertisement_service(data)
+  return create_advertisement_service(data, request.user)
 
 @advertisements_bp.route('/advertisements/<id_advertisement>', methods=['PATCH'])
 @require_auth

@@ -1,3 +1,5 @@
+#borrar
+
 import requests
 
 def get_advertisements():

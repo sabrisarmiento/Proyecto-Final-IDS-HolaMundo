@@ -1,4 +1,7 @@
 from database.db import query_db, modify_db
+from helpers.user_belongs import user_belongs_to_course
+from controllers.slack_controller import send_advertisement_to_slack
+
 
 def get_all_advertisements(filters):
   try:
@@ -84,22 +87,43 @@ def get_advertisement_by_id(id_advertisement):
       "description": str(e)
     }
 
-def create_advertisement(data):
+def create_advertisement(data, user):
   try:
-    id_user = data.get("id_usuario")
+    id_user = user["id_usuario"]
     id_course = data.get("id_curso")
     title = data.get("titulo")
     message = data.get("mensaje")
-
+#    user_mail = user["correo"]
+    print("USER DEL TOKEN:", user)
+    user_mail = user.get("correo", "Usuario Panel FIUBA")
+    
+    if not id_course or not title or not message:
+      return {
+        "ok": False,
+        "code": 400,
+        "message": "Bad Request",
+        "description": "Faltan datos obligatorios"
+      }
+    if not user_belongs_to_course(id_user, id_course):
+      return {
+        "ok": False,
+        "code": 403,
+        "message": "Forbidden",
+        "description": "No tenés permisos para crear avisos en este curso"
+      }
     sql = """
       INSERT INTO avisos (id_usuario, id_curso, titulo, mensaje)
       VALUES (%s, %s, %s, %s)
     """
     modify_db(sql, (id_user, id_course, title, message))
 
+    slack_result = send_advertisement_to_slack(id_course, title, message, user_mail)
+    print("RESULTADO SLACK:", slack_result)
+
     return {
       "ok": True,
-      "data": "aviso creado correctamente"
+      "data": "aviso creado correctamente",
+      "slack": slack_result
     }
   except Exception as e:
     return {

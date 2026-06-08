@@ -1,0 +1,94 @@
+<section>
+    <button
+    type="button"
+    class="btn-create-student"
+    onclick="openModal('create-student-modal')"
+    >
+    agregar alumno
+    </button>
+    {% call modal("create-student-modal", "Crear Alumno") %}
+    <form
+    action="{{ url_for('courses.course_detail', course_id=course['id_curso']) }}"
+    method="POST"
+    >
+    <label for="student-name">Nombre:</label>
+    <input type="text" id="student-name" name="nombre" required />
+    <label for="student-lastname">Apellido:</label>
+    <input type="text" id="student-lastname" name="apellido" required />
+    <label for="student-dni">Padrón:</label>
+    <input type="text" id="student-dni" name="padron" required />
+    <label for="student-email">Correo:</label>
+    <input type="email" id="student-email" name="correo" required />
+    <button type="submit">Crear</button>
+    </form>
+    {% endcall %}
+</section>
+{% if students %} {% set current_order_by = request.args.get('order_by', '') %}
+{% set current_order = request.args.get('order', '') %} {% set students_base_url
+= '?tab=students&page=' ~ page %}
+<table class="tab-table">
+    <thead>
+    <tr>
+        {{ sortable_th('Nombre', 'nombre', current_order_by, current_order,
+        students_base_url) }} {{ sortable_th('Apellido', 'apellido',
+        current_order_by, current_order, students_base_url) }}
+        <th>Padrón</th>
+        <th>Correo</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for student in students %}
+    <tr>
+        <td>{{ student.nombre }}</td>
+        <td>{{ student.apellido }}</td>
+        <td>{{ student.padron }}</td>
+        <td>{{ student.correo }}</td>
+        <td>
+            <form 
+                action="{{ url_for('courses.edit_student', course_id=course['id_curso'], student_id=student.id_alumno) }}" 
+                method="POST"
+            >
+                <label class="switch-container">
+                    <input 
+                        type="checkbox" 
+                        name="estado_alumno" 
+                        value="1" 
+                        {% if student.estado_alumno %}checked{% endif %}
+                        onchange="this.form.submit()"
+                    />
+                    <span class="slider"></span>
+                </label>
+            </form>
+        </td>
+        <td>
+            <button type="button" class="btn-edit-student"
+                onclick="openModal('edit-student-{{ student.id_alumno }}')">
+                Editar
+            </button>
+            {% call modal("edit-student-" ~ student.id_alumno, "Modificar Alumno") %}
+                <form action="{{ url_for('courses.edit_student', course_id=course['id_curso'], student_id=student.id_alumno) }}" method="POST">
+                    <label for="edit-name-{{ student.id_alumno }}">Nombre:</label>
+                    <input type="text" id="edit-name-{{ student.id_alumno }}" name="nombre" value="{{ student.nombre }}" required />
+                    <label for="edit-lastname-{{ student.id_alumno }}">Apellido:</label>
+                    <input type="text" id="edit-lastname-{{ student.id_alumno }}" name="apellido" value="{{ student.apellido }}" required />
+                    <label for="edit-padron-{{ student.id_alumno }}">Padrón:</label>
+                    <input type="text" id="edit-padron-{{ student.id_alumno }}" name="padron" value="{{ student.padron }}" required />
+                    <label for="edit-email-{{ student.id_alumno }}">Correo:</label>
+                    <input type="email" id="edit-email-{{ student.id_alumno }}" name="correo" value="{{ student.correo }}" required />
+                    <button type="submit" value="{{course["id_curso"]}}">Guardar cambios</button>
+                </form>
+            {% endcall %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% set order_by = request.args.get('order_by', '') %} {% set order =
+request.args.get('order', '') %} {% set base_url = '?tab=students' %} {% if
+order_by %}{% set base_url = base_url ~ '&order_by=' ~ order_by %}{% endif %} {%
+if order %}{% set base_url = base_url ~ '&order=' ~ order %}{% endif %} {{
+pagination(page, total_pages, base_url) }} {% else %}
+<p class="tab-empty">No hay alumnos inscriptos en este curso.</p>
+{% endif %}

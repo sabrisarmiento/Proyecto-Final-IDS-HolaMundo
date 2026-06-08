@@ -1,0 +1,25 @@
+{% extends "base_private.html" %}
+
+{% block title %}Crear aviso{% endblock %}
+
+{% block content %}
+<section class="course-detail-header">
+  <h1>Crear aviso</h1>
+</section>
+
+<section class="course-detail-content">
+  {% if error %}
+    <p class="tab-empty">{{ error }}</p>
+  {% endif %}
+
+  <form method="POST">
+    <label for="titulo">Título</label>
+    <input type="text" id="titulo" name="titulo" required>
+
+    <label for="mensaje">Mensaje</label>
+    <textarea id="mensaje" name="mensaje" required></textarea>
+
+    <button type="submit" class="btn-crear">Publicar aviso</button>
+  </form>
+</section>
+{% endblock %}

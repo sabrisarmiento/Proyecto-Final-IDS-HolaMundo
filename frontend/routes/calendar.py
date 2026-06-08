@@ -1,88 +1,44 @@
-from flask import Blueprint, render_template, session, request
-from services.subjects_service import get_subjects, get_subject_by_id
-from services.calendar_frontend_service import calendar_get_all
-from services.course_frontend_service import course_get_all
+from flask import Blueprint, render_template, request
+from services.subjects_service import get_subjects
+from services.calendar_service import get_schedule_by_subject
 from services.courses_service import get_courses
 
 calendar_bp = Blueprint('calendar', __name__)
 
 @calendar_bp.route('/cronograma', methods=['GET'])
 def calendar():
-    id_subject = request.args.get("subject")
-    selected_subject = int(id_subject) if id_subject else None
-
-    schedule = {}
-    cursos = []
-    cursos_by_subject = []
-    subject = {}
-
-    if selected_subject:
-        cursos = get_courses()
-        print("CURSOS:", cursos)
-
-        subject = get_subject_by_id(selected_subject).get("subject", {})
-
-        cursos_by_subject = [c for c in cursos if c.get("materia") == subject.get("nombre")]
-
-        for curso in cursos_by_subject:
-            clases_api = calendar_get_all(curso["id_curso"])
-            for clase in clases_api:
-                week_num = clase.get('semana')
-                if week_num is not None:
-                    if week_num not in schedule:
-                        schedule[week_num] = []
-                    schedule[week_num].append(clase)
-
-    sorted_schedule = [
-        {"week": w, "classes": schedule[w]}
-        for w in sorted(schedule.keys())
-    ]
-
+  view = request.args.get("subject")
+  schedule = []
+  courses = []
+  subjects = get_subjects()
+  
+  if view is not None:
     try:
-        subjects = get_subjects()
-    except Exception as e:
-        print(f"Error al obtener materias: {e}")
-        subjects = []
-
-    return render_template(
-        'calendar.html',
-        schedule=sorted_schedule,
-        cursos=cursos_by_subject,
-        subject=subject,
-        subjects=subjects,
-        selected_subject=selected_subject,
-        active_page='calendar'
-    )
-
-"""
-    id_curso = session.get("selected_course")
-
-    clases_api = calendar_get_all(id_curso)
-
-    schedule = {}
-
-    for clase in clases_api:
-        week_num = clase.get('semana')
-
+      classes = get_schedule_by_subject(int(view))
+      all_courses = get_courses()
+      
+      subject = next((s for s in subjects if s["id_materia"] == int(view)), None)
+      subject_name = subject.get("nombre") if subject else None
+      
+      courses = [c for c in all_courses if c.get("materia") == subject_name]
+      
+      schedule_dict = {}
+      for c in classes:
+        week_num = c.get("semana")
         if week_num is not None:
+          schedule_dict.setdefault(week_num, []).append(c)
+      schedule = [{"week": week_num, "classes":
+        schedule_dict[week_num]} for week_num in sorted(schedule_dict.keys())]
+    except Exception as e:
+      print(f"Error al obetener cronograma para la materia {view}: {e}")
 
-            if week_num not in schedule:
-                schedule[week_num] = []
+  print("courses",courses)
 
-            schedule[week_num].append(clase)
-
-    sorted_schedule = [
-        {"week": w, "classes": schedule[w]}
-        for w in sorted(schedule.keys())
-    ]
-
-    cursos = calendar_get_all()
-
-    return render_template(
-        'calendar.html',
-        schedule=sorted_schedule,
-        cursos=cursos,
-        selected_course=id_curso,
-        active_page='calendar'
-    )
-"""
+  return render_template(
+    'calendar.html',
+    active_page='calendar',
+    selected_subject=int(view) if view else None,
+    subjects=subjects,
+    schedule=schedule,
+    courses=courses
+  )

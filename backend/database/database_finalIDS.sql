@@ -177,3 +177,31 @@ CREATE TABLE curso_promocion_config (
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
+CREATE TABLE curso_slack_config (
+    id_curso INT PRIMARY KEY,
+    slack_team_id VARCHAR(100),
+    slack_channel_id VARCHAR(100),
+    slack_channel_name VARCHAR(100),
+    slack_bot_token VARCHAR(500),
+    slack_webhook_url VARCHAR(1000),
+    instalado_por INT,
+    creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (instalado_por) REFERENCES usuarios(id_usuario)
+);
+
+
+
+--CREATE TABLE slack_config_logs (
+--    id_log INT AUTO_INCREMENT PRIMARY KEY,
+--    id_curso INT NOT NULL,
+--    id_usuario INT,
+--  accion VARCHAR(50) NOT NULL,
+--    slack_team_id VARCHAR(100),
+--    slack_channel_id VARCHAR(100),
+--    slack_channel_name VARCHAR(100),
+--    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ --   FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+ --   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
+--);
