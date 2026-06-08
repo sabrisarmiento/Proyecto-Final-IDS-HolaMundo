@@ -300,6 +300,11 @@ def change_student_team(course_id):
         print("Error cambiando equipo:", e)
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
+@courses_bp.route('/cursos/<int:course_id>/equipos/cancelar-cambio', methods=['POST'])
+def cancel_team_change(course_id):
+    session.pop('pending_team_change', None)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+
 @courses_bp.route('/cursos/<int:course_id>/equipos/quitar-alumno', methods=['POST'])
 def remove_student_from_team(course_id):
     try:
