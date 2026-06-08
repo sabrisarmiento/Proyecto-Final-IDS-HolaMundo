@@ -1,12 +1,19 @@
 import requests
+BASE = "http://localhost:5000"
 
-def get_all():
+def attendance_get_all(id_clase=None):
     try:
-        response = requests.get('http://localhost:5000/asistencia')
-        if response.status_code == 200:
-            datos_api = response.json()
-            return datos_api.get("attendance", [])
+        params = {"id_clase": id_clase} if id_clase else {}
+        r = requests.get(f"{BASE}/asistencia", params=params)
+        return r.json().get("attendance", []) if r.status_code == 200 else []
+    except Exception as e:
+        print(f"Error: {e}")
         return []
+
+def generate_qr(id_clase):
+    try:
+        r = requests.post(f"{BASE}/asistencia/generar-qr", json={"id_clase": id_clase})
+        return r.json()
     except Exception as e:
         print(f"Error: {e}")
         return []
