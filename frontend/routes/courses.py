@@ -257,8 +257,10 @@ def course_detail(course_id):
     promedio_general=promedio_general,
     curso_es_promocionable=curso_es_promocionable,
     promo_config=promo_config,
-    advertisements=advertisements
-  )
+    advertisements=advertisements,
+    config_msg=session.pop('config_msg', None),
+    config_ok=session.pop('config_ok', False)
+    )
 
 @courses_bp.route('/cambiar-evaluacion', methods=['POST'])
 def cambiar_evaluacion():
@@ -452,3 +454,41 @@ def edit_student(course_id, student_id):
       print(e)
       
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='students'))
+
+@courses_bp.route('/cursos/<int:course_id>/configuracion', methods=['POST'])
+def update_course_config(course_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    data = {
+        'catedra':      request.form.get('catedra'),
+        'cuatrimestre': request.form.get('cuatrimestre'),
+        'anio':         int(request.form.get('anio')),
+    }
+    slack_url   = request.form.get('slack_url', '').strip()
+    youtube_url = request.form.get('youtube_url', '').strip()
+    if slack_url:
+        data['slack_url'] = slack_url
+    if youtube_url:
+        data['youtube_url'] = youtube_url
+
+    try:
+        res = requests.patch(
+            f'http://127.0.0.1:5000/courses/{course_id}',
+            json=data,
+            headers=headers
+        )
+        if res.status_code == 200:
+            session['config_msg'] = 'Configuración guardada correctamente'
+            session['config_ok']  = True
+        else:
+            session['config_msg'] = 'No se pudo guardar la configuración'
+            session['config_ok']  = False
+    except Exception as e:
+        session['config_msg'] = f'Error de conexión: {e}'
+        session['config_ok']  = False
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
