@@ -38,3 +38,4 @@ function changeSubject(id) {
     window.location.href = window.location.pathname + "?subject=" + id
   }
 }
+

@@ -255,6 +255,44 @@
   </div>
 </div>
 
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModalFunc();
+        }
+    });
+
+    const formQR = document.querySelector('.qr-form');
+
+    formQR.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const fechaClase = document.getElementById('fecha-clase').value;
+
+    if (!fechaClase) {
+            alert('Por favor selecciona una fecha');
+            return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:5000/asistencia/generar-qr', {
+                method: 'POST',              
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id_clase: 1})
+                });
+    
+        const data = await response.json();
+
+        if (response.ok) {
+                alert('Exito! ' + data.message);
+    formQR.reset();
+    } else {
+                alert('Error' + (data.error || data.message));
+    }
+        } catch (error) {
+            alert('Error: ' + error.message);
+    }
+    });
+</script>
 <div class="dg-modal-overlay hidden" id="modal-confirmar">
   <div class="dg-modal dg-modal--sm">
     <h3 class="dg-modal-danger-title">Confirmar eliminación</h3>

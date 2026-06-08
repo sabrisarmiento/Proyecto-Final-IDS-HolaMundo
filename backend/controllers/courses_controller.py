@@ -107,6 +107,8 @@ def patch_course(id_course, data):
         term = data.get('cuatrimestre')
         year = data.get('anio')
         id_profe = data.get('id_profesor')
+        slack_url   = data.get('slack_url')
+        youtube_url = data.get('youtube_url')
 
         updates = []
         params = []
@@ -126,6 +128,12 @@ def patch_course(id_course, data):
         if id_profe is not None:
             updates.append("id_profesor = %s")
             params.append(id_profe)
+        if slack_url is not None:
+            updates.append("slack_url = %s")
+            params.append(slack_url)
+        if youtube_url is not None:
+            updates.append("youtube_url = %s")
+            params.append(youtube_url)
 
         if not updates:
             return {
@@ -138,14 +146,16 @@ def patch_course(id_course, data):
         sql = f"UPDATE cursos SET {', '.join(updates)} WHERE id_curso = %s"
         params.append(id_course)
 
-        modify_row = modify_db(sql, params)
-        if modify_row == 0:
+        exists = query_db("SELECT id_curso FROM cursos WHERE id_curso = %s", (id_course,))
+        if not exists:
             return {
                 "ok": False,
                 "code": 404,
                 "message": "Not Found",
                 "description": f"No hay un curso con el id {id_course} para actualizar"
             }
+        modify_db(sql, params)
+        
         return {
             "ok": True,
             "message": "Curso actualizado con éxito",

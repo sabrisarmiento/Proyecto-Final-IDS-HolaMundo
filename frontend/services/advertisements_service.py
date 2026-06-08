@@ -73,19 +73,30 @@ def create_advertisement(id_course, title, message, token):
             "Authorization": f"Bearer {token}"
         }
 
-        body = {
+        data = {
             "id_curso": id_course,
             "titulo": title,
             "mensaje": message
         }
 
+#        response = requests.post(
+ #           f"{API_URL}/advertisements",
+  #          json=body,
+   #         headers=headers
+    #    )
+
+        print("TOKEN QUE MANDA FRONT:", token)
+        print("HEADERS:", headers)
+        print("DATA CREATE AD:", data)
+
         response = requests.post(
             f"{API_URL}/advertisements",
-            json=body,
+            json=data,
             headers=headers
         )
-
-        if response.status_code == 201:
+        print("STATUS CREATE AD:", response.status_code)
+        print("TEXT CREATE AD:", response.text)
+        if response.status_code in [200, 201]:
             return {
                 "ok": True,
                 "data": response.json()
