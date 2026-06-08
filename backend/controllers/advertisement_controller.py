@@ -215,30 +215,34 @@ def delete_advertisement_by_id(id_advertisement):
     }
 
 def get_advertisements_by_subject(id_materia):
-    try:
-        sql = """
-            SELECT
-                a.id_aviso,
-                a.id_usuario,
-                a.id_curso,
-                a.titulo,
-                a.mensaje,
-                a.fecha,
-                CONCAT(u.nombre, ' ', u.apellido) as emisor
-            FROM avisos a
-            JOIN usuarios u ON a.id_usuario = u.id_usuario
-            JOIN cursos c ON a.id_curso = c.id_curso
-            WHERE c.id_materia = %s
-        """
-        result = query_db(sql, (id_materia,))
-        return {
-            "ok": True,
-            "data": result
-        }
-    except Exception as e:
-        return {
-            "ok": False,
-            "code": 500,
-            "message": "Internal Server Error",
-            "description": str(e)
-        }
+  try:
+    sql = """
+      SELECT
+        a.id_aviso,
+        a.id_usuario,
+        a.id_curso,
+        a.titulo,
+        a.mensaje,
+        a.fecha,
+        CONCAT(u.nombre, ' ', u.apellido) as emisor
+      FROM avisos a
+      JOIN usuarios u ON a.id_usuario = u.id_usuario
+      JOIN cursos c ON a.id_curso = c.id_curso
+      WHERE c.id_materia = %s
+      ORDER BY a.fecha DESC
+    """
+
+    result = query_db(sql, (id_materia,))
+
+    return {
+      "ok": True,
+      "data": result
+    }
+
+  except Exception as e:
+    return {
+      "ok": False,
+      "code": 500,
+      "message": "Internal Server Error",
+      "description": str(e)
+    }

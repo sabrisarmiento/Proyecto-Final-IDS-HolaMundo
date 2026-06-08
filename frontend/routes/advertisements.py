@@ -4,29 +4,30 @@ import requests
 #from services.slack_advertisement_frontend_service import SlackAdvertisementFrontendService
 from services.subjects_service import get_subjects
 from services.advertisements_service import get_advertisements_by_subject, create_advertisement
+from services.courses_service import get_courses
 
 advertisements_bp = Blueprint('advertisements', __name__)
 
-@advertisements_bp.route('/avisos')
-def public_advertisements():
-  avisos = []
-  view = request.args.get("subject")
+#@advertisements_bp.route('/avisos')
+#def public_advertisements():
+#  avisos = []
+#  view = request.args.get("subject")
 
-  if view is not None:
-    try:
-      avisos = get_advertisements_by_subject(int(view))
-    except Exception as e:
-      print(f"Error al obtener avisos para la materia {view}: {e}")
+#  if view is not None:
+#    try:
+#      avisos = get_advertisements_by_subject(int(view))
+#    except Exception as e:
+#      print(f"Error al obtener avisos para la materia {view}: {e}")
   
-  subjects = get_subjects()
+#  subjects = get_subjects()
   
-  return render_template(
-    "advertisements.html",
-    active_page="advertisements",
-    subjects=subjects,
-    avisos=avisos,
-    selected_subject=int(view) if view else None
-  )
+#  return render_template(
+#    "advertisements.html",
+#    active_page="advertisements",
+#    subjects=subjects,
+#    avisos=avisos,
+#    selected_subject=int(view) if view else None
+#  )
 
 @advertisements_bp.route('/cursos/<int:id_curso>/avisos/nuevo', methods=['GET', 'POST'])
 def create_advertisement_front(id_curso):
@@ -90,3 +91,34 @@ def connect_slack_front(id_curso):
 #         selected_course=id_curso,
 #         active_page="advertisements"
 #     )
+
+@advertisements_bp.route('/avisos')
+def public_advertisements():
+  view = request.args.get("subject")
+  avisos = []
+  courses = []
+  subjects = get_subjects()
+
+  if view is not None:
+    try:
+      avisos = get_advertisements_by_subject(int(view))
+      all_courses = get_courses()
+
+      subject = next((s for s in subjects if s["id_materia"] == int(view)), None)
+      subject_name = subject.get("nombre") if subject else None
+
+      courses = [c for c in all_courses if c.get("materia") == subject_name]
+
+    except Exception as e:
+      print(f"Error al obtener avisos para la materia {view}: {e}")
+
+  print("courses", courses)
+
+  return render_template(
+    "advertisements.html",
+    active_page="advertisements",
+    selected_subject=int(view) if view else None,
+    subjects=subjects,
+    avisos=avisos,
+    courses=courses
+  )
