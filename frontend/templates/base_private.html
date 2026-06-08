@@ -39,6 +39,9 @@
         {{ dropdown_profile(session.get('user')) }}
       {% endif %}
     </header>
+    {% if session.get('user') %}
+      {% include "profile.html" %}
+    {% endif %}
     <main class="main-private">
       {% block content %}{% endblock %}
     </main>
