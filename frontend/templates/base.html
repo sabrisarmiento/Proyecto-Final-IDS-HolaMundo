@@ -6,6 +6,7 @@
   <title>{% block title %}Panel FIUBA{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/subject_select.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=PT+Sans:wght@400;700&family=Prompt:wght@400;500;700&family=Red+Hat+Display:wght@400;500;700&display=swap" rel="stylesheet">
   
   {% block extra_styles %}{% endblock %}
@@ -38,19 +39,7 @@
     <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
   {% endif %}
 
-  <div class="subject-select-container">
-    <select title="subject-select" id="subject-select" onchange="changeSubject(this.value)">
-      <option value="general" {% if not selected_subject %}selected{% endif %}>
-        General
-      </option>
-      {% for s in subjects %}
-        <option value="{{ s.id_materia }}"
-          {% if s.id_materia == selected_subject %}selected{% endif %}>
-          {{ s.nombre }}
-        </option>
-      {% endfor %}
-    </select>
-  </div>
+  {% include "components/subject_select.html" %}
 </nav>
 
     <div class="config-box">

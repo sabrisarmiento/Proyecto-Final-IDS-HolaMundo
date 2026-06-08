@@ -36,8 +36,8 @@ def create_student_service(data):
     }, 201)
 
 
-def import_students_service(files):
-    result = import_students_from_csv(files)
+def import_students_service(files, id_curso):
+    result = import_students_from_csv(files, id_curso)
     if not result["ok"]:
         return error_response(result)
     return success_response(result["data"], result.get("status", 201))

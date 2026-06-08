@@ -6,33 +6,144 @@
 
 #msg-select-course {
     display: block;
-}
-
-.classes-container{
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    gap: 1rem;
+    color: var(--color-8);
+    text-align: center;
     margin-top: 1rem;
 }
 
+/* Encabezado */
+.section-header-schedule {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 2rem auto 1rem;
+    text-align: center;
+}
+
+.section-header-schedule h1 {
+    margin: 0;
+    color: var(--color-9);
+    font-weight: 700;
+}
+
+.section-header-schedule p {
+    margin: 0;
+    color: var(--color-8);
+    max-width: 40rem;
+}
+
+/* Contenedor principal */
 .section-schedule {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 60rem;
     margin: 0 auto;
+    padding: 0 1rem 3rem;
+    box-sizing: border-box;
 }
 
-.section-header-schedule{
+/* Selector de materia */
+#select-courses {
+    width: 100%;
+    max-width: 22rem;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--color-6);
+    border-radius: 0.75rem;
+    background: var(--color-45);
+    color: var(--color-8);
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#select-courses:hover {
+    border-color: var(--color-2);
+}
+
+#select-courses:focus {
+    outline: none;
+    border-color: var(--color-2);
+    box-shadow: 0 0 0 3px var(--color-16);
+}
+
+/* Lista de semanas */
+.classes-container {
     display: flex;
-    align-items: center;
     flex-direction: column;
-    margin: 0 auto;
+    width: 100%;
+    gap: 1.25rem;
+    margin-top: 0.5rem;
 }
 
-.class{
-    background: var(--color-6);
+/* Card por semana */
+.class {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: var(--color-45);
+    border: 1px solid var(--color-6);
     border-radius: 1rem;
     padding: 1.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 16px var(--color-16);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.class:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--color-16);
+}
+
+.class h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-2);
+    color: var(--color-9);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+/* Clases dentro de la semana */
+.class article {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem;
+    background: var(--color-5);
+    border-radius: 0.75rem;
+    border-left: 4px solid var(--color-2);
+}
+
+.class article h3 {
+    margin: 0;
+    color: var(--color-9);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.class article p {
+    margin: 0;
+    color: var(--color-8);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Badge de modalidad */
+.class article span {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+    padding: 0.2rem 0.7rem;
+    background: var(--color-2);
+    color: var(--color-13);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
 }

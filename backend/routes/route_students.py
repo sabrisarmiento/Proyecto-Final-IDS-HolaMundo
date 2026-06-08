@@ -49,7 +49,8 @@ def create_student_route():
 @students_bp.route("/students/import", methods=["POST"])
 @require_auth
 def import_students_route():
-    return import_students_service(request.files)
+    id_curso = request.form.get("id_curso") or request.args.get("id_curso")
+    return import_students_service(request.files, id_curso)
 
 @students_bp.route("/students/<int:id>", methods=["PATCH"])
 @require_auth

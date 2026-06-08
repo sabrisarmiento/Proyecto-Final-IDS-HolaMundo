@@ -1,37 +1,60 @@
 .courses {
-  padding: 2rem;
+  padding: 2.5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .courses h2 {
-  font-size: 3rem;
+  font-size: 2.25rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   color: var(--color-9);
   text-align: center;
 }
 
 .courses-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.5rem;
 }
 
 .course {
+  position: relative;
+  overflow: hidden;
   background-color: var(--color-45);
-  border: 1px solid var(--color-6);
-  border-radius: 12px;
-  padding: 1.25rem;
+  border: 1.5px solid var(--color-6);
+  border-radius: 14px;
+  padding: 1.4rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  box-shadow: 0 2px 6px rgba(30, 30, 36, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 0.6rem;
+  box-shadow: 0 2px 6px rgba(30, 30, 36, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
 }
 
+/* Accent strip that slides in on hover */
+.course::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-9);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
 .course:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(30, 30, 36, 0.15);
+  transform: translateY(-4px);
+  border-color: var(--color-9);
+  box-shadow: 0 8px 20px rgba(30, 30, 36, 0.14);
+}
+
+.course:hover::before {
+  transform: scaleX(1);
 }
 
 .course-header {
@@ -41,31 +64,48 @@
 }
 
 .course-id {
-  font-size: 0.75rem;
-  color: var(--color-8);
-  font-weight: 600;
-}
-
-.course-cuatrimestre {
-  color: var(--color-8);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 0.2rem 0.6rem;
+  color: var(--color-8);
+  background: var(--color-6);
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
 }
 
 .course-nombre {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--color-9);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.course-catedra {
+  font-size: 0.85rem;
+  color: var(--color-8);
   line-height: 1.4;
   margin: 0;
 }
 
 .course-footer {
   margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--color-6);
 }
 
 .course-anio {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.8rem;
   color: var(--color-8);
+}
+
+.course-cuatrimestre {
+  color: var(--color-8);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--color-6);
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
 }

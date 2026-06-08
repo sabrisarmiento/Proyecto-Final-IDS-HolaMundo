@@ -1,9 +1,12 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify, Response
+
 import requests
 from services.advertisements_service import get_advertisements_by_course
 from services.courses_service import get_courses, get_course_by_id, post_course
 from services.students_services import post_student, patch_student
 from services.exams_service import get_exams_by_course_id
+
+BACKEND_URL = 'http://127.0.0.1:5000'
 
 courses_bp = Blueprint('courses', __name__)
 
@@ -109,6 +112,16 @@ def course_detail(course_id):
     evaluaciones = []
 
   try:
+    tipos_res = requests.get(f'{BACKEND_URL}/tipos-evaluacion')
+    tipos_evaluacion = tipos_res.json().get("exam_types", [])
+  except Exception as e:
+    print(f"Error loading tipos de evaluacion: {e}")
+    tipos_evaluacion = []
+
+  try:
+      students_res = requests.get(
+        f'http://127.0.0.1:5000/students_with_notes?id_curso={course_id}',
+    
     params = {
         'id_curso': course_id,
         'page': page,
@@ -263,6 +276,7 @@ def course_detail(course_id):
     course_id=course_id,
     active_tab=active_tab,
     evaluaciones=evaluaciones,
+    tipos_evaluacion=tipos_evaluacion,
     eval_seleccionada=eval_seleccionada,
     promedio_eval=promedio_eval,
     promedio_general=promedio_general,
@@ -343,6 +357,61 @@ def remove_student_from_team(course_id):
     except Exception as e:
         print("Error removing student:", e)
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+
+@courses_bp.route('/cursos/<int:course_id>/importar-alumnos', methods=['POST'])
+def importar_alumnos(course_id):
+    token = session.get('token')
+    if not token:
+        return jsonify({"error": "No autenticado"}), 401
+
+    file = request.files.get('file')
+    if not file:
+        return jsonify({"error": "No se seleccionó ningún archivo"}), 400
+
+    try:
+        backend_res = requests.post(
+            f'{BACKEND_URL}/students/import',
+            headers={'Authorization': f'Bearer {token}'},
+            files={'file': (file.filename, file.stream, 'text/csv')},
+            data={'id_curso': course_id},
+        )
+        return jsonify(backend_res.json()), backend_res.status_code
+    except Exception as e:
+        return jsonify({"error": f"No se pudo importar: {e}"}), 500
+
+
+@courses_bp.route('/cursos/<int:course_id>/exportar-informes', methods=['GET'])
+def exportar_informes(course_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('auth.login'))
+
+    params = [('curso_id', course_id)]
+    for seccion in ('alumnos', 'equipos', 'notas'):
+        if request.args.get(seccion) in ('1', 'true', 'on'):
+            params.append((seccion, '1'))
+    for ev in request.args.getlist('evaluaciones[]'):
+        params.append(('evaluaciones[]', ev))
+
+    try:
+        backend_res = requests.get(
+            f'{BACKEND_URL}/reportes/exportar',
+            headers={'Authorization': f'Bearer {token}'},
+            params=params,
+        )
+    except Exception as e:
+        return f"No se pudo generar el informe: {e}", 500
+
+    if backend_res.status_code != 200:
+        return Response(backend_res.content, status=backend_res.status_code,
+                        content_type=backend_res.headers.get('Content-Type', 'application/json'))
+
+    return Response(
+        backend_res.content,
+        mimetype='application/pdf',
+        headers={'Content-Disposition': f'attachment; filename="informe_curso_{course_id}.pdf"'},
+    )
+
 
 @courses_bp.route('/cambiar-evaluacion', methods=['POST'])
 def cambiar_evaluacion():
