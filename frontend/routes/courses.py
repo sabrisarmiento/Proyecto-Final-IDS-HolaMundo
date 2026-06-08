@@ -119,9 +119,6 @@ def course_detail(course_id):
     tipos_evaluacion = []
 
   try:
-      students_res = requests.get(
-        f'http://127.0.0.1:5000/students_with_notes?id_curso={course_id}',
-    
     params = {
         'id_curso': course_id,
         'page': page,
