@@ -1,6 +1,6 @@
 import requests
 
-def attendance_get_all():
+def get_all():
     try:
         response = requests.get('http://localhost:5000/asistencia')
         if response.status_code == 200:
