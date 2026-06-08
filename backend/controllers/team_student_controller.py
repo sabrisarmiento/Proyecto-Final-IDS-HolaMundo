@@ -51,3 +51,20 @@ def add_student_to_team(data):
             "message": "Internal Server Error",
             "description": str(e)
         }
+
+def remove_student_from_team(data):
+    try:
+        id_equipo = data.get("id_equipo")
+        id_alumno = data.get("id_alumno")
+        modify_db(""" DELETE FROM equipo_alumno WHERE id_equipo = %s AND id_alumno = %s """, (id_equipo, id_alumno))
+        return {
+            "ok": True,
+            "message": "Alumno removido del equipo"
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
