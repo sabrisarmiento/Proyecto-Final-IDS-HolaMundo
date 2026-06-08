@@ -212,6 +212,8 @@ def course_detail(course_id):
     curso_es_promocionable = False
     promo_config = {}
       
+  pending_team_change = session.get("pending_team_change")
+  
   return render_template(
     'course_detail.html',
     course=course,
@@ -228,6 +230,7 @@ def course_detail(course_id):
     promedio_general=promedio_general,
     curso_es_promocionable=curso_es_promocionable,
     promo_config=promo_config,
+    pending_team_change=pending_team_change
   )
  
 @courses_bp.route('/cursos/<int:course_id>/equipos/crear', methods=['POST'])
@@ -256,6 +259,46 @@ def create_team(course_id):
         )
     )
 
+@courses_bp.route('/cursos/<int:course_id>/equipos/agregar-alumno', methods=['POST'])
+def add_student_to_team(course_id):
+    try:
+        token = session.get('token')
+        headers = {
+            'Authorization': f'Bearer {token}'
+        }
+        data = {
+            "id_equipo": request.form.get("id_equipo"),
+            "padron": request.form.get("padron")
+        }
+        response = requests.post("http://127.0.0.1:5000/equipo-alumno", headers=headers, json=data)
+        if response.status_code == 409:
+            error = response.json()
+            session["pending_team_change"] = {
+                "mensaje": error["errors"][0]["description"],
+                "padron": request.form.get("padron"),
+                "id_equipo": request.form.get("id_equipo")
+            }
+    except Exception as e:
+        print("Error agregando alumno:", e)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+
+@courses_bp.route('/cursos/<int:course_id>/equipos/cambiar', methods=['POST'])
+def change_student_team(course_id):
+    try:
+        token = session.get('token')
+        headers = {
+            'Authorization': f'Bearer {token}'
+        }
+        data = {
+            "id_equipo": request.form.get("id_equipo"),
+            "padron": request.form.get("padron"),
+            "forzar": True
+        }
+        requests.post("http://127.0.0.1:5000/equipo-alumno", headers=headers, json=data)
+        session.pop("pending_team_change", None)
+    except Exception as e:
+        print("Error cambiando equipo:", e)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cambiar-evaluacion', methods=['POST'])
 def cambiar_evaluacion():

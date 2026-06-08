@@ -98,6 +98,15 @@
     </div>
 
     <div id="tab-teams" class="tab-panel {% if active_tab != 'teams' %}hidden{% endif %}">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              {% for category, message in messages %}
+                  <div class="flash-message">
+                      {{ message }}
+                  </div>
+              {% endfor %}
+          {% endif %}
+      {% endwith %}     
       <section>
         <button
             type="button"
@@ -123,6 +132,31 @@
           </form>
         {% endcall %}
       </section>
+      {% if pending_team_change %}
+      <div class="team-warning">
+          <p>
+              {{ pending_team_change.mensaje }}
+          </p>
+          <form
+              action="{{ url_for('courses.change_student_team', course_id=course.id_curso) }}"
+              method="POST"
+          >
+              <input
+                  type="hidden"
+                  name="padron"
+                  value="{{ pending_team_change.padron }}"
+              >
+              <input
+                  type="hidden"
+                  name="id_equipo"
+                  value="{{ pending_team_change.id_equipo }}"
+              >
+              <button type="submit">
+                  Cambiar alumno de equipo
+              </button>
+          </form>
+      </div>
+      {% endif %}
       {% if teams %}
           {% for team in teams %}
             <div class="team-card">
@@ -140,7 +174,6 @@
                         name="delete_team"
                         value="{{ team.id_equipo }}"
                     >
-
                     <button
                         type="submit"
                         onclick="return confirm('¿Eliminar equipo?')"
@@ -175,6 +208,26 @@
                 {% else %}
                     <p>Este equipo no tiene integrantes.</p>
                 {% endif %}
+                <form
+                    action="{{ url_for('courses.add_student_to_team', course_id=course.id_curso) }}"
+                    method="POST"
+                >
+                    <input
+                        type="hidden"
+                        name="id_equipo"
+                        value="{{ team.id_equipo }}"
+                    >
+                    <label>Padrón:</label>
+                    <input
+                        type="number"
+                        name="padron"
+                        placeholder="Ingrese padrón"
+                        required
+                    >
+                    <button type="submit">
+                        Agregar
+                    </button>
+                </form>              
               </div>
             </div>
           {% endfor %}
