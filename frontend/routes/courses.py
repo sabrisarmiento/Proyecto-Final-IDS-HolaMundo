@@ -340,7 +340,7 @@ def remove_student_from_team(course_id):
         requests.delete("http://127.0.0.1:5000/equipo-alumno", headers=headers, json=data)
     except Exception as e:
         print("Error removing student:", e)
-    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams')
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cambiar-evaluacion', methods=['POST'])
 def cambiar_evaluacion():
