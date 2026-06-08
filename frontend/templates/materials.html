@@ -10,22 +10,48 @@
 <section class="materials-section">
     <div class="materials-container">
         <header class="materials-header">
-            <h1 class="materials-title">{{ subject }}</h1>
-            <p class="materials-subtitle">Materiales de la materia, organizados por cátedra</p>
+            <h1 class="materials-title">Materiales</h1>
+            <p class="materials-subtitle">Elegí una materia y un curso para ver sus materiales</p>
         </header>
 
-        {% if sections %}
+        <div class="materials-filters">
+            <form method="GET" action="/materiales" class="material-field">
+                <label class="material-field-label">Materia</label>
+                <select name="subject" class="material-select" onchange="this.form.submit()">
+                    <option value="" disabled {% if not subject_id %}selected{% endif %}>Elegí una materia…</option>
+                    {% for s in subjects %}
+                    <option value="{{ s.id_materia }}" {% if s.id_materia|string == subject_id %}selected{% endif %}>
+                        {{ s.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+
+            {% if subject_id %}
+            <form method="GET" action="/materiales" class="material-field">
+                <input type="hidden" name="subject" value="{{ subject_id }}">
+                <label class="material-field-label">Curso</label>
+                <select name="curso" class="material-select" onchange="this.form.submit()">
+                    <option value="" disabled {% if not course_id %}selected{% endif %}>Elegí un curso…</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id_curso }}" {% if c.id_curso|string == course_id %}selected{% endif %}>
+                        Curso {{ c.id_curso }}{% if c.catedra %} · {{ c.catedra }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if course_id and sections %}
             <div class="chair-list">
                 {% for section in sections %}
                 <div class="chair">
-                    <!-- Cabecera clickeable: dispara el toggle del acordeón -->
                     <button type="button" class="chair-header" onclick="toggleChair(this)">
                         <span class="chair-name">{{ section.name }}</span>
                         <span class="chair-count">{{ section.materials | length }} materiales</span>
                         <i class="fas fa-chevron-down chair-arrow"></i>
                     </button>
-
-                    <!-- Cuerpo desplegable: el div que se abre con los materiales -->
                     <div class="chair-body">
                         <div class="materials-list">
                             {% for material in section.materials %}
@@ -54,7 +80,13 @@
         {% else %}
             <div class="material-empty">
                 <i class="fas fa-folder-open"></i>
-                <p>No hay materiales publicados en este momento.</p>
+                {% if not subject_id %}
+                    <p>Elegí una materia para empezar.</p>
+                {% elif not course_id %}
+                    <p>Ahora elegí un curso.</p>
+                {% else %}
+                    <p>No hay materiales para este curso.</p>
+                {% endif %}
             </div>
         {% endif %}
     </div>
