@@ -1,0 +1,102 @@
+{% if config_msg %}
+  {% if config_ok %}
+    <p class="config-msg config-msg--ok">{{ config_msg }}</p>
+  {% else %}
+    <p class="config-msg config-msg--error">{{ config_msg }}</p>
+  {% endif %}
+{% endif %}
+
+<div class="config-header">
+  <h2 class="config-title">Configuración del curso</h2>
+  <p class="config-subtitle">Editá los datos generales del curso, los cambios se van a reflejar de inmediato en la plataforma</p>
+</div>
+
+<form
+  action="{{ url_for('courses.update_course_config', course_id=course['id_curso']) }}"
+  method="POST"
+  class="config-form"
+>
+  <div class="config-section">
+    <h3 class="config-section-title">Datos generales</h3>
+
+    <div class="config-field">
+      <label class="config-label" for="cfg-catedra">Cátedra</label>
+      <input
+        class="config-input"
+        type="text"
+        id="cfg-catedra"
+        name="catedra"
+        value="{{ course.catedra or '' }}"
+        required
+      />
+    </div>
+
+    <div class="config-row">
+      <div class="config-field">
+        <label class="config-label" for="cfg-cuatrimestre">Cuatrimestre</label>
+        <input
+          class="config-input"
+          type="text"
+          id="cfg-cuatrimestre"
+          name="cuatrimestre"
+          value="{{ course.cuatrimestre or '' }}"
+          placeholder="Ej: 1C"
+          required
+        />
+      </div>
+
+      <div class="config-field">
+        <label class="config-label" for="cfg-anio">Año</label>
+        <input
+          class="config-input"
+          type="number"
+          id="cfg-anio"
+          name="anio"
+          value="{{ course.anio or '' }}"
+          min="2000"
+          max="2100"
+          required
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="config-section">
+    <h3 class="config-section-title">Links externos</h3>
+
+    <div class="config-field">
+      <label class="config-label" for="cfg-slack">
+        <span class="config-label-icon">SLACK</span>
+        URL de Slack
+      </label>
+      <input
+        class="config-input"
+        type="url"
+        id="cfg-slack"
+        name="slack_url"
+        value="{{ course.slack_url or '' }}"
+        placeholder="https://app.slack.com/client/..."
+      />
+    </div>
+
+    <div class="config-field">
+      <label class="config-label" for="cfg-youtube">
+        <span class="config-label-icon">YT</span>
+        URL de YouTube
+      </label>
+      <input
+        class="config-input"
+        type="url"
+        id="cfg-youtube"
+        name="youtube_url"
+        value="{{ course.youtube_url or '' }}"
+        placeholder="https://www.youtube.com/@..."
+      />
+    </div>
+  </div>
+
+  <div class="config-actions">
+    <button type="submit" class="config-btn-save">Guardar cambios</button>
+  </div>
+
+</form>

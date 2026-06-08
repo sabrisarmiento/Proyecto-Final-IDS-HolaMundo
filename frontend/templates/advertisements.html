@@ -1,3 +1,5 @@
+
+
 {% extends "base.html" %}
 
 {% block title %}Panel FIUBA - Avisos{% endblock %}
@@ -11,13 +13,30 @@
     <div class="advertisements-container">
         <div class="advertisements-header">
             <h1 class="advertisements-title">Avisos de la Cátedra</h1>
-            <p class="advertisements-subtitle">Enterate al instante sobre novedades de la materia, cambios de aula, publicaciones de notas y recordatorios importantes</p>
+            <p class="advertisements-subtitle">
+                Enterate al instante sobre novedades de la materia, cambios de aula, publicaciones de notas y recordatorios importantes
+            </p>
         </div>
+
+        {% if selected_subject %}
+            <div class="advertisements-filter">
+                <select title="select-course" id="select-courses">
+                    <option value="" selected>Seleccione una cátedra</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <p id="msg-select-course">
+                Por favor, seleccione una cátedra para ver sus avisos.
+            </p>
+        {% endif %}
         
-        <div class="advertisements-list">
+        <div class="advertisements-list" id="advertisements-container">
             {% if avisos %}
                 {% for aviso in avisos %}
-                <article class="advertisement-card">
+                <article class="advertisement-card" data-course="{{ aviso.id_curso }}">
                     <div class="advertisement-card-header">
                         <span class="advertisement-date">{{ aviso.fecha }}</span>
                         <span class="advertisement-issuer">Publicado por: {{ aviso.emisor }}</span>
@@ -28,10 +47,12 @@
                 {% endfor %}
             {% else %}
                 <div class="advertisement-empty">
-                    <p>Elije una materia para ver sus avisos</p>
+                    <p>Elija una materia para ver sus avisos</p>
                 </div>
             {% endif %}
         </div>
     </div>
 </section>
+
+<script src="{{ url_for('static', filename='js/advertisements.js') }}"></script>
 {% endblock %}
