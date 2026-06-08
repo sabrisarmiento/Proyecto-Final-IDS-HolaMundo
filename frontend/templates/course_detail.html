@@ -11,6 +11,7 @@
   href="{{ url_for('static', filename='css/course_detail.css') }}"
 />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_course.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/config.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 {% block content %}
@@ -25,16 +26,15 @@
     <a href="?tab=general" class="nav-btn {% if active_tab == 'general' %}active{% endif %}">General</a>
     <a href="?tab=students" class="nav-btn {% if active_tab == 'students' %}active{% endif %}">Alumnos</a>
     <a href="?tab=teams" class="nav-btn {% if active_tab == 'teams' %}active{% endif %}">Equipos</a>
-    <a href="?tab=calendar" class="nav-btn {% if active_tab == 'calendar' %}active{% endif %}">Calendario</a>
+    <a href="?tab=calendar" class="nav-btn {% if active_tab == 'calendar' %}active{% endif %}">Cronograma</a>
     <a href="?tab=marks" class="nav-btn {% if active_tab == 'marks' %}active{% endif %}">Notas</a>
     <a href="?tab=ads" class="nav-btn {% if active_tab == 'ads' %}active{% endif %}">Avisos</a>
+    <a href="?tab=config" class="nav-btn {% if active_tab == 'config' %}active{% endif %}">Configuración</a>
   </nav>
 
   <div class="tab-content">
 
-    <div id="tab-general"
-        class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
- 
+    <div id="tab-general" class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
 
         <div id="dash-curso-root" data-course-id="{{ course.id_curso }}">
  
@@ -146,6 +146,7 @@
  
             </div>
         </div>
+
     </div>
 
     <div id="tab-students" class="tab-panel {% if active_tab != 'students' %}hidden{% endif %}">
@@ -163,6 +164,7 @@
     <div id="tab-marks" class="tab-panel {% if active_tab != 'marks' %}hidden{% endif %}">
       {% include "tabs/marks_tab.html" %}
     </div>
+
     <div id="tab-ads" class="tab-panel {% if active_tab != 'ads' %}hidden{% endif %}">
 
       <div class="ads-header">
@@ -179,28 +181,32 @@
           href="{{ url_for('advertisements.connect_slack_front', id_curso=course['id_curso']) }}"
         >
           Conectar Slack
-</a>
+        </a>
       </div>
 
-    {% if advertisements %}
-      <div class="advertisements-list">
-        {% for aviso in advertisements %}
-          <article class="advertisement-card">
-            <div class="advertisement-card-header">
-              <span>{{ aviso.fecha }}</span>
-              <span>Publicado por: {{ aviso.emisor }}</span>
-            </div>
+      {% if advertisements %}
+        <div class="advertisements-list">
+          {% for aviso in advertisements %}
+            <article class="advertisement-card">
+              <div class="advertisement-card-header">
+                <span>{{ aviso.fecha }}</span>
+                <span>Publicado por: {{ aviso.emisor }}</span>
+              </div>
+              <h3>{{ aviso.titulo }}</h3>
+              <p>{{ aviso.mensaje }}</p>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="tab-empty">No hay avisos cargados para este curso</p>
+      {% endif %}
 
-          <h3>{{ aviso.titulo }}</h3>
-          <p>{{ aviso.mensaje }}</p>
-        </article>
-      {% endfor %}
     </div>
-  {% else %}
-    <p class="tab-empty">No hay avisos cargados para este curso.</p>
-  {% endif %}
 
-</div>
+    <div id="tab-config" class="tab-panel {% if active_tab != 'config' %}hidden{% endif %}">
+      {% include "tabs/config_tab.html" %}
+    </div>
+
   </div>
 </section>
 
