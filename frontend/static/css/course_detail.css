@@ -1119,3 +1119,59 @@
 .estado-badge {
   display: inline-block;
 }
+/* ---- Importar alumnos (CSV) ---- */
+.csv-dropzone {
+  border: 2px dashed #b0b0b0;
+  border-radius: 8px;
+  padding: 28px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.csv-dropzone:hover,
+.csv-dropzone--active {
+  border-color: #4a90d9;
+  background: rgba(74, 144, 217, 0.08);
+}
+.csv-dropzone-text {
+  margin: 0;
+  color: #666;
+}
+.csv-file-name {
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+.csv-hint {
+  font-size: 0.85rem;
+  color: #777;
+  margin: 10px 0;
+}
+
+/* ---- Exportar informes ---- */
+.export-reports-bar {
+  margin-bottom: 16px;
+}
+.export-check {
+  display: block;
+  margin: 8px 0;
+  cursor: pointer;
+}
+.export-evaluaciones {
+  margin: 4px 0 8px 24px;
+  padding-left: 8px;
+  border-left: 2px solid #e0e0e0;
+}
+.export-subcheck {
+  margin: 4px 0;
+  font-size: 0.92rem;
+}
+
+/* ---- Mensajes de formulario ---- */
+.form-message {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #2e7d32;
+}
+.form-message--error {
+  color: #c0392b;
+}

@@ -34,7 +34,43 @@
 
     <div id="tab-general"
         class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
- 
+
+        <section class="export-reports-bar">
+          <button type="button" class="btn-create-student" onclick="openModal('export-reports-modal')">
+            Exportar informes
+          </button>
+        </section>
+
+        {% call modal("export-reports-modal", "Exportar informes") %}
+        <form id="export-reports-form"
+              data-base="{{ url_for('courses.exportar_informes', course_id=course['id_curso']) }}">
+          <label class="export-check">
+            <input type="checkbox" name="alumnos" value="1" /> Listado de alumnos (sin notas)
+          </label>
+
+          <label class="export-check">
+            <input type="checkbox" name="notas" value="1" id="export-notas-check" /> Notas
+          </label>
+          <div id="export-evaluaciones" class="export-evaluaciones" hidden>
+            {% if tipos_evaluacion %}
+              {% for tipo in tipos_evaluacion %}
+              <label class="export-check export-subcheck">
+                <input type="checkbox" name="evaluaciones[]" value="{{ tipo.nombre }}" /> {{ tipo.nombre }}
+              </label>
+              {% endfor %}
+            {% else %}
+              <p class="csv-hint">No hay tipos de evaluación cargados.</p>
+            {% endif %}
+          </div>
+
+          <label class="export-check">
+            <input type="checkbox" name="equipos" value="1" /> Reporte de equipos con integrantes
+          </label>
+
+          <button type="submit" id="export-submit">Exportar PDF</button>
+          <p id="export-message" class="form-message" hidden></p>
+        </form>
+        {% endcall %}
 
         <div id="dash-curso-root" data-course-id="{{ course.id_curso }}">
  
@@ -153,6 +189,24 @@
         <button type="button" class="btn-create-student" onclick="openModal('create-student-modal')">
           agregar alumno
         </button>
+        <button type="button" class="btn-create-student" onclick="openModal('import-students-modal')">
+          Importar alumnos desde CSV
+        </button>
+
+        {% call modal("import-students-modal", "Importar alumnos desde CSV") %}
+        <form id="import-students-form"
+              data-action="{{ url_for('courses.importar_alumnos', course_id=course['id_curso']) }}">
+          <div id="csv-dropzone" class="csv-dropzone">
+            <p class="csv-dropzone-text">Presioná para seleccionar archivo o arrastrá el .csv aquí</p>
+            <p class="csv-file-name" id="csv-file-name" hidden></p>
+            <input type="file" id="csv-file-input" name="file" accept=".csv" hidden />
+          </div>
+          <p class="csv-hint">Columnas requeridas: <strong>nombre, apellido, padron, mail</strong></p>
+          <button type="submit" id="csv-submit" disabled>Importar</button>
+          <p id="import-message" class="form-message" hidden></p>
+        </form>
+        {% endcall %}
+
         {% call modal("create-student-modal", "Crear Alumno") %}
         <form action="{{ url_for('courses.course_detail', course_id=course['id_curso']) }}" method="POST">
           <label for="student-name">Nombre:</label>
@@ -696,4 +750,5 @@
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/course_detail.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard_course.js') }}"></script>
+<script src="{{ url_for('static', filename='js/course_reports.js') }}"></script>
 {% endblock %}
