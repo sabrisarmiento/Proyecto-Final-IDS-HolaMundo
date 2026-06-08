@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for
+import requests
 #from services.advertisement_frontend_service import AdvertisementFrontendService
 #from services.slack_advertisement_frontend_service import SlackAdvertisementFrontendService
 from services.subjects_service import get_subjects
@@ -35,12 +36,12 @@ def create_advertisement_front(id_curso):
     token = session.get("token")
 
     if not token:
-      return redirect(url_for("auth.login"))
+      return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
 
     result = create_advertisement(id_curso, title, message, token)
 
     if result["ok"]:
-      return redirect(url_for("advertisements.public_advertisements"))
+      return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
 
     return render_template(
       "create_advertisement.html",
@@ -52,6 +53,27 @@ def create_advertisement_front(id_curso):
     "create_advertisement.html",
     id_curso=id_curso
   )
+
+@advertisements_bp.route("/cursos/<int:id_curso>/slack/conectar")
+def connect_slack_front(id_curso):
+    token = session.get("token")
+
+    if not token:
+        return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
+    
+    response = requests.get(
+        f"http://localhost:5000/slack/install/{id_curso}",
+        headers={
+            "Authorization": f"Bearer {token}"
+        },
+        allow_redirects=False
+    )
+
+    if response.status_code in [301, 302]:
+        return redirect(response.headers["Location"])
+
+    return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
+
 # @advertisements_bp.route('/avisos/slack')
 # def slack_advertisements():
 

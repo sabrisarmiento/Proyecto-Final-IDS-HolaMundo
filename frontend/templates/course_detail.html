@@ -659,6 +659,12 @@
         >
           + Crear aviso
         </a>
+        <a 
+          class="btn-crear"
+          href="{{ url_for('advertisements.connect_slack_front', id_curso=course['id_curso']) }}"
+        >
+          Conectar Slack
+</a>
       </div>
 
     {% if advertisements %}

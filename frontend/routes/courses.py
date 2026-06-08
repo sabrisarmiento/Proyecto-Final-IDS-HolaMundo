@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 
 import requests
-
+from services.advertisements_service import get_advertisements_by_course
 courses_bp = Blueprint('courses', __name__)
 
 #Cursos (todos)
@@ -203,6 +203,12 @@ def course_detail(course_id):
     curso_es_promocionable = False
     promo_config = {}
       
+  try:
+    advertisements = get_advertisements_by_course(course_id)
+  except Exception as e:
+    print(f"Error loading advertisements: {e}")
+    advertisements = []
+
   return render_template(
     'course_detail.html',
     course=course,
@@ -219,6 +225,7 @@ def course_detail(course_id):
     promedio_general=promedio_general,
     curso_es_promocionable=curso_es_promocionable,
     promo_config=promo_config,
+    advertisements=advertisements
   )
  
 
@@ -235,8 +242,9 @@ def cambiar_evaluacion():
 def guardar_notas(course_id):
     token = session.get('token')
     if not token:
-        return redirect(url_for('auth.login'))
- 
+        #return redirect(url_for('auth.login'))
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+    
     headers = {'Authorization': f'Bearer {token}'}
     id_eval = request.form.get('id_evaluacion')
  
@@ -271,8 +279,9 @@ def guardar_notas(course_id):
 def crear_evaluacion(course_id):
     token = session.get('token')
     if not token:
-        return redirect(url_for('auth.login'))
- 
+        #return redirect(url_for('auth.login'))
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+    
     nombre = request.form.get('nombre_eval')
     headers = {'Authorization': f'Bearer {token}'}
  
@@ -291,8 +300,9 @@ def crear_evaluacion(course_id):
 def eliminar_evaluacion(course_id, eval_id):
     token = session.get('token')
     if not token:
-        return redirect(url_for('auth.login'))
- 
+        #return redirect(url_for('auth.login'))
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+    
     headers = {'Authorization': f'Bearer {token}'}
  
     requests.delete(
@@ -311,8 +321,8 @@ def guardar_promocion(course_id):
 
     token = session.get('token')
     if not token:
-        return redirect(url_for('auth.login'))
-
+      #return redirect(url_for('auth.login'))
+      return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
     headers = {'Authorization': f'Bearer {token}'}
 
     es_promocionable = request.form.get('es_promocionable') == '1'
