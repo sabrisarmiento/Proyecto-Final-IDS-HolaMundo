@@ -14,6 +14,7 @@ from .route_courses import courses_bp
 from .route_subjects import subjects_bp
 from .route_dashboard_course import dashboard_course_bp
 from .route_dashboard_general import dashboard_general_bp
+from .route_reports import reports_bp
 
 __all__ = ["advertisements_bp", 
           "attendance_bp", 
@@ -30,5 +31,6 @@ __all__ = ["advertisements_bp",
           "courses_bp",
           "subjects_bp",
           "dashboard_course_bp",
-          "dashboard_general_bp"
+          "dashboard_general_bp",
+          "reports_bp"
 ]

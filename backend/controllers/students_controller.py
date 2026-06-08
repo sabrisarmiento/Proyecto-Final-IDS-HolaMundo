@@ -94,7 +94,10 @@ def create_student(data):
                 "description": str(e)}
 
 
-def import_students_from_csv(files):
+COLUMNAS_CSV = ["nombre", "apellido", "padron", "mail"]
+
+
+def import_students_from_csv(files, id_curso):
     if 'file' not in files:
         return {"ok": False, "code": 400, "message": "Bad Request",
                 "description": "No se envió archivo (campo 'file' requerido)"}
@@ -104,26 +107,64 @@ def import_students_from_csv(files):
         return {"ok": False, "code": 400, "message": "Bad Request",
                 "description": "El archivo debe ser .csv"}
 
+    if id_curso in (None, ""):
+        return {"ok": False, "code": 400, "message": "Bad Request",
+                "description": "Falta el id_curso (en form-data o query param)"}
+    try:
+        id_curso = int(id_curso)
+    except (ValueError, TypeError):
+        return {"ok": False, "code": 400, "message": "Bad Request",
+                "description": "El id_curso debe ser un entero"}
+
     try:
         stream = io.StringIO(file.stream.read().decode("utf-8-sig"), newline=None)
-        rows = list(csv.DictReader(stream))
+        reader = csv.DictReader(stream)
+        recibidas = [h.strip() for h in (reader.fieldnames or [])]
+        rows = list(reader)
     except Exception as e:
         return {"ok": False, "code": 400, "message": "Bad Request",
                 "description": f"No se pudo leer el CSV: {e}"}
 
+    # Validación estricta de columnas: exactamente las de COLUMNAS_CSV
+    faltantes = [c for c in COLUMNAS_CSV if c not in recibidas]
+    sobrantes = [c for c in recibidas if c not in COLUMNAS_CSV]
+    if faltantes or sobrantes:
+        partes = []
+        if faltantes:
+            partes.append(f"faltan columnas: {faltantes}")
+        if sobrantes:
+            partes.append(f"columnas no permitidas: {sobrantes}")
+        return {"ok": False, "code": 400, "message": "Bad Request",
+                "description": "El CSV debe tener exactamente las columnas "
+                               f"{COLUMNAS_CSV}. " + "; ".join(partes)}
+
     if not rows:
         return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "El CSV está vacío"}
+                "description": "El CSV no tiene filas de datos"}
 
     creados, errores = [], []
     for i, row in enumerate(rows, start=2):
+        nombre = (row.get("nombre") or "").strip()
+        apellido = (row.get("apellido") or "").strip()
+        padron = (row.get("padron") or "").strip()
+        correo = (row.get("mail") or "").strip()
+
+        if not all([nombre, apellido, padron, correo]):
+            errores.append({"fila": i, "error": "Hay campos vacíos en la fila"})
+            continue
         try:
-            row["id_rol"] = int(row["id_rol"])
-        except (KeyError, ValueError, TypeError):
-            errores.append({"fila": i, "error": "id_rol inválido o ausente"})
+            padron = int(padron)
+        except (ValueError, TypeError):
+            errores.append({"fila": i, "error": "padron inválido (debe ser numérico)"})
             continue
 
-        result = create_student(row)
+        result = create_student({
+            "nombre": nombre,
+            "apellido": apellido,
+            "padron": padron,
+            "correo": correo,
+            "id_curso": id_curso,
+        })
         if result["ok"]:
             creados.append({"fila": i, "id": result["id"]})
         else:
