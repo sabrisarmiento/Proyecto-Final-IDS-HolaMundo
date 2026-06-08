@@ -4,6 +4,7 @@ from services.student_service import (
     student_service,
     create_student_service,
     import_students_service,
+    update_student_service
 )
 from middleware.auth_middleware import require_auth
 
@@ -49,3 +50,8 @@ def create_student_route():
 @require_auth
 def import_students_route():
     return import_students_service(request.files)
+
+@students_bp.route("/students/<int:id>", methods=["PATCH"])
+@require_auth
+def update_student_route(id):
+    return update_student_service(id, request.get_json(silent=True))
