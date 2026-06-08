@@ -269,7 +269,7 @@ def course_detail(course_id):
     curso_es_promocionable=curso_es_promocionable,
     promo_config=promo_config,
     pending_team_change=pending_team_change,
-    advertisements=advertisements
+    advertisements=advertisements,
     config_msg=session.pop('config_msg', None),
     config_ok=session.pop('config_ok', False)
   )
