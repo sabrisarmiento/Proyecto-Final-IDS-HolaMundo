@@ -106,6 +106,23 @@ function toggleTeam(teamId) {
     div.classList.toggle('hidden');
 }
 
+function filterTeams() {
+    const searchInput = document
+        .getElementById("team-search")
+        .value
+        .toLowerCase();
+    const teams = document.querySelectorAll(".searchable-team");
+    teams.forEach(team => {
+        const teamName =
+            team.dataset.teamName.toLowerCase();
+        if (teamName.includes(searchInput)) {
+            team.style.display = "";
+        } else {
+            team.style.display = "none";
+        }
+    });
+}
+
 function togglePromocionable(checked) {
     var wrapper = document.getElementById('promo-table-wrapper');
     if (!wrapper) return;
