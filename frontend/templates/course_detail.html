@@ -11,6 +11,7 @@
   href="{{ url_for('static', filename='css/course_detail.css') }}"
 />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_course.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 {% block content %}
@@ -36,7 +37,7 @@
         class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
 
         <section class="export-reports-bar">
-          <button type="button" class="btn-create-student" onclick="openModal('export-reports-modal')">
+          <button type="button" class="btn-action" onclick="openModal('export-reports-modal')">
             Exportar informes
           </button>
         </section>
@@ -186,10 +187,10 @@
 
     <div id="tab-students" class="tab-panel {% if active_tab != 'students' %}hidden{% endif %}">
       <section>
-        <button type="button" class="btn-create-student" onclick="openModal('create-student-modal')">
-          agregar alumno
+        <button type="button" class="btn-action" onclick="openModal('create-student-modal')">
+          Agregar alumno
         </button>
-        <button type="button" class="btn-create-student" onclick="openModal('import-students-modal')">
+        <button type="button" class="btn-action" onclick="openModal('import-students-modal')">
           Importar alumnos desde CSV
         </button>
 
