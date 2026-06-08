@@ -10,7 +10,6 @@ __pycache__/
 
 # Archivos de configuración locales
 *.env
-.env.*
 
 # Logs y cachés
 *.log

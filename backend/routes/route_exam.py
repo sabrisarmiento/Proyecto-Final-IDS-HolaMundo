@@ -64,11 +64,18 @@ def save_notes():
  
     return save_exam_notes_service(id_exam, notes, id_corrector, correctores)
  
- 
 @exam_bp.route("/students_with_notes", methods=["GET"])
 def obtain_students_report():
-    id_curso = request.args.get('id_curso')
-    return students_notes_report_service(id_curso)
+    id_curso   = request.args.get('id_curso')
+    page       = request.args.get('page', 1)
+    per_page   = request.args.get('per_page')
+    order_by   = request.args.get('order_by')
+    order      = request.args.get('order', 'asc')
+    return students_notes_report_service(id_curso, page=page, per_page=per_page, order_by=order_by, order=order)
+# @exam_bp.route("/students_with_notes", methods=["GET"])
+# def obtain_students_report():
+#     id_curso = request.args.get('id_curso')
+#     return students_notes_report_service(id_curso)
 
 # PROMOCIÓN
 

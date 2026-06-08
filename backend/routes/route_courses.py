@@ -30,7 +30,7 @@ def create_course_route():
     return create_course_service(data)
 
 @courses_bp.route('/courses/<int:id_course>', methods=['PATCH'])
-@require_auth
+# @require_auth descomentar cuando este listo
 def patch_course_route(id_course):
     data = request.get_json()
     return patch_course_service(id_course, data)

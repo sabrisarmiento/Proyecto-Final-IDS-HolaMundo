@@ -1,5 +1,7 @@
 from database.db import query_db, modify_db
 from helpers.user_belongs import user_belongs_to_course
+from controllers.slack_controller import send_advertisement_to_slack
+
 
 def get_all_advertisements(filters):
   try:
@@ -91,7 +93,10 @@ def create_advertisement(data, user):
     id_course = data.get("id_curso")
     title = data.get("titulo")
     message = data.get("mensaje")
-
+#    user_mail = user["correo"]
+    print("USER DEL TOKEN:", user)
+    user_mail = user.get("correo", "Usuario Panel FIUBA")
+    
     if not id_course or not title or not message:
       return {
         "ok": False,
@@ -112,9 +117,13 @@ def create_advertisement(data, user):
     """
     modify_db(sql, (id_user, id_course, title, message))
 
+    slack_result = send_advertisement_to_slack(id_course, title, message, user_mail)
+    print("RESULTADO SLACK:", slack_result)
+
     return {
       "ok": True,
-      "data": "aviso creado correctamente"
+      "data": "aviso creado correctamente",
+      "slack": slack_result
     }
   except Exception as e:
     return {
@@ -206,30 +215,34 @@ def delete_advertisement_by_id(id_advertisement):
     }
 
 def get_advertisements_by_subject(id_materia):
-    try:
-        sql = """
-            SELECT
-                a.id_aviso,
-                a.id_usuario,
-                a.id_curso,
-                a.titulo,
-                a.mensaje,
-                a.fecha,
-                CONCAT(u.nombre, ' ', u.apellido) as emisor
-            FROM avisos a
-            JOIN usuarios u ON a.id_usuario = u.id_usuario
-            JOIN cursos c ON a.id_curso = c.id_curso
-            WHERE c.id_materia = %s
-        """
-        result = query_db(sql, (id_materia,))
-        return {
-            "ok": True,
-            "data": result
-        }
-    except Exception as e:
-        return {
-            "ok": False,
-            "code": 500,
-            "message": "Internal Server Error",
-            "description": str(e)
-        }
+  try:
+    sql = """
+      SELECT
+        a.id_aviso,
+        a.id_usuario,
+        a.id_curso,
+        a.titulo,
+        a.mensaje,
+        a.fecha,
+        CONCAT(u.nombre, ' ', u.apellido) as emisor
+      FROM avisos a
+      JOIN usuarios u ON a.id_usuario = u.id_usuario
+      JOIN cursos c ON a.id_curso = c.id_curso
+      WHERE c.id_materia = %s
+      ORDER BY a.fecha DESC
+    """
+
+    result = query_db(sql, (id_materia,))
+
+    return {
+      "ok": True,
+      "data": result
+    }
+
+  except Exception as e:
+    return {
+      "ok": False,
+      "code": 500,
+      "message": "Internal Server Error",
+      "description": str(e)
+    }

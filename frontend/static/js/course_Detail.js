@@ -106,6 +106,23 @@ function toggleTeam(teamId) {
     div.classList.toggle('hidden');
 }
 
+function filterTeams() {
+    const searchInput = document
+        .getElementById("team-search")
+        .value
+        .toLowerCase();
+    const teams = document.querySelectorAll(".searchable-team");
+    teams.forEach(team => {
+        const teamName =
+            team.dataset.teamName.toLowerCase();
+        if (teamName.includes(searchInput)) {
+            team.style.display = "";
+        } else {
+            team.style.display = "none";
+        }
+    });
+}
+
 function togglePromocionable(checked) {
     var wrapper = document.getElementById('promo-table-wrapper');
     if (!wrapper) return;
@@ -249,3 +266,49 @@ function recalcularEstadoPlanilla() {
 window.addEventListener('DOMContentLoaded', function () {
     recalcularEstadoPlanilla();
 });
+
+function createClass() {
+    const data={
+        fecha: document.getElementById("fecha-clase").value,
+        semana:document.getElementById("semana-clase").value,
+        temas:document.getElementById("temas-clase").value,
+        tipo:document.getElementById("tipo-clase").value,
+        modalidad:document.getElementById("modalidad-clase").value,
+    }
+    const courseId =document.getElementById("tab-calendar").dataset.courseId;
+
+    fetch(`/cursos/${courseId}/clases/crear`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+}
+
+function deleteClass(idClase) {
+
+    console.log("Intentando borrar:", idClase);
+
+    if (!confirm("¿Eliminar esta clase?")) {
+        return;
+    }
+
+    const idCurso =
+        document.getElementById("tab-calendar").dataset.courseId;
+
+    fetch(`/cursos/${idCurso}/clases/${idClase}/eliminar`, {
+        method: "DELETE"
+    })
+    .then(response => {
+        console.log("Status:", response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log("Respuesta:", data);
+        location.reload();
+    })
+    .catch(error => {
+        console.error(error);
+    });
+}

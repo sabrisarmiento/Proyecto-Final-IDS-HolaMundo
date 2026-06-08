@@ -1,22 +1,42 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify, Response
 
 import requests
+from services.advertisements_service import get_advertisements_by_course
+from services.courses_service import get_courses, get_course_by_id, post_course
+from services.students_services import post_student, patch_student
+from services.exams_service import get_exams_by_course_id
 
 BACKEND_URL = 'http://127.0.0.1:5000'
 
 courses_bp = Blueprint('courses', __name__)
 
 #Cursos (todos)
-
-@courses_bp.route('/cursos')
+@courses_bp.route('/cursos', methods=['GET', 'POST'])
 def courses():
   try:
-    response = requests.get('http://127.0.0.1:5000/courses')
-    data = response.json()
-    courses = data.get("courses") or data.get("data") or []
+    data_courses = get_courses()
+    if request.method == 'POST':
+      try:
+        data = {
+          "catedra": request.form.get('catedra'),
+          "cuatrimestre": request.form.get('cuatrimestre'),
+          "anio": int(request.form.get('anio')),
+          "id_materia": int(request.form.get('id_materia')),
+          "id_profesor": int(request.form.get('id_profesor')),
+        }
+        post_course(data)
+        return redirect(url_for('courses.courses'))
+      except Exception as e:
+        print(f"Error en cursos: {e}")
   except Exception as e:
-    courses = []
-  return render_template('courses.html', courses=courses, active_page='courses')
+    data_courses = []
+
+  return render_template(
+    'courses.html',
+    courses=data_courses,
+    active_page='courses',
+  )
+
 
 @courses_bp.route('/set-course/<int:course_id>')
 def set_course(course_id):
@@ -39,9 +59,16 @@ def set_general():
 @courses_bp.route('/cursos/<int:course_id>', methods=['GET', 'POST'])
 def course_detail(course_id):
   if request.method == 'POST':
+    if request.form.get("delete_team"):
+      team_id = request.form.get("delete_team")
+      try:
+          token = session.get("token")
+          headers = {"Authorization": f"Bearer {token}"}
+          requests.delete(f"http://127.0.0.1:5000/equipos/{team_id}", headers=headers)
+      except Exception as e:
+          print(f"Error deleting team: {e}")
+      return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
     try:
-      token = session.get('token')
-      headers = {'Authorization': f'Bearer {token}'}
       data = {
         "nombre": request.form.get('nombre'),
         "apellido": request.form.get('apellido'),
@@ -49,11 +76,18 @@ def course_detail(course_id):
         "correo": request.form.get('correo'),
         "id_curso": course_id
         }
-      requests.post('http://127.0.0.1:5000/students', headers=headers, json=data)
+      post_student(data)
     except Exception as e:
-      print(f"Error creating student: {e}")
-    return redirect(url_for('courses.course_detail', course_id=course_id, tab='students'))
-    
+      print(f"Error al crear alumno: {e}")
+
+    return redirect(
+      url_for(
+        'courses.course_detail',
+        course_id=course_id,
+        tab='students'
+        )
+      )
+
   active_tab = request.args.get('tab', 'general')
   page = request.args.get('page', 1, type=int)
   per_page = 10
@@ -64,14 +98,7 @@ def course_detail(course_id):
   headers = {'Authorization': f'Bearer {token}'}
 
   try:
-      course_res = requests.get(f'http://127.0.0.1:5000/courses/{course_id}')
-      course_json = course_res.json()
-      course = (
-        course_json.get("course")
-        or course_json.get("data")
-        or course_json.get("curso")
-        or {}
-      )
+      course = get_course_by_id(course_id)
   except:
       course = {}
 
@@ -79,16 +106,8 @@ def course_detail(course_id):
   headers = {'Authorization': f'Bearer {token}'}
 
   try:
-    evals_res = requests.get(
-      f'http://127.0.0.1:5000/evaluaciones?id_curso={course_id}',
-      headers=headers
-    )
-    evals_json = evals_res.json()
-    evaluaciones = (
-      evals_json.get("evaluaciones")
-      or evals_json.get("exams")
-      or []
-    )
+
+    evaluaciones = get_exams_by_course_id(course_id)
   except Exception as e:
     evaluaciones = []
 
@@ -102,19 +121,43 @@ def course_detail(course_id):
   try:
       students_res = requests.get(
         f'http://127.0.0.1:5000/students_with_notes?id_curso={course_id}',
+    
+    params = {
+        'id_curso': course_id,
+        'page': page,
+        'per_page': per_page,
+    }
+    if order_by:
+        params['order_by'] = order_by
+    if order:
+        params['order'] = order
+
+    students_res = requests.get(
+        f'http://127.0.0.1:5000/students_with_notes',
+        params=params,
         headers=headers
-      )
-      response_data = students_res.json()
-      students_data = (
-        response_data.get("data")
-        or response_data.get("students")
-        or response_data.get("alumnos")
+    )
+    response_data = students_res.json()
+    students_data = (
+        response_data.get('data')
+        or response_data.get('students')
         or []
-      )
-      total = len(students_data)
+    )
+    total = response_data.get('total', len(students_data))
   except Exception as e:
       students_data = []
       total = 0
+
+  try:
+    clases_res = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
+
+    clases_json = clases_res.json()
+
+    clases = clases_json.get("classes", [])
+
+  except Exception as e:
+    print(f"Error cargando clases: {e}")
+    clases = []
 
   for s in students_data:
     notas_dict = {}
@@ -212,11 +255,21 @@ def course_detail(course_id):
     curso_es_promocionable = False
     promo_config = {}
       
+  pending_team_change = session.get("pending_team_change")
+  
+  try:
+    advertisements = get_advertisements_by_course(course_id)
+  except Exception as e:
+    print(f"Error loading advertisements: {e}")
+
+    advertisements = []
+
   return render_template(
     'course_detail.html',
     course=course,
     students=students_data,
     teams=teams,
+    clases=clases,
     active_page='courses',
     page=page,
     total_pages=total_pages,
@@ -229,8 +282,81 @@ def course_detail(course_id):
     promedio_general=promedio_general,
     curso_es_promocionable=curso_es_promocionable,
     promo_config=promo_config,
+    pending_team_change=pending_team_change,
+    advertisements=advertisements,
+    config_msg=session.pop('config_msg', None),
+    config_ok=session.pop('config_ok', False)
   )
  
+@courses_bp.route('/cursos/<int:course_id>/equipos/crear', methods=['POST'])
+def create_team(course_id):
+    try:
+        token = session.get('token')
+        headers = {'Authorization': f'Bearer {token}'}
+        data = {
+            "nombre_equipo": request.form.get("nombre_equipo"),
+            "id_curso": course_id
+        }
+        requests.post("http://127.0.0.1:5000/equipos", headers=headers, json=data)
+    except Exception as e:
+        print("Error creando equipo:", e)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+
+@courses_bp.route('/cursos/<int:course_id>/equipos/agregar-alumno', methods=['POST'])
+def add_student_to_team(course_id):
+    try:
+        token = session.get('token')
+        headers = {'Authorization': f'Bearer {token}'}
+        data = {
+            "id_equipo": request.form.get("id_equipo"),
+            "padron": request.form.get("padron")
+        }
+        response = requests.post("http://127.0.0.1:5000/equipo-alumno", headers=headers, json=data)
+        if response.status_code == 409:
+            error = response.json()
+            session["pending_team_change"] = {
+                "mensaje": error["errors"][0]["description"],
+                "padron": request.form.get("padron"),
+                "id_equipo": request.form.get("id_equipo")
+            }
+    except Exception as e:
+        print("Error agregando alumno:", e)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+
+@courses_bp.route('/cursos/<int:course_id>/equipos/cambiar', methods=['POST'])
+def change_student_team(course_id):
+    try:
+        token = session.get('token')
+        headers = {'Authorization': f'Bearer {token}'}
+        data = {
+            "id_equipo": request.form.get("id_equipo"),
+            "padron": request.form.get("padron"),
+            "forzar": True
+        }
+        requests.post("http://127.0.0.1:5000/equipo-alumno", headers=headers, json=data)
+        session.pop("pending_team_change", None)
+    except Exception as e:
+        print("Error cambiando equipo:", e)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+
+@courses_bp.route('/cursos/<int:course_id>/equipos/cancelar-cambio', methods=['POST'])
+def cancel_team_change(course_id):
+    session.pop('pending_team_change', None)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+
+@courses_bp.route('/cursos/<int:course_id>/equipos/quitar-alumno', methods=['POST'])
+def remove_student_from_team(course_id):
+    try:
+        token = session.get('token')
+        headers = {'Authorization': f'Bearer {token}'}
+        data = {
+            "id_equipo": request.form.get("id_equipo"),
+            "id_alumno": request.form.get("id_alumno")
+        }
+        requests.delete("http://127.0.0.1:5000/equipo-alumno", headers=headers, json=data)
+    except Exception as e:
+        print("Error removing student:", e)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cursos/<int:course_id>/importar-alumnos', methods=['POST'])
 def importar_alumnos(course_id):
@@ -294,17 +420,17 @@ def cambiar_evaluacion():
     if eval_id:
         session['eval_seleccionada'] = int(eval_id)
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
- 
- 
+
 @courses_bp.route('/cursos/<int:course_id>/notas/guardar', methods=['POST'])
 def guardar_notas(course_id):
     token = session.get('token')
     if not token:
-        return redirect(url_for('auth.login'))
- 
+        #return redirect(url_for('auth.login'))
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+    
     headers = {'Authorization': f'Bearer {token}'}
     id_eval = request.form.get('id_evaluacion')
- 
+
     notas_dict = {}
     correctores_dict = {}
  
@@ -336,8 +462,9 @@ def guardar_notas(course_id):
 def crear_evaluacion(course_id):
     token = session.get('token')
     if not token:
-        return redirect(url_for('auth.login'))
- 
+        #return redirect(url_for('auth.login'))
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+    
     nombre = request.form.get('nombre_eval')
     headers = {'Authorization': f'Bearer {token}'}
  
@@ -356,8 +483,9 @@ def crear_evaluacion(course_id):
 def eliminar_evaluacion(course_id, eval_id):
     token = session.get('token')
     if not token:
-        return redirect(url_for('auth.login'))
- 
+        #return redirect(url_for('auth.login'))
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+    
     headers = {'Authorization': f'Bearer {token}'}
  
     requests.delete(
@@ -376,8 +504,8 @@ def guardar_promocion(course_id):
 
     token = session.get('token')
     if not token:
-        return redirect(url_for('auth.login'))
-
+      #return redirect(url_for('auth.login'))
+      return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
     headers = {'Authorization': f'Bearer {token}'}
 
     es_promocionable = request.form.get('es_promocionable') == '1'
@@ -421,3 +549,97 @@ def course_dashboard_data(course_id):
         return jsonify(res.json()), res.status_code
     except Exception as e:
         return jsonify({"error": str(e)}), 502
+    
+
+@courses_bp.route('/cursos/<int:course_id>/clases/crear', methods=['POST'])
+def crear_clase(course_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('auth.login'))
+ 
+    headers = {'Authorization': f'Bearer {token}'}
+ 
+    data = request.get_json()
+    data['id_curso'] = course_id
+    response = requests.post(
+        'http://127.0.0.1:5000/clases',
+        json=data,
+        headers=headers
+    )
+
+    response = requests.post(
+    'http://127.0.0.1:5000/clases',
+    json=data,
+    headers=headers
+)
+    return response.json(), response.status_code
+
+
+@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/eliminar',methods=['DELETE'])
+def eliminar_clase(course_id, id_clase):
+
+    token = session.get('token')
+
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    response = requests.delete(
+        f'http://127.0.0.1:5000/clases/{id_clase}',
+        headers=headers
+    )
+
+    return response.json(), response.status_code
+
+@courses_bp.route('/cursos/<int:course_id>/estudiantes/<int:student_id>', methods=['POST'])
+def edit_student(course_id, student_id):
+    try:
+      data = {
+          "nombre": request.form.get('nombre'),
+          "apellido": request.form.get('apellido'),
+          "padron": int(request.form.get('padron')),
+          "correo": request.form.get('correo'),
+      }
+      patch_student(student_id, data)
+    except Exception as e:
+      print(e)
+      
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='students'))
+
+@courses_bp.route('/cursos/<int:course_id>/configuracion', methods=['POST'])
+def update_course_config(course_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+
+    headers = {'Authorization': f'Bearer {token}'}
+
+    data = {
+        'catedra':      request.form.get('catedra'),
+        'cuatrimestre': request.form.get('cuatrimestre'),
+        'anio':         int(request.form.get('anio')),
+    }
+    slack_url   = request.form.get('slack_url', '').strip()
+    youtube_url = request.form.get('youtube_url', '').strip()
+    if slack_url:
+        data['slack_url'] = slack_url
+    if youtube_url:
+        data['youtube_url'] = youtube_url
+
+    try:
+        res = requests.patch(
+            f'http://127.0.0.1:5000/courses/{course_id}',
+            json=data,
+            headers=headers
+        )
+        if res.status_code == 200:
+            session['config_msg'] = 'Configuración guardada correctamente'
+            session['config_ok']  = True
+        else:
+            session['config_msg'] = 'No se pudo guardar la configuración'
+            session['config_ok']  = False
+    except Exception as e:
+        session['config_msg'] = f'Error de conexión: {e}'
+        session['config_ok']  = False
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))

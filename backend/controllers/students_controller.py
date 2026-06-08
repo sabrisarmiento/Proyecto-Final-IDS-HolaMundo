@@ -182,3 +182,73 @@ def import_students_from_csv(files, id_curso):
             "detalle_errores": errores,
         },
     }
+
+def update_student(student_id, data):
+    try:
+        if not data:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": "JSON requerido"
+            }
+
+        exists = query_db(
+            "SELECT id_alumno FROM alumnos WHERE id_alumno = %s",
+            (student_id,)
+        )
+        if not exists:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Not Found",
+                "description": f"No existe un alumno con ID {student_id}"
+            }
+
+        if "correo" in data or "padron" in data:
+            correo = data.get("correo")
+            padron = data.get("padron")
+            dup = query_db(
+                "SELECT id_alumno FROM alumnos WHERE (correo = %s OR padron = %s) AND id_alumno <> %s",
+                (correo, padron, student_id)
+            )
+            if dup:
+                return {
+                    "ok": False,
+                    "code": 409,
+                    "message": "Conflict",
+                    "description": "Ya existe otro alumno con ese correo o padrón"
+                }
+
+        fields, params = [], []
+        for key in ["nombre", "apellido", "padron", "correo", "id_curso", "estado_alumno"]:
+            if key in data and data[key] is not None:
+                fields.append(f"{key} = %s")
+                params.append(data[key])
+
+        if not fields:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": "No se enviaron campos para actualizar"
+            }
+
+        sql = f"UPDATE alumnos SET {', '.join(fields)} WHERE id_alumno = %s"
+        params.append(student_id)
+
+        modify_db(sql, tuple(params))
+
+        return {
+            "ok": True,
+            "message": "Alumno actualizado correctamente",
+            "id": student_id
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }

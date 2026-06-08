@@ -1,29 +1,61 @@
-{% extends "base_private.html" %}
+{% extends "base_private.html" %} {% block title %}Panel FIUBA - Cursos{%
+endblock %} {% from "components/modal.html" import modal %} {% block
+extra_styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/courses.css') }}"
+/>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %} {% block content %}
+<section>
+  <button type="button" onclick="openModal('create-course-modal')">
+    Crear curso
+  </button>
 
-{% block title %}Panel FIUBA - Cursos{% endblock %}
+  {% call modal("create-course-modal", "Crear Curso") %}
+  <form action="{{ url_for('courses.courses') }}" method="POST">
+    <label for="catedra">Cátedra:</label>
+    <input type="text" id="catedra" name="catedra" required />
 
-{% block extra_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}">
-{% endblock %}
+    <label for="cuatrimestre">Cuatrimestre:</label>
+    <input type="text" id="cuatrimestre" name="cuatrimestre" required />
 
-{% block content %}
-  <section class="courses" >
-    <h2>Gestión de Cursos</h2>
-    <div class="courses-container">
-      {% for course in courses %}
-        <article class="course" onclick="window.location.href='/cursos/{{ course.id_curso }}'">
-          <div class="course-header">
-            <span class="course-id">#{{ course.id_curso }}</span>
-          </div>
-          <h3 class="course-nombre">{{ course.materia }}</h3>
-          <p class="course-catedra">{{ course.catedra }}</p>
-          <div class="course-footer">
-            <span class="course-anio">📅 {{ course.anio }}, 
-              <span class="course-cuatrimestre">{{ course.cuatrimestre }}</span>
-            </span>
-          </div>
-        </article>
-      {% endfor %}
-    </div>
-  </section>
+    <label for="anio">Año:</label>
+    <input type="number" id="anio" name="anio" min="2026" required />
+
+    <label for="id_materia">ID Materia:</label>
+    <input type="number" id="id_materia" name="id_materia" required />
+
+    <label for="id_profesor">ID Profesor:</label>
+    <input type="number" id="id_profesor" name="id_profesor" min="1" required />
+
+    <button type="submit">Crear</button>
+  </form>
+  {% endcall %}
+</section>
+
+<section class="courses">
+  <h2>Gestión de Cursos</h2>
+  <div class="courses-container">
+    {% for course in courses %}
+    <article
+      class="course"
+      onclick="window.location.href='/cursos/{{ course.id_curso }}'"
+    >
+      <div class="course-header">
+        <span class="course-id">#{{ course.id_curso }}</span>
+        status:
+      </div>
+      <h3 class="course-nombre">{{ course.materia }}</h3>
+      <p class="course-catedra">{{ course.catedra }}</p>
+      <div class="course-footer">
+        <span class="course-anio"
+          >📅 {{ course.anio }},
+          <span class="course-cuatrimestre">{{ course.cuatrimestre }}</span>
+        </span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}
