@@ -260,6 +260,15 @@ def course_detail(course_id):
     print(f"Error loading advertisements: {e}")
 
     advertisements = []
+    
+  try:
+      dash_res = requests.get(
+          f'http://127.0.0.1:5000/cursos/{course_id}/dashboard',
+          headers=headers
+      )
+      dash_data = dash_res.json().get('dashboard', {}) if dash_res.ok else {}
+  except Exception:
+      dash_data = {}
 
   return render_template(
     'course_detail.html',
@@ -282,7 +291,8 @@ def course_detail(course_id):
     pending_team_change=pending_team_change,
     advertisements=advertisements,
     config_msg=session.pop('config_msg', None),
-    config_ok=session.pop('config_ok', False)
+    config_ok=session.pop('config_ok', False),
+    dash_data=dash_data
   )
  
 @courses_bp.route('/cursos/<int:course_id>/equipos/crear', methods=['POST'])

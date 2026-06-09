@@ -16,6 +16,14 @@
     </div>
   </header>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <p class="dg-modal-msg {{ category }}">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   <section class="dg-kpis">
     <div class="dg-kpi">
       <span class="dg-kpi-icon">Usuarios activos</span>
@@ -106,7 +114,12 @@
               <td>{{ u.nivel_administracion or '—' }}</td>
               <td class="dg-acciones">
                 <button class="dg-btn-icon js-editar-usuario" title="Editar usuario">✏️</button>
-                <button class="dg-btn-icon dg-btn-icon--danger js-eliminar-usuario" title="Eliminar">🗑️</button>
+
+                <form method="POST"
+                      action="{{ url_for('dashboard.eliminar_usuario', id_user=u.id_usuario) }}"
+                      onsubmit="return confirm('¿Eliminar a {{ u.nombre }} {{ u.apellido }}? Esta acción no se puede deshacer.')">
+                  <button type="submit" class="dg-btn-icon dg-btn-icon--danger" title="Eliminar">🗑️</button>
+                </form>
               </td>
             </tr>
             {% endfor %}
@@ -139,7 +152,12 @@
             <span class="dg-rol-nombre">{{ r.nombre }}</span>
             <span class="dg-rol-nivel">Nivel {{ r.nivel_administracion }}</span>
           </div>
-          <button class="dg-btn-icon dg-btn-icon--danger js-eliminar-rol" title="Eliminar rol">🗑️</button>
+
+          <form method="POST"
+                action="{{ url_for('dashboard.eliminar_rol', id_rol=r.id_rol) }}"
+                onsubmit="return confirm('¿Eliminar el rol \"{{ r.nombre }}\"? Los usuarios con este rol pueden quedar sin asignación.')">
+            <button type="submit" class="dg-btn-icon dg-btn-icon--danger" title="Eliminar rol">🗑️</button>
+          </form>
         </div>
         {% endfor %}
       </div>
@@ -155,40 +173,42 @@
   <div class="dg-modal">
     <button class="dg-modal-close js-cerrar-modal" data-target="modal-crear-usuario">✕</button>
     <h3>Nuevo usuario</h3>
-    <div id="msg-crear-usuario" class="dg-modal-msg hidden"></div>
-    <div class="dg-form-group">
-      <label>Nombre</label>
-      <input type="text" id="cu-nombre" placeholder="Nombre">
-    </div>
-    <div class="dg-form-group">
-      <label>Apellido</label>
-      <input type="text" id="cu-apellido" placeholder="Apellido">
-    </div>
-    <div class="dg-form-group">
-      <label>Correo</label>
-      <input type="email" id="cu-correo" placeholder="correo@fi.uba.ar">
-    </div>
-    <div class="dg-form-group">
-      <label>Contraseña</label>
-      <input type="password" id="cu-password" placeholder="Mínimo 8 caracteres">
-    </div>
-    <div class="dg-form-group">
-      <label>Rol</label>
-      <select id="cu-rol">
-        {% for r in data.roles %}
-        <option value="{{ r.id_rol }}">
-          {% if r.nivel_administracion == 3 %}Superadmin
-          {% elif r.nivel_administracion == 2 %}Profesor
-          {% else %}Ayudante{% endif %}
-          — {{ r.nombre }}
-        </option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="dg-modal-actions">
-      <button class="dg-btn dg-btn--ghost js-cerrar-modal" data-target="modal-crear-usuario">Cancelar</button>
-      <button class="dg-btn dg-btn--primary" id="btn-crear-usuario">Crear usuario</button>
-    </div>
+    <form method="POST" action="{{ url_for('dashboard.crear_usuario') }}">
+      <div class="dg-form-group">
+        <label>Nombre</label>
+        <input type="text" name="nombre" placeholder="Nombre" required>
+      </div>
+      <div class="dg-form-group">
+        <label>Apellido</label>
+        <input type="text" name="apellido" placeholder="Apellido" required>
+      </div>
+      <div class="dg-form-group">
+        <label>Correo</label>
+        <input type="email" name="correo" placeholder="correo@fi.uba.ar" required>
+      </div>
+      <div class="dg-form-group">
+        <label>Contraseña</label>
+        <input type="password" name="contraseña" placeholder="Mínimo 8 caracteres" required>
+      </div>
+      <div class="dg-form-group">
+        <label>Rol</label>
+        <select name="id_rol">
+          {% for r in data.roles %}
+          <option value="{{ r.id_rol }}">
+            {% if r.nivel_administracion == 3 %}Superadmin
+            {% elif r.nivel_administracion == 2 %}Profesor
+            {% else %}Ayudante{% endif %}
+            — {{ r.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="dg-modal-actions">
+        <button type="button" class="dg-btn dg-btn--ghost js-cerrar-modal"
+                data-target="modal-crear-usuario">Cancelar</button>
+        <button type="submit" class="dg-btn dg-btn--primary">Crear usuario</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -197,37 +217,39 @@
     <button class="dg-modal-close js-cerrar-modal" data-target="modal-editar-usuario">✕</button>
     <h3>Editar usuario</h3>
     <p class="dg-modal-sub" id="eu-nombre-label"></p>
-    <div id="msg-editar-usuario" class="dg-modal-msg hidden"></div>
-    <input type="hidden" id="eu-id">
-    <div class="dg-form-group">
-      <label>Nombre</label>
-      <input type="text" id="eu-nombre" placeholder="Nombre">
-    </div>
-    <div class="dg-form-group">
-      <label>Apellido</label>
-      <input type="text" id="eu-apellido" placeholder="Apellido">
-    </div>
-    <div class="dg-form-group">
-      <label>Correo</label>
-      <input type="email" id="eu-correo" placeholder="correo@fi.uba.ar">
-    </div>
-    <div class="dg-form-group">
-      <label>Rol</label>
-      <select id="eu-rol">
-        {% for r in data.roles %}
-        <option value="{{ r.id_rol }}">
-          {% if r.nivel_administracion == 3 %}Superadmin
-          {% elif r.nivel_administracion == 2 %}Profesor
-          {% else %}Ayudante{% endif %}
-          — {{ r.nombre }}
-        </option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="dg-modal-actions">
-      <button class="dg-btn dg-btn--ghost js-cerrar-modal" data-target="modal-editar-usuario">Cancelar</button>
-      <button class="dg-btn dg-btn--primary" id="btn-editar-usuario">Guardar cambios</button>
-    </div>
+    <form method="POST" id="form-editar-usuario" action="">
+      <input type="hidden" id="eu-id" name="id_usuario">
+      <div class="dg-form-group">
+        <label>Nombre</label>
+        <input type="text" id="eu-nombre" name="nombre" placeholder="Nombre" required>
+      </div>
+      <div class="dg-form-group">
+        <label>Apellido</label>
+        <input type="text" id="eu-apellido" name="apellido" placeholder="Apellido" required>
+      </div>
+      <div class="dg-form-group">
+        <label>Correo</label>
+        <input type="email" id="eu-correo" name="correo" placeholder="correo@fi.uba.ar" required>
+      </div>
+      <div class="dg-form-group">
+        <label>Rol</label>
+        <select id="eu-rol" name="id_rol">
+          {% for r in data.roles %}
+          <option value="{{ r.id_rol }}">
+            {% if r.nivel_administracion == 3 %}Superadmin
+            {% elif r.nivel_administracion == 2 %}Profesor
+            {% else %}Ayudante{% endif %}
+            — {{ r.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="dg-modal-actions">
+        <button type="button" class="dg-btn dg-btn--ghost js-cerrar-modal"
+                data-target="modal-editar-usuario">Cancelar</button>
+        <button type="submit" class="dg-btn dg-btn--primary">Guardar cambios</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -235,34 +257,25 @@
   <div class="dg-modal dg-modal--sm">
     <button class="dg-modal-close js-cerrar-modal" data-target="modal-crear-rol">✕</button>
     <h3>Nuevo rol</h3>
-    <div id="msg-crear-rol" class="dg-modal-msg hidden"></div>
-    <div class="dg-form-group">
-      <label>Nombre del rol</label>
-      <input type="text" id="cr-nombre" placeholder="Ej: Jefe de trabajos prácticos">
-    </div>
-    <div class="dg-form-group">
-      <label>Nivel de administración</label>
-      <select id="cr-nivel">
-        <option value="3">3 — Superadmin</option>
-        <option value="2">2 — Profesor</option>
-        <option value="1" selected>1 — Ayudante</option>
-      </select>
-    </div>
-    <div class="dg-modal-actions">
-      <button class="dg-btn dg-btn--ghost js-cerrar-modal" data-target="modal-crear-rol">Cancelar</button>
-      <button class="dg-btn dg-btn--primary" id="btn-crear-rol">Crear rol</button>
-    </div>
-  </div>
-</div>
-</script>
-<div class="dg-modal-overlay hidden" id="modal-confirmar">
-  <div class="dg-modal dg-modal--sm">
-    <h3 class="dg-modal-danger-title">Confirmar eliminación</h3>
-    <p id="modal-confirmar-msg" class="dg-modal-sub"></p>
-    <div class="dg-modal-actions">
-      <button class="dg-btn dg-btn--ghost js-cerrar-modal" data-target="modal-confirmar">Cancelar</button>
-      <button class="dg-btn dg-btn--danger" id="modal-confirmar-btn">Si, eliminar</button>
-    </div>
+    <form method="POST" action="{{ url_for('dashboard.crear_rol') }}">
+      <div class="dg-form-group">
+        <label>Nombre del rol</label>
+        <input type="text" name="nombre" placeholder="Ej: Jefe de trabajos prácticos" required>
+      </div>
+      <div class="dg-form-group">
+        <label>Nivel de administración</label>
+        <select name="nivel_administracion">
+          <option value="3">3 — Superadmin</option>
+          <option value="2">2 — Profesor</option>
+          <option value="1" selected>1 — Ayudante</option>
+        </select>
+      </div>
+      <div class="dg-modal-actions">
+        <button type="button" class="dg-btn dg-btn--ghost js-cerrar-modal"
+                data-target="modal-crear-rol">Cancelar</button>
+        <button type="submit" class="dg-btn dg-btn--primary">Crear rol</button>
+      </div>
+    </form>
   </div>
 </div>
 

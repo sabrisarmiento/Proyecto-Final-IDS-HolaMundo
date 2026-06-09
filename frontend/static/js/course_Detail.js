@@ -74,11 +74,6 @@ function filtrarPorEquipo(equipoSeleccionado) {
     recalcularPromedio();
 }
 
-/**
- * @param {string} nombreEval
- * @param {number} tieneNotas
- * @returns {boolean}
- */
 function confirmarEliminarEval(nombreEval, cant) {
     var tieneNotas = parseInt(cant, 10) > 0;
     if (tieneNotas) {
@@ -125,15 +120,16 @@ function filterTeams() {
 
 function togglePromocionable(checked) {
     var wrapper = document.getElementById('promo-table-wrapper');
-    if (!wrapper) return;
-    var hidden = document.querySelector('#form-promo input[name="es_promocionable"]');
-    if (checked) {
-        wrapper.classList.remove('hidden');
-        if (hidden) hidden.value = '1';
-    } else {
-        wrapper.classList.add('hidden');
-        if (hidden) hidden.value = '0';
+    var hidden = document.getElementById('hidden-es-promocionable');
+
+    if (hidden) hidden.value = checked ? '1' : '0';
+
+    if (wrapper) {
+        wrapper.style.display = checked ? '' : 'none';
     }
+
+    var form = document.getElementById('form-toggle-promo');
+    if (form) form.submit();
 }
 
 function toggleNotaMinima(checkbox) {
@@ -229,7 +225,7 @@ function recalcularEstadoPlanilla() {
         if (recursa) {
             estado = 'recursa';
         } else if (!esPromocionable) {
-            estado = 'final';
+            estado = vals.length > 0 ? 'final' : 'final';
         } else {
             var puedePromo = true;
 
