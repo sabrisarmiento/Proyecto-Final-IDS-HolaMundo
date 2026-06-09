@@ -1,4 +1,3 @@
-{# Datos del dashboard embebidos por Jinja2 — el JS los lee sin fetch #}
 {% if dash_data %}
 <script id="dash-curso-data" type="application/json">{{ dash_data | tojson }}</script>
 {% endif %}
