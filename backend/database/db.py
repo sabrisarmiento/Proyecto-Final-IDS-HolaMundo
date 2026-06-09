@@ -38,7 +38,7 @@ def modify_db(query, params=None):
     try:
         cursor.execute(query, params or ())
         connection.commit()
-        return cursor.lastrowid
+        return cursor.rowcount
     finally:
         cursor.close()
         connection.close()

@@ -1,0 +1,150 @@
+{% if dash_data %}
+<script id="dash-curso-data" type="application/json">{{ dash_data | tojson }}</script>
+{% endif %}
+
+<section class="export-reports-bar">
+  <button type="button" class="btn-action" onclick="openModal('export-reports-modal')">
+    Exportar informes
+  </button>
+</section>
+
+{% call modal("export-reports-modal", "Exportar informes") %}
+<form id="export-reports-form"
+      data-base="{{ url_for('courses.exportar_informes', course_id=course['id_curso']) }}">
+  <label class="export-check">
+    <input type="checkbox" name="alumnos" value="1" /> Listado de alumnos (sin notas)
+  </label>
+  <label class="export-check">
+    <input type="checkbox" name="notas" value="1" id="export-notas-check" /> Notas
+  </label>
+  <div id="export-evaluaciones" class="export-evaluaciones" hidden>
+    {% if tipos_evaluacion %}
+      {% for tipo in tipos_evaluacion %}
+      <label class="export-check export-subcheck">
+        <input type="checkbox" name="evaluaciones[]" value="{{ tipo.nombre }}" /> {{ tipo.nombre }}
+      </label>
+      {% endfor %}
+    {% else %}
+      <p class="csv-hint">No hay tipos de evaluación cargados.</p>
+    {% endif %}
+  </div>
+  <label class="export-check">
+    <input type="checkbox" name="equipos" value="1" /> Reporte de equipos con integrantes
+  </label>
+  <button type="submit" id="export-submit">Exportar PDF</button>
+  <p id="export-message" class="form-message" hidden></p>
+</form>
+{% endcall %}
+
+<div id="dash-curso-root" data-course-id="{{ course.id_curso }}">
+
+  {% if not dash_data %}
+  <p class="dash-error">No se pudieron cargar las estadísticas del curso.</p>
+  {% else %}
+
+  <div id="dash-curso-loading" class="dash-loading" style="display:none;"></div>
+  <p id="dash-curso-error" class="dash-error hidden"></p>
+
+  <div id="dash-curso-content">
+
+    <section class="dash-info-row">
+      <div class="dash-info-item">
+        <span class="dash-info-label">Materia</span>
+        <span class="dash-info-value">{{ course.materia }}</span>
+      </div>
+      <div class="dash-info-item">
+        <span class="dash-info-label">Cátedra</span>
+        <span class="dash-info-value">{{ course.catedra }}</span>
+      </div>
+      <div class="dash-info-item">
+        <span class="dash-info-label">Cuatrimestre</span>
+        <span class="dash-info-value">{{ course.cuatrimestre }} — {{ course.anio }}</span>
+      </div>
+    </section>
+
+    <section class="dash-stats-grid">
+
+      <div class="dash-stat-card dash-stat--primary">
+        <span class="dash-stat-label">Total Inscriptos</span>
+        <strong class="dash-stat-num" id="dash-total-alumnos">—</strong>
+        <span class="dash-stat-sub">
+          <span id="dash-activos">—</span> activos ·
+          <span id="dash-abandonaron">—</span> abandonaron
+        </span>
+      </div>
+
+      <div class="dash-stat-card">
+        <span class="dash-stat-label">Equipos</span>
+        <strong class="dash-stat-num" id="dash-equipos">—</strong>
+        <span class="dash-stat-sub">grupos de trabajo</span>
+      </div>
+
+      <div class="dash-stat-card dash-stat--accent">
+        <span class="dash-stat-label">Promedio General</span>
+        <strong class="dash-stat-num" id="dash-promedio">—</strong>
+        <span class="dash-stat-sub">escala 0 – 10</span>
+      </div>
+
+      <div class="dash-stat-card">
+        <span class="dash-stat-label">Promocionan</span>
+        <strong class="dash-stat-num dash-stat-num--green" id="dash-promocionados">—</strong>
+        <span class="dash-stat-sub">alumnos</span>
+      </div>
+
+      <div class="dash-stat-card">
+        <span class="dash-stat-label">Van a Final</span>
+        <strong class="dash-stat-num" id="dash-van-final">—</strong>
+        <span class="dash-stat-sub">alumnos</span>
+      </div>
+
+      <div class="dash-stat-card dash-stat--warn">
+        <span class="dash-stat-label">Recursantes</span>
+        <strong class="dash-stat-num" id="dash-recursantes">—</strong>
+        <span class="dash-stat-sub">alumnos</span>
+      </div>
+
+    </section>
+
+    <section class="dash-charts-grid">
+
+      <div class="dash-chart-card dash-chart-card--wide">
+        <h4 class="dash-chart-title">Rendimiento por Evaluación</h4>
+        <p class="dash-chart-subtitle">Promedio de notas</p>
+        <div class="dash-chart-wrap" style="height:220px;">
+          <canvas id="chart-rendimiento"></canvas>
+        </div>
+        <p class="dash-chart-empty hidden">Sin evaluaciones cargadas</p>
+      </div>
+
+      <div class="dash-chart-card">
+        <h4 class="dash-chart-title">Asistencia</h4>
+        <p class="dash-chart-subtitle">Regularidad de asistencia</p>
+        <div class="dash-asist-badges">
+          <span class="dash-asist-badge dash-asist-badge--ok">
+            <strong id="dash-asist-regulares">—</strong> regulares
+          </span>
+          <span class="dash-asist-badge dash-asist-badge--risk">
+            <strong id="dash-asist-en-riesgo">—</strong> en riesgo
+          </span>
+        </div>
+        <div class="dash-chart-wrap" style="height:180px;">
+          <canvas id="chart-asistencia"></canvas>
+        </div>
+        <p class="dash-chart-empty hidden">Sin datos de asistencia</p>
+      </div>
+
+      <div class="dash-chart-card">
+        <h4 class="dash-chart-title">Estado de la Cursada</h4>
+        <p class="dash-chart-subtitle">Distribución actual del alumnado</p>
+        <div class="dash-chart-wrap" style="height:180px;">
+          <canvas id="chart-estado"></canvas>
+        </div>
+        <p class="dash-chart-empty hidden">Sin notas cargadas</p>
+      </div>
+
+    </section>
+
+  </div>
+  {% endif %}
+
+</div>

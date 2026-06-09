@@ -3,11 +3,6 @@
 
   const CSS = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-  function setInner(id, html) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-  }
-
   function setText(id, text) {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
@@ -21,13 +16,12 @@
     setText("dash-promedio",        d.promedio_general !== null ? d.promedio_general : "—");
 
     const c = d.clasificacion;
-    setText("dash-promocionados", c.promocionados);
+    setText("dash-promocionados", d.es_promocionable ? c.promocionados : "—");
     setText("dash-van-final",     c.van_a_final);
     setText("dash-recursantes",   c.recursantes);
   }
 
 // rendimiento por evaluacion (barritas)
-
   function renderBarChart(evaluaciones) {
     const canvas = document.getElementById("chart-rendimiento");
     if (!canvas) return;
@@ -86,7 +80,6 @@
   }
 
 // asistencia (torta)
-
   function renderAsistenciaChart(asistencia) {
     const canvas = document.getElementById("chart-asistencia");
     if (!canvas) return;
@@ -101,8 +94,8 @@
       return;
     }
 
-    setText("dash-asist-regulares",  regulares);
-    setText("dash-asist-en-riesgo",  en_riesgo);
+    setText("dash-asist-regulares", regulares);
+    setText("dash-asist-en-riesgo", en_riesgo);
     if (total > 0) {
       setText("dash-asist-pct", Math.round((regulares / total) * 100) + "%");
     }
@@ -139,7 +132,6 @@
   }
 
 // estado cursada (torta)
-
   function renderEstadoChart(clasificacion, esPromocionable) {
     const canvas = document.getElementById("chart-estado");
     if (!canvas) return;
@@ -167,9 +159,9 @@
             data: [promocionados, van_a_final, recursantes, abandonaron],
             backgroundColor: [
               "#22c55e",
-              CSS("--color-9")  || "#111D4A",
-              CSS("--color-3")  || "#92140C",
-              CSS("--color-8")  || "#887672",
+              CSS("--color-9") || "#111D4A",
+              CSS("--color-3") || "#92140C",
+              CSS("--color-8") || "#887672",
             ],
             borderWidth: 0,
             hoverOffset: 6,
@@ -190,49 +182,26 @@
     });
   }
 
-  function showError(msg) {
-    const el = document.getElementById("dash-curso-error");
-    if (el) {
-      el.textContent = msg;
-      el.classList.remove("hidden");
-    }
-    document.getElementById("dash-curso-loading")?.classList.add("hidden");
-    document.getElementById("dash-curso-content")?.classList.add("hidden");
-  }
+  window.addEventListener("DOMContentLoaded", function () {
+    const dataEl = document.getElementById("dash-curso-data");
+    if (!dataEl) return;
 
-  function hideLoading() {
+    let d;
+    try {
+      d = JSON.parse(dataEl.textContent);
+    } catch (e) {
+      console.error("Error al leer dash-curso-data:", e);
+      return;
+    }
+
+    renderStats(d);
+    renderBarChart(d.evaluaciones);
+    renderAsistenciaChart(d.asistencia);
+    renderEstadoChart(d.clasificacion, d.es_promocionable);
+
     const loading = document.getElementById("dash-curso-loading");
     const content = document.getElementById("dash-curso-content");
     if (loading) loading.style.display = "none";
     if (content) content.classList.remove("hidden");
-  }
-
-  async function loadDashboard(courseId) {
-    try {
-      const res  = await fetch(`/cursos/${courseId}/dashboard-data`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const d    = json.dashboard;
-
-      renderStats(d);
-      renderBarChart(d.evaluaciones);
-      renderAsistenciaChart(d.asistencia);
-      renderEstadoChart(d.clasificacion, d.es_promocionable);
-      hideLoading();
-    } catch (err) {
-      showError("No se pudieron cargar las estadísticas del curso.");
-      console.error(err);
-    }
-  }
-
-  window.addEventListener("DOMContentLoaded", function () {
-    const courseId = document.getElementById("dash-curso-root")?.dataset.courseId;
-    if (!courseId) return;
-
-    if (typeof Chart !== "undefined") {
-      loadDashboard(courseId);
-    } else {
-      window.addEventListener("load", () => loadDashboard(courseId));
-    }
   });
 })();
