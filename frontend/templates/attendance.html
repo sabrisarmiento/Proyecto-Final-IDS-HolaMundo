@@ -9,6 +9,16 @@
 {% block content %}
 <section class="attendance">
     <header class="attendance-head">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="attendance-flash">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
         <h2>Asistencia</h2>
         <p class="attendance-subtitle">
             Elegí materia, curso y clase para ver la asistencia y generar los QR.
@@ -38,7 +48,7 @@
                     <option value="{{ c.id_curso }}" {% if c.id_curso|string == course_id %}selected{% endif %}>
                         Curso {{ c.id_curso }}{% if c.catedra %} · {{ c.catedra }}{% endif %}
                     </option>
-                    {% endfor %}
+                {% endfor %}
             </select>
         </form>
         {% endif %}

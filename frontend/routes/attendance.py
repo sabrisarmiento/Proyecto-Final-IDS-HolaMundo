@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from services.attendance_frontend_service import attendance_get_all, generate_qr
 from services.subjects_service import get_subjects
 from services.courses_service import get_courses
@@ -46,5 +46,6 @@ def generate_qr_view():
     subject_id = request.form.get('subject')
     course_id = request.form.get('curso')
     class_id = request.form.get('id_clase')
-    generate_qr(class_id)
+    result = generate_qr(class_id)
+    flash(result.get("message", "No se pudieron generar los QR."))
     return redirect(url_for('attendance.attendance', subject=subject_id, curso=course_id, clase=class_id))

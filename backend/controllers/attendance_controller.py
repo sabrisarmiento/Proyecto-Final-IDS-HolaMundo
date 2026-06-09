@@ -1,4 +1,5 @@
 import math
+import hashlib
 from database.db import query_db, modify_db
 
 def get_attendance(id_clase=None, id_alumno=None):
@@ -62,10 +63,22 @@ def create_attendance(data):
             }
 
         id_alumno = data["id_alumno"]
+        id_clase = data["id_clase"]
+        code = data.get("code")
         lat = data.get("latitud")
         lon = data.get("longitud")
 
+        expected_code = hashlib.sha256(f"{id_alumno}-{id_clase}-2026-secret".encode()).hexdigest()
+        if not code or code != expected_code:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "Código QR inválido o ausente"
+            }
+
         if not student_active(id_alumno):
+
             return {
                 "ok": False,
                 "code": 403,

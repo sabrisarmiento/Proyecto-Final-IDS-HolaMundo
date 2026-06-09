@@ -168,6 +168,17 @@
     color: var(--color-8);
 }
 
+.attendance-flash {
+    background-color: var(--color-6);
+    border: 1px solid var(--color-3);
+    color: var(--color-9);
+    border-radius: 0.5rem;
+    padding: 0.85rem 1.25rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
 @media (max-width: 600px) {
     .attendance {
         padding: 1.25rem;

@@ -294,3 +294,24 @@
     border-color: var(--color-3);
     box-shadow: 0 0 0 3px rgba(146, 20, 12, 0.12);
 }
+
+.materials-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.material-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 220px;
+}
+
+.material-field-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-9);
+}
