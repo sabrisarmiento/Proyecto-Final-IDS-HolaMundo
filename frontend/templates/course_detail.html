@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/config.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
+
 {% block content %}
 <section class="course-detail-header">
   <h1>
@@ -24,6 +25,7 @@
   </h1>
   <p class="catedra-subtitle">{{ course.catedra }}</p>
 </section>
+
 <section class="course-detail-content">
   <nav class="course-nav">
     <a href="?tab=general" class="nav-btn {% if active_tab == 'general' %}active{% endif %}">General</a>
@@ -37,344 +39,159 @@
 
   <div class="tab-content">
 
-    <div id="tab-general"
-        class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
-
-        <section class="export-reports-bar">
-          <button type="button" class="btn-action" onclick="openModal('export-reports-modal')">
-            Exportar informes
-          </button>
-        </section>
-
-        {% call modal("export-reports-modal", "Exportar informes") %}
-        <form id="export-reports-form"
-              data-base="{{ url_for('courses.exportar_informes', course_id=course['id_curso']) }}">
-          <label class="export-check">
-            <input type="checkbox" name="alumnos" value="1" /> Listado de alumnos (sin notas)
-          </label>
-
-          <label class="export-check">
-            <input type="checkbox" name="notas" value="1" id="export-notas-check" /> Notas
-          </label>
-          <div id="export-evaluaciones" class="export-evaluaciones" hidden>
-            {% if tipos_evaluacion %}
-              {% for tipo in tipos_evaluacion %}
-              <label class="export-check export-subcheck">
-                <input type="checkbox" name="evaluaciones[]" value="{{ tipo.nombre }}" /> {{ tipo.nombre }}
-              </label>
-              {% endfor %}
-            {% else %}
-              <p class="csv-hint">No hay tipos de evaluación cargados.</p>
-            {% endif %}
-          </div>
-
-          <label class="export-check">
-            <input type="checkbox" name="equipos" value="1" /> Reporte de equipos con integrantes
-          </label>
-
-          <button type="submit" id="export-submit">Exportar PDF</button>
-          <p id="export-message" class="form-message" hidden></p>
-        </form>
-        {% endcall %}
-
     <div id="tab-general" class="tab-panel {% if active_tab != 'general' %}hidden{% endif %}">
 
-        <div id="dash-curso-root" data-course-id="{{ course.id_curso }}">
- 
-            <div id="dash-curso-loading" class="dash-loading">
-                <span class="dash-spinner"></span>
-                <p>Cargando estadisticas…</p>
-            </div>
- 
-            <p id="dash-curso-error" class="dash-error hidden"></p>
- 
-            <div id="dash-curso-content" class="hidden">
- 
-                <section class="dash-info-row">
-                    <div class="dash-info-item">
-                        <span class="dash-info-label">Materia</span>
-                        <span class="dash-info-value">{{ course.materia }}</span>
-                    </div>
-                    <div class="dash-info-item">
-                        <span class="dash-info-label">Cátedra</span>
-                        <span class="dash-info-value">{{ course.catedra }}</span>
-                    </div>
-                    <div class="dash-info-item">
-                        <span class="dash-info-label">Cuatrimestre</span>
-                        <span class="dash-info-value">{{ course.cuatrimestre }} — {{ course.anio }}</span>
-                    </div>
-                </section>
-
-                <section class="dash-stats-grid">
-
-                    <div class="dash-stat-card dash-stat--primary">
-                        <span class="dash-stat-label">Total Inscriptos</span>
-                        <strong class="dash-stat-num" id="dash-total-alumnos">—</strong>
-                        <span class="dash-stat-sub">
-                            <span id="dash-activos">—</span> activos ·
-                            <span id="dash-abandonaron">—</span> abandonaron
-                        </span>
-                    </div>
-
-                    <div class="dash-stat-card">
-                        <span class="dash-stat-label">Equipos</span>
-                        <strong class="dash-stat-num" id="dash-equipos">—</strong>
-                        <span class="dash-stat-sub">grupos de trabajo</span>
-                    </div>
-
-                    <div class="dash-stat-card dash-stat--accent">
-                        <span class="dash-stat-label">Promedio General</span>
-                        <strong class="dash-stat-num" id="dash-promedio">—</strong>
-                        <span class="dash-stat-sub">escala 0 – 10</span>
-                    </div>
-
-                    <div class="dash-stat-card">
-                        <span class="dash-stat-label">Promocionan</span>
-                        <strong class="dash-stat-num dash-stat-num--green" id="dash-promocionados">—</strong>
-                        <span class="dash-stat-sub">alumnos</span>
-                    </div>
-
-                    <div class="dash-stat-card">
-                        <span class="dash-stat-label">Van a Final</span>
-                        <strong class="dash-stat-num" id="dash-van-final">—</strong>
-                        <span class="dash-stat-sub">alumnos</span>
-                    </div>
- 
-                    <div class="dash-stat-card dash-stat--warn">
-                        <span class="dash-stat-label">Recursantes</span>
-                        <strong class="dash-stat-num" id="dash-recursantes">—</strong>
-                        <span class="dash-stat-sub">alumnos</span>
-                    </div>
- 
-                </section>
- 
-                <section class="dash-charts-grid">
-
-                    <div class="dash-chart-card dash-chart-card--wide">
-                        <h4 class="dash-chart-title">Rendimiento por Evaluación</h4>
-                        <p class="dash-chart-subtitle">Promedio de notas</p>
-                        <div class="dash-chart-wrap" style="height:220px;">
-                            <canvas id="chart-rendimiento"></canvas>
-                        </div>
-                        <p class="dash-chart-empty hidden">Sin evaluaciones cargadas</p>
-                    </div>
- 
-                    <div class="dash-chart-card">
-                        <h4 class="dash-chart-title">Asistencia</h4>
-                        <p class="dash-chart-subtitle">Regularidad de asistencia</p>
-                        <div class="dash-asist-badges">
-                            <span class="dash-asist-badge dash-asist-badge--ok">
-                                <strong id="dash-asist-regulares">—</strong> regulares
-                            </span>
-                            <span class="dash-asist-badge dash-asist-badge--risk">
-                                <strong id="dash-asist-en-riesgo">—</strong> en riesgo
-                            </span>
-                        </div>
-                        <div class="dash-chart-wrap" style="height:180px;">
-                            <canvas id="chart-asistencia"></canvas>
-                        </div>
-                        <p class="dash-chart-empty hidden">Sin datos de asistencia</p>
-                    </div>
- 
-                    <div class="dash-chart-card">
-                        <h4 class="dash-chart-title">Estado de la Cursada</h4>
-                        <p class="dash-chart-subtitle">Distribución actual del alumnado</p>
-                        <div class="dash-chart-wrap" style="height:180px;">
-                            <canvas id="chart-estado"></canvas>
-                        </div>
-                        <p class="dash-chart-empty hidden">Sin notas cargadas</p>
-                    </div>
- 
-                </section>
- 
-            </div>
-        </div>
-
-    </div>
-
-    <div id="tab-students" class="tab-panel {% if active_tab != 'students' %}hidden{% endif %}">
-      <section>
-        <button type="button" class="btn-action" onclick="openModal('create-student-modal')">
-          Agregar alumno
+      <section class="export-reports-bar">
+        <button type="button" class="btn-action" onclick="openModal('export-reports-modal')">
+          Exportar informes
         </button>
-        <button type="button" class="btn-action" onclick="openModal('import-students-modal')">
-          Importar alumnos desde CSV
-        </button>
-
-        {% call modal("import-students-modal", "Importar alumnos desde CSV") %}
-        <form id="import-students-form"
-              data-action="{{ url_for('courses.importar_alumnos', course_id=course['id_curso']) }}">
-          <div id="csv-dropzone" class="csv-dropzone">
-            <p class="csv-dropzone-text">Presioná para seleccionar archivo o arrastrá el .csv aquí</p>
-            <p class="csv-file-name" id="csv-file-name" hidden></p>
-            <input type="file" id="csv-file-input" name="file" accept=".csv" hidden />
-          </div>
-          <p class="csv-hint">Columnas requeridas: <strong>nombre, apellido, padron, mail</strong></p>
-          <button type="submit" id="csv-submit" disabled>Importar</button>
-          <p id="import-message" class="form-message" hidden></p>
-        </form>
-        {% endcall %}
-
-        {% call modal("create-student-modal", "Crear Alumno") %}
-        <form action="{{ url_for('courses.course_detail', course_id=course['id_curso']) }}" method="POST">
-          <label for="student-name">Nombre:</label>
-          <input type="text" id="student-name" name="nombre" required />
-          <label for="student-lastname">Apellido:</label>
-          <input type="text" id="student-lastname" name="apellido" required />
-          <label for="student-dni">Padrón:</label>
-          <input type="text" id="student-dni" name="padron" required />
-          <label for="student-email">Correo:</label>
-          <input type="email" id="student-email" name="correo" required />
-          <button type="submit">Crear</button>
-        </form>
-        {% endcall %}
       </section>
-      {% if students %}
-        {% set current_order_by = request.args.get('order_by', '') %}
-        {% set current_order = request.args.get('order', '') %}
-        {% set students_base_url = '?tab=students&page=' ~ page %}
-        <table class="tab-table">
-          <thead>
-            <tr>
-              {{ sortable_th('Nombre', 'nombre', current_order_by, current_order, students_base_url) }}
-              {{ sortable_th('Apellido', 'apellido', current_order_by, current_order, students_base_url) }}
-              <th>Padrón</th>
-              <th>Correo</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for student in students %}
-            <tr>
-              <td>{{ student.nombre }}</td>
-              <td>{{ student.apellido }}</td>
-              <td>{{ student.padron }}</td>
-              <td>{{ student.correo }}</td>
-              <td>
-                <span class="{% if student.estado_alumno %}status-active{% else %}status-inactive{% endif %}">
-                  {% if student.estado_alumno %}Activo{% else %}Baja{% endif %}
-                </span>
-              </td>
-            </tr>
+
+      {% call modal("export-reports-modal", "Exportar informes") %}
+      <form id="export-reports-form"
+            data-base="{{ url_for('courses.exportar_informes', course_id=course['id_curso']) }}">
+        <label class="export-check">
+          <input type="checkbox" name="alumnos" value="1" /> Listado de alumnos (sin notas)
+        </label>
+
+        <label class="export-check">
+          <input type="checkbox" name="notas" value="1" id="export-notas-check" /> Notas
+        </label>
+        <div id="export-evaluaciones" class="export-evaluaciones" hidden>
+          {% if tipos_evaluacion %}
+            {% for tipo in tipos_evaluacion %}
+            <label class="export-check export-subcheck">
+              <input type="checkbox" name="evaluaciones[]" value="{{ tipo.nombre }}" /> {{ tipo.nombre }}
+            </label>
             {% endfor %}
-          </tbody>
-        </table>
-        {% set order_by = request.args.get('order_by', '') %}
-        {% set order = request.args.get('order', '') %}
-        {% set base_url = '?tab=students' %}
-        {% if order_by %}{% set base_url = base_url ~ '&order_by=' ~ order_by %}{% endif %}
-        {% if order %}{% set base_url = base_url ~ '&order=' ~ order %}{% endif %}
-        {{ pagination(page, total_pages, base_url) }}
-      {% else %}
-        <p class="tab-empty">No hay alumnos inscriptos en este curso.</p>
-      {% endif %}
-    </div>
-
-    <div id="tab-teams" class="tab-panel {% if active_tab != 'teams' %}hidden{% endif %}">
-      {% if teams %}
-          {% for team in teams %}
-            <div class="team-card">
-                <button
-                    type="button"
-                    class="team-header"
-                    onclick="toggleTeam({{ team.id_equipo }})"
-                >
-                    {{ team.nombre_equipo }}
-                </button>
-                  <div
-                      id="team-{{ team.id_equipo }}"
-                      class="team-members hidden"
-                  >
-                      {% if team.alumnos %}
-                          <table class="tab-table">
-                              <thead>
-                                  <tr>
-                                      <th>Nombre</th>
-                                      <th>Apellido</th>
-                                      <th>Padrón</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  {% for alumno in team.alumnos %}
-                                  <tr>
-                                      <td>{{ alumno.nombre }}</td>
-                                      <td>{{ alumno.apellido }}</td>
-                                      <td>{{ alumno.padron }}</td>
-                                  </tr>
-                                  {% endfor %}
-                              </tbody>
-                          </table>
-                      {% else %}
-                          <p>Este equipo no tiene integrantes.</p>
-                      {% endif %}
-                  </div>
-            </div>
-          {% endfor %}
-      {% else %}
-          <p class="tab-empty">No hay equipos registrados.</p>
-      {% endif %}
-    </div>
-
-    <div id="tab-calendar" class="tab-panel {% if active_tab != 'calendar' %}hidden{% endif %}">
-      <form class="calendar-form" onsubmit="event.preventDefault();">
-        <div>
-          <label for="fecha-clase">
-            Fecha:
-          </label>
-          <input
-            type="date"
-            id="fecha-clase"
-            name="fecha_clase"
-          >
+          {% else %}
+            <p class="csv-hint">No hay tipos de evaluación cargados.</p>
+          {% endif %}
         </div>
 
-        <div>
-          <label for="semana-clase">
-            Semana:</label>
-          <input
-            type="number"
-            id="semana-clase"
-            name="semana"
-            placeholder="Indicar semana..."
-          >
-        </div>
+        <label class="export-check">
+          <input type="checkbox" name="equipos" value="1" /> Reporte de equipos con integrantes
+        </label>
 
-        <div>
-          <label for="temas-clase">
-            Temas:
-          </label>
-          <input
-            type="text"
-            id="temas-clase"
-            name="temas"
-            placeholder="Escribir temas..."
-          >
-        </div>
-
-        <div>
-          <label for="tipo-clase">Tipo:</label>
-          <select id="tipo-clase" name="tipo">
-            <option value="Teórica">Teórica</option>
-            <option value="Práctica">Práctica</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="modalidad-clase">Modalidad:</label>
-          <select id="modalidad-clase" name="modalidad">
-            <option value="Presencial">Presencial</option>
-            <option value="Virtual">Virtual</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn-primary">
-          Agregar clase
-        </button>
-
+        <button type="submit" id="export-submit">Exportar PDF</button>
+        <p id="export-message" class="form-message" hidden></p>
       </form>
+      {% endcall %}
+
+      <div id="dash-curso-root" data-course-id="{{ course.id_curso }}">
+
+        <div id="dash-curso-loading" class="dash-loading">
+          <span class="dash-spinner"></span>
+          <p>Cargando estadisticas…</p>
+        </div>
+
+        <p id="dash-curso-error" class="dash-error hidden"></p>
+
+        <div id="dash-curso-content" class="hidden">
+
+          <section class="dash-info-row">
+            <div class="dash-info-item">
+              <span class="dash-info-label">Materia</span>
+              <span class="dash-info-value">{{ course.materia }}</span>
+            </div>
+            <div class="dash-info-item">
+              <span class="dash-info-label">Cátedra</span>
+              <span class="dash-info-value">{{ course.catedra }}</span>
+            </div>
+            <div class="dash-info-item">
+              <span class="dash-info-label">Cuatrimestre</span>
+              <span class="dash-info-value">{{ course.cuatrimestre }} — {{ course.anio }}</span>
+            </div>
+          </section>
+
+          <section class="dash-stats-grid">
+
+            <div class="dash-stat-card dash-stat--primary">
+              <span class="dash-stat-label">Total Inscriptos</span>
+              <strong class="dash-stat-num" id="dash-total-alumnos">—</strong>
+              <span class="dash-stat-sub">
+                <span id="dash-activos">—</span> activos ·
+                <span id="dash-abandonaron">—</span> abandonaron
+              </span>
+            </div>
+
+            <div class="dash-stat-card">
+              <span class="dash-stat-label">Equipos</span>
+              <strong class="dash-stat-num" id="dash-equipos">—</strong>
+              <span class="dash-stat-sub">grupos de trabajo</span>
+            </div>
+
+            <div class="dash-stat-card dash-stat--accent">
+              <span class="dash-stat-label">Promedio General</span>
+              <strong class="dash-stat-num" id="dash-promedio">—</strong>
+              <span class="dash-stat-sub">escala 0 – 10</span>
+            </div>
+
+            <div class="dash-stat-card">
+              <span class="dash-stat-label">Promocionan</span>
+              <strong class="dash-stat-num dash-stat-num--green" id="dash-promocionados">—</strong>
+              <span class="dash-stat-sub">alumnos</span>
+            </div>
+
+            <div class="dash-stat-card">
+              <span class="dash-stat-label">Van a Final</span>
+              <strong class="dash-stat-num" id="dash-van-final">—</strong>
+              <span class="dash-stat-sub">alumnos</span>
+            </div>
+
+            <div class="dash-stat-card dash-stat--warn">
+              <span class="dash-stat-label">Recursantes</span>
+              <strong class="dash-stat-num" id="dash-recursantes">—</strong>
+              <span class="dash-stat-sub">alumnos</span>
+            </div>
+
+          </section>
+
+          <section class="dash-charts-grid">
+
+            <div class="dash-chart-card dash-chart-card--wide">
+              <h4 class="dash-chart-title">Rendimiento por Evaluación</h4>
+              <p class="dash-chart-subtitle">Promedio de notas</p>
+              <div class="dash-chart-wrap" style="height:220px;">
+                <canvas id="chart-rendimiento"></canvas>
+              </div>
+              <p class="dash-chart-empty hidden">Sin evaluaciones cargadas</p>
+            </div>
+
+            <div class="dash-chart-card">
+              <h4 class="dash-chart-title">Asistencia</h4>
+              <p class="dash-chart-subtitle">Regularidad de asistencia</p>
+              <div class="dash-asist-badges">
+                <span class="dash-asist-badge dash-asist-badge--ok">
+                  <strong id="dash-asist-regulares">—</strong> regulares
+                </span>
+                <span class="dash-asist-badge dash-asist-badge--risk">
+                  <strong id="dash-asist-en-riesgo">—</strong> en riesgo
+                </span>
+              </div>
+              <div class="dash-chart-wrap" style="height:180px;">
+                <canvas id="chart-asistencia"></canvas>
+              </div>
+              <p class="dash-chart-empty hidden">Sin datos de asistencia</p>
+            </div>
+
+            <div class="dash-chart-card">
+              <h4 class="dash-chart-title">Estado de la Cursada</h4>
+              <p class="dash-chart-subtitle">Distribución actual del alumnado</p>
+              <div class="dash-chart-wrap" style="height:180px;">
+                <canvas id="chart-estado"></canvas>
+              </div>
+              <p class="dash-chart-empty hidden">Sin notas cargadas</p>
+            </div>
+
+          </section>
+
+        </div>
+      </div>
+
     </div>
-  
-      {% include "tabs/students_tab.html" %}
+
+    {% include "tabs/students_tab.html" %}
 
     <div id="tab-teams" class="tab-panel {% if active_tab != 'teams' %}hidden{% endif %}">
       {% include "tabs/teams_tab.html" %}
@@ -443,6 +260,7 @@
     </div>
   </div>
 </dialog>
+
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/course_detail.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard_course.js') }}"></script>

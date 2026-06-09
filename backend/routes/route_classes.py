@@ -29,20 +29,20 @@ def get_classes_by_subject_route(id_subject):
 
 
 @classes_bp.route('/clases', methods=['POST'])
-@require_auth
+# @require_auth
 def create_class_route():
     data = request.get_json()
     return create_class_service(data)
 
 @classes_bp.route('/clases/<int:id_clase>', methods=['PATCH'])
-@require_auth
+# @require_auth
 def update_class_route(id_clase):
     data = request.get_json()
     return update_class_service(id_clase, data)
 
 
 @classes_bp.route('/clases/<int:id_clase>', methods=['DELETE'])
-@require_auth
+# @require_auth
 def delete_class_route(id_clase):
     return delete_class_service(id_clase)
 
