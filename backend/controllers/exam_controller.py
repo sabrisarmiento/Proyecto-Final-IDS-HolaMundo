@@ -12,6 +12,7 @@ def get_all_exams(filters):
                 e.id_curso,
                 e.id_usuario,
                 e.fecha,
+                e.asociacion,
                 t.nombre AS nombre
             FROM evaluaciones e
             JOIN tipos_evaluacion t ON e.id_tipo = t.id_tipo
@@ -68,7 +69,7 @@ def create_exam(data):
         fecha      = data.get('fecha')
         id_curso   = data.get('id_curso')
         nombre     = data.get('nombre')
-        asociacion = data.get('asociacion', 'Individual')  # default individual
+        asociacion = data.get('asociacion', 'Individual')
 
         if not nombre:
             return {
@@ -302,52 +303,7 @@ def get_students_with_notes_db(id_curso, limit=None, offset=0, order_by=None, or
             "message": "Internal Server Error",
             "description": f"Error al obtener reporte: {str(e)}"
         }
-# def get_students_with_notes_db(id_curso):
-#     try:
-#         sql = """
-#             SELECT 
-#                 a.id_alumno,
-#                 a.nombre,
-#                 a.apellido,
-#                 a.padron,
-#                 a.estado_alumno,
-#                 e.nombre_equipo AS equipo,
-#                 IFNULL(
-#                     GROUP_CONCAT(
-#                         CONCAT(n.id_evaluacion, ':', n.nota)
-#                         ORDER BY n.id_evaluacion
-#                         SEPARATOR ','
-#                     ), ''
-#                 ) AS notas_raw,
-#                 IFNULL(
-#                     GROUP_CONCAT(
-#                         CONCAT(n.id_evaluacion, ':', IFNULL(n.corrector_nombre, ''))
-#                         ORDER BY n.id_evaluacion
-#                         SEPARATOR ','
-#                     ), ''
-#                 ) AS correctores_raw
-#             FROM alumnos a
-#             LEFT JOIN equipo_alumno ea ON a.id_alumno = ea.id_alumno
-#             LEFT JOIN equipos e ON ea.id_equipo = e.id_equipo
-#             LEFT JOIN notas n ON a.id_alumno = n.id_alumno
-#             WHERE a.id_curso = %s
-#             GROUP BY a.id_alumno, a.nombre, a.apellido, a.padron, a.estado_alumno, e.nombre_equipo
-#             ORDER BY a.apellido, a.nombre
-#         """
-#         result = query_db(sql, (id_curso,))
-#         return {
-#             "ok": True,
-#             "data": result if result else []
-#         }
-#     except Exception as e:
-#         return {
-#             "ok": False,
-#             "code": 500,
-#             "message": "Internal Server Error",
-#             "description": f"Error al obtener reporte: {str(e)}"
-#         }
 
-# PROMOCION
 
 def get_promocion_config_db(id_curso):
     try:
