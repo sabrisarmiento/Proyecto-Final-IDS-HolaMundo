@@ -60,7 +60,20 @@ def get_all_teams(filters):
 
 def get_team_by_id(id):
     try:
-        sql = """SELECT id_equipo, nombre_equipo, id_curso FROM equipos WHERE id_equipo = %s;"""
+        sql = """
+        SELECT
+            e.id_equipo,
+            e.nombre_equipo,
+            e.id_curso,
+            a.id_alumno,
+            a.nombre,
+            a.apellido,
+            a.padron
+        FROM equipos e
+        LEFT JOIN equipo_alumno ea ON e.id_equipo = ea.id_equipo
+        LEFT JOIN alumnos a ON ea.id_alumno = a.id_alumno
+        WHERE e.id_equipo = %s
+        """
         result = query_db(sql, (id,))
         if not result:
             return {
@@ -69,9 +82,23 @@ def get_team_by_id(id):
                 "message": "Team not found",
                 "description": f"No existe un equipo con id {id}"
             }
+        equipo = {
+            "id_equipo": result[0]["id_equipo"],
+            "nombre_equipo": result[0]["nombre_equipo"],
+            "id_curso": result[0]["id_curso"],
+            "alumnos": []
+        }
+        for row in result:
+            if row["id_alumno"] is not None:
+                equipo["alumnos"].append({
+                    "id_alumno": row["id_alumno"],
+                    "nombre": row["nombre"],
+                    "apellido": row["apellido"],
+                    "padron": row["padron"]
+                })
         return {
             "ok": True,
-            "data": result
+            "data": equipo
         }
     except Exception as e:
         return {

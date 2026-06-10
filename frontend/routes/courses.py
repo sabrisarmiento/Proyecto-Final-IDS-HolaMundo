@@ -236,11 +236,16 @@ def course_detail(course_id):
                 if ':' in par:
                     id_ev, nota = par.split(':', 1)
                     try:
-                        notas_dict[int(id_ev.strip())] = nota.strip()
+                        # Guardar con AMBAS claves (int y string) para maxima compatibilidad
+                        key_int = int(id_ev.strip())
+                        key_str = str(key_int)
+                        notas_dict[key_int] = nota.strip()
+                        notas_dict[key_str] = nota.strip()
                     except ValueError:
                         pass
         s['notas_todas'] = notas_dict
-        s['notas_json']  = {str(k): v for k, v in notas_dict.items()}
+        # notas_json solo con claves string (sin duplicar)
+        s['notas_json']  = {str(k): v for k, v in notas_dict.items() if isinstance(k, int)}
 
         correctores_dict = {}
         raw_corr = s.get('correctores_raw') or ""
@@ -251,13 +256,15 @@ def course_detail(course_id):
                     try:
                         val = nombre_corr.strip()
                         if val:
-                            correctores_dict[int(id_ev.strip())] = val
+                            key_int = int(id_ev.strip())
+                            correctores_dict[key_int] = val
+                            correctores_dict[str(key_int)] = val
                     except ValueError:
                         pass
         s['correctores_todas'] = correctores_dict
 
         if not s.get('promedio_final') and notas_dict:
-            valores = [float(v) for v in notas_dict.values() if v not in ('', None)]
+            valores = [float(v) for k, v in notas_dict.items() if isinstance(k, int) and v not in ('', None)]
             s['promedio_final'] = round(sum(valores) / len(valores), 1) if valores else None
 
     eval_id_sel    = session.get('eval_seleccionada')
@@ -279,8 +286,8 @@ def course_detail(course_id):
 
     todos_los_valores = []
     for s in students_data:
-        for nota in (s.get('notas_todas') or {}).values():
-            if nota not in (None, ''):
+        for k, nota in (s.get('notas_todas') or {}).items():
+            if isinstance(k, int) and nota not in (None, ''):
                 try:
                     todos_los_valores.append(float(nota))
                 except ValueError:
@@ -483,27 +490,31 @@ def guardar_notas(course_id):
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
 
-    headers    = {'Authorization': f'Bearer {token}'}
-    id_eval    = request.form.get('id_evaluacion')
-    notas_dict = {}
+    headers          = {'Authorization': f'Bearer {token}'}
+    id_eval          = request.form.get('id_evaluacion')
+    notas_dict       = {}
     correctores_dict = {}
 
     for key, value in request.form.items():
-        if key.startswith('nota_') and value:
-            id_alumno = key.replace('nota_', '')
+        if key.startswith('nota_alumno_') and value.strip():
+            id_alumno = key.replace('nota_alumno_', '')
             try:
                 notas_dict[id_alumno] = float(value)
             except ValueError:
                 pass
-        elif key.startswith('corrector_') and value:
-            id_alumno = key.replace('corrector_', '')
-            correctores_dict[id_alumno] = value
+        elif key.startswith('corrector_alumno_') and value.strip():
+            id_alumno = key.replace('corrector_alumno_', '')
+            correctores_dict[id_alumno] = value.strip()
 
-    requests.post(
+    print(f"[guardar_notas] id_eval={id_eval} notas={notas_dict} correctores={correctores_dict}")
+
+    resp = requests.post(
         'http://127.0.0.1:5000/notas/guardar',
         json={'id_evaluacion': id_eval, 'notas': notas_dict, 'correctores': correctores_dict},
         headers=headers
     )
+    print(f"[guardar_notas] backend response: {resp.status_code} {resp.text}")
+
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
 
 
@@ -512,12 +523,12 @@ def crear_evaluacion(course_id):
     token = session.get('token')
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
-
-    nombre  = request.form.get('nombre_eval')
-    headers = {'Authorization': f'Bearer {token}'}
+    nombre     = request.form.get('nombre_eval')
+    asociacion = request.form.get('asociacion', 'Individual')
+    headers    = {'Authorization': f'Bearer {token}'}
     requests.post(
         'http://127.0.0.1:5000/evaluaciones',
-        json={'id_curso': course_id, 'id_tipo': 1, 'nombre': nombre},
+        json={'id_curso': course_id, 'id_tipo': 1, 'nombre': nombre, 'asociacion': asociacion},
         headers=headers
     )
     session.pop('eval_seleccionada', None)
@@ -562,6 +573,88 @@ def guardar_promocion(course_id):
         )
     except Exception as e:
         print(f"Error guardando promo: {e}")
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
+
+
+@courses_bp.route('/cursos/<int:course_id>/notas/grupal', methods=['POST'])
+def asociar_nota_grupal(course_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+
+    headers       = {'Authorization': f'Bearer {token}'}
+    id_evaluacion = request.form.get('id_evaluacion')
+
+    equipos_ids = [
+        key.replace('id_equipo_', '')
+        for key in request.form
+        if key.startswith('id_equipo_')
+    ]
+
+    print(f"[asociar_nota_grupal] id_evaluacion={id_evaluacion} equipos_ids={equipos_ids}")
+
+    if not equipos_ids:
+        flash('No se encontraron equipos en el formulario.', 'error')
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
+
+    notas_dict       = {}
+    correctores_dict = {}
+
+    for id_equipo in equipos_ids:
+        nota_raw  = request.form.get(f'nota_equipo_{id_equipo}', '').strip()
+        corrector = request.form.get(f'corrector_equipo_{id_equipo}', '').strip()
+
+        print(f"  equipo {id_equipo}: nota='{nota_raw}' corrector='{corrector}'")
+
+        if not nota_raw:
+            continue
+
+        try:
+            nota = float(nota_raw)
+        except (ValueError, TypeError):
+            continue
+
+        try:
+            team_res  = requests.get(f'http://127.0.0.1:5000/equipos/{id_equipo}', headers=headers)
+            team_json = team_res.json()
+            print(f"  team_json: {team_json}")
+
+            team_data = team_json.get('team') or {}
+            alumnos = team_data.get('alumnos', [])
+
+            print(f"  alumnos: {alumnos}")
+        except Exception as e:
+            print(f"  Error obteniendo equipo {id_equipo}: {e}")
+            continue
+
+        for alumno in alumnos:
+            aid = str(alumno['id_alumno'])
+            notas_dict[aid] = nota
+            if corrector:
+                correctores_dict[aid] = corrector
+
+    print(f"[asociar_nota_grupal] notas_dict={notas_dict}")
+
+    if not notas_dict:
+        flash('No se ingresó ninguna nota válida o los equipos no tienen alumnos.', 'error')
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
+
+    try:
+        resp = requests.post(
+            'http://127.0.0.1:5000/notas/guardar',
+            json={
+                'id_evaluacion': id_evaluacion,
+                'notas':         notas_dict,
+                'correctores':   correctores_dict,
+            },
+            headers=headers
+        )
+        print(f"[asociar_nota_grupal] backend response: {resp.status_code} {resp.text}")
+        flash('Notas grupales guardadas correctamente.', 'ok')
+    except Exception as e:
+        print(f"Error guardando notas grupales: {e}")
+        flash('Hubo un error al guardar las notas.', 'error')
 
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
 

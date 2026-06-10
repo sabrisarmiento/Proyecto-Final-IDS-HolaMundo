@@ -74,6 +74,16 @@ function filtrarPorEquipo(equipoSeleccionado) {
     recalcularPromedio();
 }
 
+function filtrarEquiposGrupales(equipoId) {
+    document.querySelectorAll('.grupal-equipo-card').forEach(function(card) {
+        if (!equipoId || card.dataset.equipoId === equipoId) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
 function confirmarEliminarEval(nombreEval, cant) {
     var tieneNotas = parseInt(cant, 10) > 0;
     if (tieneNotas) {
