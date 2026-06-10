@@ -113,12 +113,12 @@
               </td>
               <td>{{ u.nivel_administracion or '—' }}</td>
               <td class="dg-acciones">
-                <button class="dg-btn-icon js-editar-usuario" title="Editar usuario">✏️</button>
+                <button class="dg-btn-icon js-editar-usuario" title="Editar usuario">Editar usuario</button>
 
                 <form method="POST"
                       action="{{ url_for('dashboard.eliminar_usuario', id_user=u.id_usuario) }}"
                       onsubmit="return confirm('¿Eliminar a {{ u.nombre }} {{ u.apellido }}? Esta acción no se puede deshacer.')">
-                  <button type="submit" class="dg-btn-icon dg-btn-icon--danger" title="Eliminar">🗑️</button>
+                  <button type="submit" class="dg-btn-icon dg-btn-icon--danger" title="Eliminar">Eliminar</button>
                 </form>
               </td>
             </tr>
@@ -135,7 +135,7 @@
       <div class="dg-card-header-row">
         <div>
           <h2 class="dg-card-title">Roles del sistema</h2>
-          <p class="dg-card-sub">Control de acceso (RBAC) | Nivel 3 = Superadmin | Nivel 2 = Profesor | Nivel 1 = Ayudante</p>
+          <p class="dg-card-sub">Control de acceso | Nivel 3 = Superadmin | Nivel 2 = Profesor | Nivel 1 = Ayudante</p>
         </div>
         <button class="dg-btn dg-btn--primary" id="btn-abrir-crear-rol">+ Nuevo rol</button>
       </div>
@@ -156,7 +156,7 @@
           <form method="POST"
                 action="{{ url_for('dashboard.eliminar_rol', id_rol=r.id_rol) }}"
                 onsubmit="return confirm('¿Eliminar el rol \"{{ r.nombre }}\"? Los usuarios con este rol pueden quedar sin asignación.')">
-            <button type="submit" class="dg-btn-icon dg-btn-icon--danger" title="Eliminar rol">🗑️</button>
+            <button type="submit" class="dg-btn-icon dg-btn-icon--danger" title="Eliminar rol">Eliminar rol</button>
           </form>
         </div>
         {% endfor %}
