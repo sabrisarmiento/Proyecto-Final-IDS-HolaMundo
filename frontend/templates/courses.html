@@ -1,61 +1,215 @@
-{% extends "base_private.html" %} {% block title %}Panel FIUBA - Cursos{%
-endblock %} {% from "components/modal.html" import modal %} {% block
-extra_styles %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/courses.css') }}"
-/>
+{% extends "base_private.html" %}
+{% block title %}Panel FIUBA - Cursos{% endblock %}
+{% from "components/modal.html" import modal %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/courses_management.css') }}">
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-{% endblock %} {% block content %}
-<section>
-  <button type="button" onclick="openModal('create-course-modal')">
-    Crear curso
-  </button>
+{% endblock %}
 
-  {% call modal("create-course-modal", "Crear Curso") %}
-  <form action="{{ url_for('courses.courses') }}" method="POST">
-    <label for="catedra">Cátedra:</label>
-    <input type="text" id="catedra" name="catedra" required />
+{% block content %}
 
-    <label for="cuatrimestre">Cuatrimestre:</label>
-    <input type="text" id="cuatrimestre" name="cuatrimestre" required />
+<!-- ═══════════════════════════════════════════
+     SECCIÓN: GESTIÓN DE MATERIAS
+════════════════════════════════════════════ -->
+<section class="mgmt-section">
+  <div class="mgmt-section-header">
+    <div>
+      <h2 class="mgmt-section-title">Gestión de materias</h2>
+      <p class="mgmt-section-desc">Creá, editá o eliminá las materias disponibles en la plataforma</p>
+    </div>
+    <button type="button" class="btn-mgmt-create" onclick="openModal('modal-crear-materia')">
+      + Crear nueva materia
+    </button>
+  </div>
 
-    <label for="anio">Año:</label>
-    <input type="number" id="anio" name="anio" min="2026" required />
+  {% if subjects %}
+  <div class="subjects-grid">
+    {% for subject in subjects %}
+    <div class="subject-card">
+      <div class="subject-card-icon">📚</div>
+      <div class="subject-card-body">
+        <span class="subject-card-name" title="{{ subject.nombre }}" data-tooltip="{{ subject.nombre }}">{{ subject.nombre }}</span>
+        {% if subject.codigo %}
+        <span class="subject-card-code">{{ subject.codigo }}</span>
+        {% endif %}
+      </div>
+      <div class="subject-card-actions">
+        <button type="button"
+                class="btn-subject-action btn-subject-edit"
+                title="Editar"
+                onclick="openModal('modal-editar-materia-{{ subject.id_materia }}')">
+          Editar
+        </button>
+        <form action="{{ url_for('courses.eliminar_materia', subject_id=subject.id_materia) }}"
+              method="POST"
+              onsubmit="return confirm('¿Eliminar la materia {{ subject.nombre }}? Esta acción no se puede deshacer.')">
+          <button type="submit" class="btn-subject-action btn-subject-delete" title="Eliminar">Eliminar</button>
+        </form>
+      </div>
+    </div>
 
-    <label for="id_materia">ID Materia:</label>
-    <input type="number" id="id_materia" name="id_materia" required />
+    {# Modal editar materia #}
+    {% call modal('modal-editar-materia-' ~ subject.id_materia, 'Editar materia') %}
+    <form action="{{ url_for('courses.editar_materia', subject_id=subject.id_materia) }}" method="POST">
+      <label for="edit-nombre-{{ subject.id_materia }}">Nombre</label>
+      <input type="text"
+             id="edit-nombre-{{ subject.id_materia }}"
+             name="nombre"
+             value="{{ subject.nombre }}"
+             required>
+      <label for="edit-codigo-{{ subject.id_materia }}">Código</label>
+      <input type="text"
+             id="edit-codigo-{{ subject.id_materia }}"
+             name="codigo"
+             value="{{ subject.codigo or '' }}">
+      <button type="submit">Guardar cambios</button>
+    </form>
+    {% endcall %}
 
-    <label for="id_profesor">ID Profesor:</label>
-    <input type="number" id="id_profesor" name="id_profesor" min="1" required />
-
-    <button type="submit">Crear</button>
-  </form>
-  {% endcall %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="mgmt-empty">No hay materias cargadas aún. ¡Creá la primera!</p>
+  {% endif %}
 </section>
 
-<section class="courses">
-  <h2>Gestión de Cursos</h2>
+{# Modal crear materia #}
+{% call modal('modal-crear-materia', 'Crear nueva materia') %}
+<form action="{{ url_for('courses.crear_materia') }}" method="POST">
+  <label for="nueva-nombre">Nombre</label>
+  <input type="text" id="nueva-nombre" name="nombre" placeholder="Ej: Introducción al Desarrollo de Software" required>
+  <label for="nueva-codigo">Código</label>
+  <input type="text" id="nueva-codigo" name="codigo" placeholder="Ej: 75.40">
+  <button type="submit">Crear materia</button>
+</form>
+{% endcall %}
+
+
+<!-- ═══════════════════════════════════════════
+     SEPARADOR
+════════════════════════════════════════════ -->
+<hr class="section-divider">
+
+
+<!-- ═══════════════════════════════════════════
+     SECCIÓN: GESTIÓN DE CURSOS
+════════════════════════════════════════════ -->
+<section class="mgmt-section">
+  <div class="mgmt-section-header">
+    <div>
+      <h2 class="mgmt-section-title">Gestión de cursos</h2>
+      <p class="mgmt-section-desc">Filtrá y gestioná los cursos existentes en la plataforma</p>
+    </div>
+    <button type="button" class="btn-mgmt-create" onclick="openModal('create-course-modal')">
+      + Crear nuevo curso
+    </button>
+  </div>
+
+  {# Filtros #}
+  <form method="GET" action="{{ url_for('courses.courses') }}" class="courses-filters">
+    <div class="filter-field">
+      <label class="filter-label" for="f-materia">Materia</label>
+      <select id="f-materia" name="materia" class="filter-select">
+        <option value="">Todas</option>
+        {% for subject in subjects %}
+        <option value="{{ subject.nombre }}"
+          {% if filtro_materia == subject.nombre %}selected{% endif %}>
+          {{ subject.nombre }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-field">
+      <label class="filter-label" for="f-catedra">Cátedra</label>
+      <select id="f-catedra" name="catedra" class="filter-select">
+        <option value="">Todas</option>
+        {% for cat in catedras_opciones %}
+        <option value="{{ cat }}" {% if filtro_catedra == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-field">
+      <label class="filter-label" for="f-anio">Año</label>
+      <select id="f-anio" name="anio" class="filter-select">
+        <option value="">Todos</option>
+        {% for anio in anios_opciones %}
+        <option value="{{ anio }}" {% if filtro_anio == anio %}selected{% endif %}>{{ anio }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-field">
+      <label class="filter-label" for="f-cuatrimestre">Cuatrimestre</label>
+      <select id="f-cuatrimestre" name="cuatrimestre" class="filter-select">
+        <option value="">Todos</option>
+        {% for cuatri in cuatrimestres_opciones %}
+        <option value="{{ cuatri }}" {% if filtro_cuatrimestre == cuatri %}selected{% endif %}>{{ cuatri }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn-filter-apply">Filtrar</button>
+
+    {% if filtro_materia or filtro_catedra or filtro_anio or filtro_cuatrimestre %}
+    <a href="{{ url_for('courses.courses') }}" class="btn-filter-clear">Limpiar</a>
+    {% endif %}
+  </form>
+
+  {# Listado de cursos #}
+  {% if courses %}
   <div class="courses-container">
     {% for course in courses %}
-    <article
-      class="course"
-      onclick="window.location.href='/cursos/{{ course.id_curso }}'"
-    >
+    <article class="course" onclick="window.location.href='/cursos/{{ course.id_curso }}'">
       <div class="course-header">
         <span class="course-id">#{{ course.id_curso }}</span>
-        status:
+        <span class="course-status-badge">Activo</span>
       </div>
       <h3 class="course-nombre">{{ course.materia }}</h3>
       <p class="course-catedra">{{ course.catedra }}</p>
       <div class="course-footer">
-        <span class="course-anio"
-          >📅 {{ course.anio }},
+        <span class="course-anio">
+          📅 {{ course.anio }},
           <span class="course-cuatrimestre">{{ course.cuatrimestre }}</span>
         </span>
       </div>
     </article>
     {% endfor %}
   </div>
+  {% else %}
+  <p class="mgmt-empty">No se encontraron cursos con los filtros seleccionados.</p>
+  {% endif %}
 </section>
+
+
+{# Modal crear curso #}
+{% call modal("create-course-modal", "Crear Curso") %}
+<form action="{{ url_for('courses.courses') }}" method="POST">
+  <label for="new-materia">Materia</label>
+  <select id="new-materia" name="id_materia" required>
+    <option value="" disabled selected>Seleccioná una materia</option>
+    {% for subject in subjects %}
+    <option value="{{ subject.id_materia }}">{{ subject.nombre }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="new-catedra">Cátedra</label>
+  <input type="text" id="new-catedra" name="catedra" placeholder="Ej: Cátedra Lanzillota" required>
+
+  <label for="new-cuatrimestre">Cuatrimestre</label>
+  <input type="text" id="new-cuatrimestre" name="cuatrimestre" placeholder="Ej: 1C" required>
+
+  <label for="new-anio">Año</label>
+  <input type="number" id="new-anio" name="anio" min="2020" max="2099" required>
+
+  <label for="new-profesor">ID Profesor</label>
+  <input type="number" id="new-profesor" name="id_profesor" min="1" required>
+
+  <button type="submit">Crear</button>
+</form>
+{% endcall %}
+
 {% endblock %}

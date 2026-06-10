@@ -24,7 +24,7 @@ def get_course(id_course):
     return course_service(id_course)
 
 @courses_bp.route('/courses', methods=['POST'])
-@require_auth
+# @require_auth descomentar cuanto este listo
 def create_course_route():
     data = request.get_json()
     return create_course_service(data)
