@@ -29,8 +29,14 @@ tags:
     description: Gestión de materias
   - name: Teams
     description: Gestión de equipos de alumnos
+  - name: TeamStudents
+    description: Gestión de alumnos dentro de equipos
   - name: Users
     description: Gestión de usuarios del sistema
+  - name: Dashboard
+    description: Dashboards de métricas y gestión centralizada
+  - name: Reports
+    description: Generación de reportes en PDF
 
 paths:
 
@@ -89,7 +95,11 @@ paths:
       tags:
         - Advertisements
       summary: Crear un nuevo aviso
-      description: Crea un aviso nuevo. Requiere autenticación.
+      description: >
+        Crea un aviso nuevo. El usuario se extrae del token JWT.
+        Valida que el usuario pertenezca al curso antes de crear el aviso.
+        También envía el aviso al canal de Slack del curso automáticamente.
+        Requiere autenticación.
       security:
         - bearerAuth: []
       requestBody:
@@ -115,10 +125,15 @@ paths:
                       message:
                         type: string
                         example: aviso creado correctamente
+                      slack:
+                        type: object
+                        description: Resultado del envío al canal de Slack del curso
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /advertisements/slack:
     get:
@@ -137,6 +152,42 @@ paths:
                   ok:
                     type: boolean
                     example: true
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /advertisements/subject/{id_materia}:
+    get:
+      tags:
+        - Advertisements
+      summary: Obtener avisos por materia
+      description: >
+        Retorna todos los avisos de todos los cursos que pertenecen a una materia,
+        ordenados por fecha descendente.
+      parameters:
+        - in: path
+          name: id_materia
+          required: true
+          schema:
+            type: integer
+          description: ID de la materia
+      responses:
+        "200":
+          description: Avisos de la materia obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      advertisements:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Advertisement"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -302,7 +353,8 @@ paths:
       summary: Registrar asistencia
       description: >
         Registra la asistencia de un alumno a una clase.
-        Valida que el alumno esté activo y que su ubicación GPS esté dentro del radio permitido (300 m de FIUBA).
+        Valida el código QR (`code`) generado con SHA-256 a partir del `id_alumno`, `id_clase` y un secreto interno.
+        También valida que el alumno esté activo y que su ubicación GPS esté dentro del radio permitido (300 m de FIUBA).
       requestBody:
         required: true
         content:
@@ -516,9 +568,7 @@ paths:
       tags:
         - Classes
       summary: Crear una nueva clase
-      description: Crea una clase dentro de un curso. Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Crea una clase dentro de un curso.
       requestBody:
         required: true
         content:
@@ -544,8 +594,42 @@ paths:
                         example: Clase creada correctamente
         "400":
           $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /clases/materia/{id_subject}:
+    get:
+      tags:
+        - Classes
+      summary: Obtener clases por materia
+      description: >
+        Retorna todas las clases de todos los cursos que pertenecen a una materia,
+        ordenadas por semana y fecha ascendente.
+      parameters:
+        - in: path
+          name: id_subject
+          required: true
+          schema:
+            type: integer
+          description: ID de la materia
+      responses:
+        "200":
+          description: Clases de la materia obtenidas correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      classes:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Class"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -586,9 +670,7 @@ paths:
       tags:
         - Classes
       summary: Actualizar parcialmente una clase
-      description: Actualiza uno o más campos permitidos de una clase. Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Actualiza uno o más campos permitidos de una clase.
       parameters:
         - in: path
           name: id_clase
@@ -621,8 +703,6 @@ paths:
                         example: Clase con ID 3 actualizada correctamente
         "400":
           $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -630,9 +710,7 @@ paths:
       tags:
         - Classes
       summary: Eliminar una clase
-      description: Elimina una clase por su ID. Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Elimina una clase por su ID.
       parameters:
         - in: path
           name: id_clase
@@ -657,8 +735,6 @@ paths:
                       message:
                         type: string
                         example: Clase con ID 3 eliminada correctamente
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -671,13 +747,13 @@ paths:
       tags:
         - Courses
       summary: Obtener todos los cursos
-      description: Retorna todos los cursos. Se puede filtrar por nombre de materia, cátedra o año.
+      description: Retorna todos los cursos. Se puede filtrar por nombre de materia (parcial), cátedra (parcial) o año.
       parameters:
         - in: query
-          name: nombre
+          name: materia
           schema:
             type: string
-          description: Nombre (parcial) de la materia
+          description: Nombre parcial de la materia (búsqueda con LIKE)
         - in: query
           name: cuatrimestre
           schema:
@@ -713,9 +789,7 @@ paths:
       tags:
         - Courses
       summary: Crear un nuevo curso
-      description: Crea un curso nuevo asociado a una materia. Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Crea un curso nuevo asociado a una materia.
       requestBody:
         required: true
         content:
@@ -741,8 +815,6 @@ paths:
                         example: curso creado correctamente
         "400":
           $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
 
   /courses/{id_course}:
     get:
@@ -781,9 +853,7 @@ paths:
       tags:
         - Courses
       summary: Actualizar parcialmente un curso
-      description: Actualiza uno o más campos de un curso existente. Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Actualiza uno o más campos de un curso existente. Ahora también permite actualizar `slack_url` y `youtube_url`.
       parameters:
         - in: path
           name: id_course
@@ -816,8 +886,6 @@ paths:
                         example: Curso actualizado con éxito
         "400":
           $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -859,7 +927,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-# EVALUACIONES
+# EVALUACIÓN
 
   /evaluaciones:
     get:
@@ -1109,8 +1177,8 @@ paths:
       description: >
         Retorna todos los alumnos de un curso junto con sus notas por evaluación,
         su equipo (si corresponde) y el nombre del corrector por nota.
-        Las notas se devuelven en campos `notas_raw` y `correctores_raw` como strings
-        con el formato `id_evaluacion:valor` separados por coma.
+        Soporta paginación y ordenamiento. Las notas se devuelven en campos `notas_raw`
+        y `correctores_raw` con el formato `id_evaluacion:valor` separados por coma.
       parameters:
         - in: query
           name: id_curso
@@ -1118,6 +1186,30 @@ paths:
           schema:
             type: integer
           description: ID del curso
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Número de página (default 1)
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+          description: Resultados por página. Si se omite, se devuelven todos.
+        - in: query
+          name: order_by
+          schema:
+            type: string
+            enum: [nombre, apellido, padron]
+          description: Campo por el cual ordenar
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+          description: Dirección del ordenamiento
       responses:
         "200":
           description: Reporte obtenido correctamente
@@ -1136,12 +1228,16 @@ paths:
                         type: array
                         items:
                           $ref: "#/components/schemas/StudentNotesReport"
+                      total:
+                        type: integer
+                        description: Total de alumnos en el curso (sin paginación)
+                        example: 45
         "400":
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-# TIPOS DE EVALUACION
+# TIPOS DE EVALUACIÓN
 
   /tipos-evaluacion:
     get:
@@ -1772,7 +1868,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-# ALUMNOS
+# ESTUDIANTES
 
   /students:
     get:
@@ -1907,8 +2003,11 @@ paths:
       summary: Importar alumnos desde CSV
       description: >
         Importa alumnos en lote desde un archivo `.csv` enviado como `multipart/form-data`
-        en el campo `file`. El CSV debe incluir los campos requeridos de cada alumno más
-        `id_rol` (entero).
+        en el campo `file`. El `id_curso` se envía como campo de form-data o como query param.
+
+
+        El CSV debe tener **exactamente** las columnas: `nombre`, `apellido`, `padron`, `mail`.
+        No se permiten columnas extra ni faltan columnas.
 
 
         El status de respuesta varía según el resultado:
@@ -1920,6 +2019,12 @@ paths:
         Requiere autenticación.
       security:
         - bearerAuth: []
+      parameters:
+        - in: query
+          name: id_curso
+          schema:
+            type: integer
+          description: ID del curso (alternativa al campo form-data)
       requestBody:
         required: true
         content:
@@ -1932,7 +2037,10 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: Archivo CSV con los datos de los alumnos
+                  description: Archivo CSV con columnas nombre, apellido, padron, mail
+                id_curso:
+                  type: integer
+                  description: ID del curso (alternativa al query param)
       responses:
         "201":
           description: Todos los alumnos importados correctamente
@@ -1993,14 +2101,74 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-# MATERIAS
+    patch:
+      tags:
+        - Students
+      summary: Actualizar parcialmente un alumno
+      description: >
+        Modifica uno o más campos de un alumno. Si se cambia `correo` o `padron`,
+        valida que no existan duplicados con otro alumno (devuelve 409 si colisiona).
+        Requiere autenticación.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del alumno a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentPatch"
+      responses:
+        "200":
+          description: Alumno actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Alumno actualizado correctamente
+                      id:
+                        type: integer
+                        example: 42
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# MATERIA
 
   /subjects:
     get:
       tags:
         - Subjects
       summary: Obtener todas las materias
-      description: Retorna todas las materias disponibles.
+      description: Retorna todas las materias disponibles. Se puede filtrar por nombre exacto.
+      parameters:
+        - in: query
+          name: nombre
+          schema:
+            type: string
+          description: Filtrar por nombre exacto de la materia
       responses:
         "200":
           description: Lista de materias obtenida correctamente
@@ -2027,10 +2195,8 @@ paths:
         - Subjects
       summary: Crear una materia
       description: >
-        Crea una materia nueva. Devuelve 409 si ya existe una materia con el mismo
-        `codigo`. Requiere autenticación.
-      security:
-        - bearerAuth: []
+        Crea una materia nueva. El campo `codigo` es opcional; si se envía,
+        devuelve 409 si ya existe otra materia con ese código.
       requestBody:
         required: true
         content:
@@ -2056,8 +2222,6 @@ paths:
                         example: Materia creada exitosamente
         "400":
           $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "409":
           $ref: "#/components/responses/Conflict"
 
@@ -2096,6 +2260,92 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+    patch:
+      tags:
+        - Subjects
+      summary: Actualizar parcialmente una materia
+      description: >
+        Modifica `nombre` y/o `codigo` de una materia. Si se cambia el `codigo`,
+        valida que no exista otra materia con ese código (devuelve 409 si colisiona).
+      parameters:
+        - in: path
+          name: subject_id
+          required: true
+          schema:
+            type: integer
+          description: ID de la materia a actualizar (debe ser > 0)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubjectPatch"
+      responses:
+        "200":
+          description: Materia actualizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Materia actualizada correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags:
+        - Subjects
+      summary: Eliminar una materia
+      description: >
+        Elimina una materia por su ID. Devuelve 409 si la materia tiene cursos
+        asociados (no se puede eliminar mientras tenga dependencias).
+      parameters:
+        - in: path
+          name: subject_id
+          required: true
+          schema:
+            type: integer
+          description: ID de la materia a eliminar (debe ser > 0)
+      responses:
+        "200":
+          description: Materia eliminada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Materia con ID 3 eliminada correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 # EQUIPOS
 
   /equipos:
@@ -2104,17 +2354,14 @@ paths:
         - Teams
       summary: Obtener equipos
       description: >
-        Retorna todos los equipos. Se puede filtrar por curso y/o por alumno.
-        Si se filtra por `id_alumno` se hace un JOIN con la tabla `equipo_alumno`.
-        Requiere autenticación.
-      security:
-        - bearerAuth: []
+        Retorna todos los equipos con sus alumnos embebidos. Se puede filtrar por curso y/o por alumno.
+        Si se filtra por `id_alumno` se traen solo los equipos donde ese alumno participa.
       parameters:
         - in: query
           name: id_alumno
           schema:
             type: integer
-          description: Filtrar por ID de alumno (trae solo los equipos donde participa ese alumno)
+          description: Filtrar por ID de alumno
         - in: query
           name: id_curso
           schema:
@@ -2138,8 +2385,6 @@ paths:
                         type: array
                         items:
                           $ref: "#/components/schemas/Team"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -2147,9 +2392,7 @@ paths:
       tags:
         - Teams
       summary: Crear un equipo
-      description: Crea un nuevo equipo dentro de un curso. Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Crea un nuevo equipo dentro de un curso.
       requestBody:
         required: true
         content:
@@ -2173,8 +2416,6 @@ paths:
                       id_equipo:
                         type: integer
                         example: 12
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -2183,9 +2424,7 @@ paths:
       tags:
         - Teams
       summary: Obtener un equipo por ID
-      description: Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Retorna el equipo con sus alumnos embebidos.
       parameters:
         - in: path
           name: id_team
@@ -2208,11 +2447,7 @@ paths:
                     type: object
                     properties:
                       team:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/Team"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                        $ref: "#/components/schemas/Team"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -2222,9 +2457,7 @@ paths:
       tags:
         - Teams
       summary: Actualizar un equipo
-      description: Modifica `nombre_equipo` y/o `id_curso` de un equipo. Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Modifica `nombre_equipo` y/o `id_curso` de un equipo.
       parameters:
         - in: path
           name: id_team
@@ -2257,16 +2490,12 @@ paths:
                         example: Equipo actualizado correctamente
         "400":
           $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
 
     delete:
       tags:
         - Teams
       summary: Eliminar un equipo
-      description: Elimina un equipo por su ID. Requiere autenticación.
-      security:
-        - bearerAuth: []
+      description: Elimina un equipo por su ID.
       parameters:
         - in: path
           name: id_team
@@ -2291,8 +2520,6 @@ paths:
                       message:
                         type: string
                         example: Equipo con ID 12 eliminado correctamente
-        "401":
-          $ref: "#/components/responses/Unauthorized"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -2519,6 +2746,554 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /cursos/{id_curso}/promocion:
+    get:
+      tags:
+        - Exams
+      summary: Obtener configuración de promoción de un curso
+      description: >
+        Retorna si el curso es promocionable y la configuración de cada evaluación
+        (si cuenta para promoción y la nota mínima requerida).
+      parameters:
+        - in: path
+          name: id_curso
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+      responses:
+        "200":
+          description: Configuración de promoción obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      config:
+                        $ref: "#/components/schemas/PromocionConfig"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Exams
+      summary: Guardar configuración de promoción de un curso
+      description: >
+        Guarda o actualiza la configuración de promoción del curso y de cada evaluación.
+        Usa `INSERT ... ON DUPLICATE KEY UPDATE`, por lo que es idempotente.
+      parameters:
+        - in: path
+          name: id_curso
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PromocionConfigInput"
+      responses:
+        "200":
+          description: Configuración de promoción guardada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Configuración de promoción guardada correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# DASHBOARD POR CURSO
+
+  /cursos/{id_curso}/dashboard:
+    get:
+      tags:
+        - Dashboard
+      summary: Dashboard de un curso
+      description: >
+        Retorna métricas consolidadas de un curso: conteo de alumnos, equipos,
+        clasificación académica (promocionados / van a final / recursantes / abandonaron),
+        promedio general, promedios por evaluación y estadísticas de asistencia.
+        El cuatrimestre actual se determina automáticamente por la fecha del servidor.
+      parameters:
+        - in: path
+          name: id_curso
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+      responses:
+        "200":
+          description: Dashboard obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      dashboard:
+                        $ref: "#/components/schemas/CourseDashboard"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# DASHBOARD GENERAL
+
+  /dashboard/general:
+    get:
+      tags:
+        - Dashboard
+      summary: Dashboard general del sistema
+      description: >
+        Retorna métricas globales: total de usuarios, cursos activos en el cuatrimestre
+        actual, total de alumnos, lista de usuarios con su rol, roles disponibles,
+        rendimiento histórico promedio por año y estadísticas por curso del cuatrimestre actual.
+      responses:
+        "200":
+          description: Dashboard general obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/GeneralDashboard"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /dashboard/usuarios:
+    post:
+      tags:
+        - Dashboard
+      summary: Crear usuario desde el dashboard
+      description: >
+        Crea un nuevo usuario del sistema. Mismo comportamiento que `POST /users`
+        (contraseña hasheada, 409 si el correo ya existe).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: Usuario creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: usuario creado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /dashboard/usuarios/{id_user}:
+    patch:
+      tags:
+        - Dashboard
+      summary: Actualizar usuario desde el dashboard
+      description: Mismo comportamiento que `PATCH /users/{id_user}`.
+      parameters:
+        - in: path
+          name: id_user
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPatch"
+      responses:
+        "200":
+          description: Usuario actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Usuario actualizado con exito
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Dashboard
+      summary: Eliminar usuario desde el dashboard
+      description: Mismo comportamiento que `DELETE /users/{id_user}`.
+      parameters:
+        - in: path
+          name: id_user
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario a eliminar
+      responses:
+        "200":
+          description: Usuario eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Usuario con ID 5 eliminado correctamente
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /dashboard/roles:
+    post:
+      tags:
+        - Dashboard
+      summary: Crear rol desde el dashboard
+      description: Mismo comportamiento que `POST /roles`. Devuelve 409 si ya existe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleCreate"
+      responses:
+        "201":
+          description: Rol creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: El rol ha sido creado exitosamente
+                      id:
+                        type: integer
+                        example: 4
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /dashboard/roles/{id_rol}:
+    delete:
+      tags:
+        - Dashboard
+      summary: Eliminar rol desde el dashboard
+      description: Mismo comportamiento que `DELETE /roles/{id}`.
+      parameters:
+        - in: path
+          name: id_rol
+          required: true
+          schema:
+            type: integer
+          description: ID del rol a eliminar
+      responses:
+        "200":
+          description: Rol eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Rol eliminado correctamente
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# EQUIPO - ESTUDIANTES
+
+  /equipo-alumno:
+    post:
+      tags:
+        - TeamStudents
+      summary: Agregar alumno a un equipo
+      description: >
+        Agrega un alumno a un equipo buscándolo por su `padron`.
+        Si el alumno ya pertenece a otro equipo, devuelve 409 a menos que se envíe
+        `forzar: true`, en cuyo caso se lo remueve del equipo anterior y se lo agrega al nuevo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamStudentAdd"
+      responses:
+        "200":
+          description: Alumno agregado al equipo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Alumno agregado al equipo
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags:
+        - TeamStudents
+      summary: Remover alumno de un equipo
+      description: Elimina la relación entre un alumno y un equipo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamStudentRemove"
+      responses:
+        "200":
+          description: Alumno removido del equipo correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Alumno removido del equipo
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+# REPORTES
+
+  /reportes/alumnos:
+    get:
+      tags:
+        - Reports
+      summary: Reporte de alumnos en PDF
+      description: Genera y descarga un PDF con el listado de alumnos de un curso (padrón, nombre, apellido, correo, estado).
+      parameters:
+        - in: query
+          name: curso_id
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+      responses:
+        "200":
+          description: PDF generado correctamente
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /reportes/equipos:
+    get:
+      tags:
+        - Reports
+      summary: Reporte de equipos en PDF
+      description: Genera y descarga un PDF con los equipos del curso y los alumnos que los integran.
+      parameters:
+        - in: query
+          name: curso_id
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+      responses:
+        "200":
+          description: PDF generado correctamente
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /reportes/notas:
+    get:
+      tags:
+        - Reports
+      summary: Reporte de notas en PDF
+      description: >
+        Genera y descarga un PDF con las notas de los alumnos del curso.
+        Se puede filtrar por evaluaciones específicas pasando el parámetro
+        `evaluaciones[]` (o `evaluaciones`) una o más veces.
+        Si se omite, se incluyen todas las evaluaciones.
+      parameters:
+        - in: query
+          name: curso_id
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+        - in: query
+          name: evaluaciones[]
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: Nombres de evaluaciones a incluir (ej. `evaluaciones[]=Parcial 1&evaluaciones[]=TP Final`)
+      responses:
+        "200":
+          description: PDF generado correctamente
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /reportes/exportar:
+    get:
+      tags:
+        - Reports
+      summary: Reporte combinado en PDF
+      description: >
+        Genera un único PDF con las secciones seleccionadas: alumnos, notas y/o equipos.
+        Al menos una sección debe estar activada. Las evaluaciones solo aplican cuando `notas=true`.
+        Los valores truthy aceptados para los flags son: `1`, `true`, `True`, `on`, `yes`.
+      parameters:
+        - in: query
+          name: curso_id
+          required: true
+          schema:
+            type: integer
+          description: ID del curso
+        - in: query
+          name: alumnos
+          schema:
+            type: string
+          description: Incluir sección de alumnos (`true` / `1`)
+        - in: query
+          name: equipos
+          schema:
+            type: string
+          description: Incluir sección de equipos (`true` / `1`)
+        - in: query
+          name: notas
+          schema:
+            type: string
+          description: Incluir sección de notas (`true` / `1`)
+        - in: query
+          name: evaluaciones[]
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: Filtro de evaluaciones para la sección de notas (opcional)
+      responses:
+        "200":
+          description: PDF combinado generado correctamente
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 # COMPONENTES
 
 components:
@@ -2560,14 +3335,11 @@ components:
     AdvertisementCreate:
       type: object
       required:
-        - id_usuario
         - id_curso
         - titulo
         - mensaje
+      description: El `id_usuario` se obtiene automáticamente del token JWT, no hace falta enviarlo.
       properties:
-        id_usuario:
-          type: integer
-          example: 10
         id_curso:
           type: integer
           example: 3
@@ -2617,6 +3389,7 @@ components:
       required:
         - id_alumno
         - id_clase
+        - code
         - latitud
         - longitud
       properties:
@@ -2626,6 +3399,12 @@ components:
         id_clase:
           type: integer
           example: 5
+        code:
+          type: string
+          description: >
+            Hash SHA-256 generado a partir de `{id_alumno}-{id_clase}-2026-secret`.
+            Se obtiene escaneando el QR enviado por email al alumno.
+          example: "a3f1c2d4e5..."
         latitud:
           type: number
           format: float
@@ -2787,6 +3566,12 @@ components:
         id_profesor:
           type: integer
           example: 7
+        slack_url:
+          type: string
+          example: https://app.slack.com/client/T000/C999
+        youtube_url:
+          type: string
+          example: https://www.youtube.com/@MiCurso
 
     Exam:
       type: object
@@ -2807,6 +3592,10 @@ components:
           type: string
           format: date
           example: "2026-05-20"
+        asociacion:
+          type: string
+          enum: [Individual, Grupal]
+          example: Individual
         nombre:
           type: string
           description: Nombre del tipo de evaluación (join con tipos_evaluacion)
@@ -2911,6 +3700,9 @@ components:
         padron:
           type: string
           example: "107345"
+        correo:
+          type: string
+          example: mgonzalez@fi.uba.ar
         estado_alumno:
           type: boolean
           example: true
@@ -2977,6 +3769,29 @@ components:
           type: integer
           example: 1
 
+    StudentPatch:
+      type: object
+      description: Al menos uno de los campos debe estar presente.
+      properties:
+        nombre:
+          type: string
+          example: Laura
+        apellido:
+          type: string
+          example: Fernández
+        padron:
+          type: string
+          example: "108234"
+        correo:
+          type: string
+          example: nuevo@fi.uba.ar
+        id_curso:
+          type: integer
+          example: 2
+        estado_alumno:
+          type: boolean
+          example: false
+
     ImportResult:
       type: object
       properties:
@@ -3035,14 +3850,27 @@ components:
       type: object
       required:
         - nombre
-        - codigo
       properties:
         nombre:
           type: string
           example: Algoritmos y Programación I
         codigo:
           type: string
+          nullable: true
+          description: Código de la materia. Opcional; si se envía debe ser único.
           example: "75.41"
+
+    SubjectPatch:
+      type: object
+      description: Al menos uno de los campos debe estar presente.
+      properties:
+        nombre:
+          type: string
+          example: Algoritmos y Programación II
+        codigo:
+          type: string
+          description: Si se envía, no debe coincidir con el código de otra materia.
+          example: "75.42"
 
     ExamType:
       type: object
@@ -3227,6 +4055,24 @@ components:
         id_curso:
           type: integer
           example: 1
+        alumnos:
+          type: array
+          description: Alumnos que pertenecen al equipo
+          items:
+            type: object
+            properties:
+              id_alumno:
+                type: integer
+                example: 7
+              nombre:
+                type: string
+                example: María
+              apellido:
+                type: string
+                example: González
+              padron:
+                type: string
+                example: "107345"
 
     TeamCreate:
       type: object
@@ -3327,6 +4173,262 @@ components:
         id_rol:
           type: integer
           example: 3
+
+    PromocionConfig:
+      type: object
+      properties:
+        es_promocionable:
+          type: boolean
+          example: true
+        evaluaciones:
+          type: array
+          items:
+            type: object
+            properties:
+              id_evaluacion:
+                type: integer
+                example: 1
+              cuenta_para_promocion:
+                type: boolean
+                example: true
+              nota_minima:
+                type: number
+                nullable: true
+                example: 6.0
+
+    PromocionConfigInput:
+      type: object
+      required:
+        - es_promocionable
+        - evaluaciones
+      properties:
+        es_promocionable:
+          type: boolean
+          example: true
+        evaluaciones:
+          type: array
+          items:
+            type: object
+            required:
+              - id_evaluacion
+            properties:
+              id_evaluacion:
+                type: integer
+                example: 1
+              cuenta:
+                type: boolean
+                description: Alias de `cuenta_para_promocion`. Se acepta cualquiera de los dos.
+                example: true
+              cuenta_para_promocion:
+                type: boolean
+                example: true
+              nota_minima:
+                type: number
+                nullable: true
+                example: 6.0
+
+    CourseDashboard:
+      type: object
+      properties:
+        alumnos:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 50
+            activos:
+              type: integer
+              example: 44
+            abandonaron:
+              type: integer
+              example: 6
+        equipos:
+          type: integer
+          example: 10
+        clasificacion:
+          type: object
+          properties:
+            promocionados:
+              type: integer
+              example: 12
+            van_a_final:
+              type: integer
+              example: 20
+            recursantes:
+              type: integer
+              example: 8
+            abandonaron:
+              type: integer
+              example: 6
+        promedio_general:
+          type: number
+          nullable: true
+          example: 6.85
+        evaluaciones:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              nombre:
+                type: string
+                example: Parcial 1
+              promedio:
+                type: number
+                nullable: true
+                example: 7.2
+        asistencia:
+          type: object
+          properties:
+            regulares:
+              type: integer
+              description: Alumnos con 75% o más de asistencia
+              example: 30
+            en_riesgo:
+              type: integer
+              description: Alumnos con menos del 75% de asistencia
+              example: 14
+            sin_datos:
+              type: integer
+              description: Alumnos sin datos de asistencia (no hay clases registradas)
+              example: 0
+        es_promocionable:
+          type: boolean
+          example: true
+
+    GeneralDashboard:
+      type: object
+      properties:
+        total_usuarios:
+          type: integer
+          example: 15
+        cursos_activos:
+          type: integer
+          description: Cursos del cuatrimestre actual del año en curso
+          example: 4
+        total_alumnos:
+          type: integer
+          example: 320
+        anio_actual:
+          type: integer
+          example: 2026
+        cuatrimestre_actual:
+          type: integer
+          enum: [1, 2]
+          example: 1
+        usuarios:
+          type: array
+          description: Lista de usuarios con su rol, ordenados por nivel de administración
+          items:
+            type: object
+            properties:
+              id_usuario:
+                type: integer
+                example: 5
+              nombre:
+                type: string
+                example: Carlos
+              apellido:
+                type: string
+                example: Rodríguez
+              correo:
+                type: string
+                example: crodriguez@fi.uba.ar
+              creado:
+                type: string
+                format: date-time
+                example: "2026-03-01T10:00:00Z"
+              rol_nombre:
+                type: string
+                example: Docente
+              nivel_administracion:
+                type: integer
+                example: 2
+              id_rol:
+                type: integer
+                example: 2
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
+        rendimiento_historico:
+          type: array
+          description: Promedio de notas agrupado por año
+          items:
+            type: object
+            properties:
+              anio:
+                type: integer
+                example: 2025
+              promedio_notas:
+                type: number
+                example: 6.74
+        cursos_stats:
+          type: array
+          description: Estadísticas de alumnos por curso del cuatrimestre actual
+          items:
+            type: object
+            properties:
+              id_curso:
+                type: integer
+                example: 2
+              materia:
+                type: string
+                example: Introducción al Desarrollo de Software
+              catedra:
+                type: string
+                example: Cátedra Medina
+              anio:
+                type: integer
+                example: 2026
+              cuatrimestre:
+                type: integer
+                example: 1
+              total_alumnos:
+                type: integer
+                example: 80
+              activos:
+                type: integer
+                example: 72
+              abandono:
+                type: integer
+                example: 8
+
+    TeamStudentAdd:
+      type: object
+      required:
+        - id_equipo
+        - padron
+      properties:
+        id_equipo:
+          type: integer
+          example: 12
+        padron:
+          type: integer
+          description: Padrón del alumno a agregar
+          example: 108234
+        forzar:
+          type: boolean
+          description: >
+            Si es `true` y el alumno ya pertenece a otro equipo, se lo remueve del anterior
+            y se lo agrega al nuevo. Si es `false` (default) devuelve 409.
+          default: false
+          example: false
+
+    TeamStudentRemove:
+      type: object
+      required:
+        - id_equipo
+        - id_alumno
+      properties:
+        id_equipo:
+          type: integer
+          example: 12
+        id_alumno:
+          type: integer
+          example: 7
 
     ErrorResponse:
       type: object
