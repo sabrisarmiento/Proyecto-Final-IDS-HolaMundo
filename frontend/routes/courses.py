@@ -350,6 +350,26 @@ def course_detail(course_id):
         dash_data=dash_data
     )
 
+@courses_bp.route('/cursos/<int:course_id>/buscar-alumno')
+def buscar_alumno(course_id):
+    headers = {'Authorization': f"Bearer {session.get('token')}"}
+    params = {'padron': request.args.get('padron'), 'id_curso': course_id}
+    try:
+        res = requests.get('http://127.0.0.1:5000/students', params=params, headers=headers)
+        alumnos = res.json().get("students", []) if res.status_code != 204 else []
+        if not alumnos:
+            return jsonify({"found": False})
+        al = alumnos[0]
+        return jsonify({
+            "found": True,
+            "nombre": al["nombre"],
+            "apellido": al["apellido"],
+            "correo": al["correo"],
+            "estado": al["estado_alumno"]
+        })
+    except Exception as e:
+        print("ERROR BUSCAR ALUMNO:", e)
+        return jsonify({"found": False, "error": str(e)}), 500
 
 @courses_bp.route('/cursos/<int:course_id>/equipos/crear', methods=['POST'])
 def create_team(course_id):

@@ -66,13 +66,9 @@
                       <td>{{ alumno.correo }}</td>
                       <td>
                           {% if alumno.estado_alumno %}
-                              <span class="status-active">
-                                  Activo
-                              </span>
+                              <span class="student-active">Activo</span>
                           {% else %}
-                              <span class="status-inactive">
-                                  No activo
-                              </span>
+                              <span class="student-inactive">No activo</span>
                           {% endif %}
                       </td>
                       <td>
@@ -92,7 +88,8 @@
             <form class="team-add-form" action="{{ url_for('courses.add_student_to_team', course_id=course.id_curso) }}" method="POST">
               <input type="hidden" name="id_equipo" value="{{ team.id_equipo }}">
               <label>Padrón:</label>
-              <input type="number" name="padron" placeholder="Ingrese padrón" required>
+              <input type="number" name="padron" class="padron-input" data-course-id="{{ course_id }}" placeholder="Ingrese padrón" required>
+              <div class="student-preview"></div>
               <button type="submit">Agregar</button>
             </form>
           </div>
