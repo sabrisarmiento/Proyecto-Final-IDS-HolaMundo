@@ -1,4 +1,5 @@
-<form class="calendar-form" onsubmit="event.preventDefault()">
+<form class="calendar-form" action="{{ url_for('courses.crear_clase', course_id=course.id_curso) }}"
+  method="POST">
   <div class="calendar-form-group">
     <label for="fecha-clase"> Fecha: </label>
     <input type="date" id="fecha-clase" name="fecha_clase" />
@@ -40,7 +41,7 @@
     </select>
   </div>
 
-  <button type="button" class="btn-primary" onclick="createClass()">
+  <button type="submit" class="btn-primary">
     Agregar clase
   </button>
 </form>
@@ -66,7 +67,12 @@
       <td>{{ clase.tipo }}</td>
       <td>{{ clase.modalidad }}</td>
       <td>
-        <button onclick="deleteClass({{ clase.id_clase }})">Eliminar</button>
+        <form action="{{ url_for('courses.eliminar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}" 
+        method="POST" style="display:inline;">
+          <button type="submit">
+            Eliminar
+          </button>
+        </form>
       </td>
     </tr>
     {% endfor %}
