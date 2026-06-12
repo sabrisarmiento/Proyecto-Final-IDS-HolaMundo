@@ -223,7 +223,8 @@ def course_detail(course_id):
 
     try:
         clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
-        clases      = clases_res.json().get("classes", [])
+        clases_json = clases_res.json()
+        clases      = clases_json.get("classes", [])
     except Exception as e:
         print(f"Error cargando clases: {e}")
         clases = []
@@ -670,25 +671,56 @@ def course_dashboard_data(course_id):
         return jsonify({"error": str(e)}), 502
 
 
+
 @courses_bp.route('/cursos/<int:course_id>/clases/crear', methods=['POST'])
 def crear_clase(course_id):
+    print("ENTRO A CREAR_CLASE")
     token = session.get('token')
     if not token:
         return redirect(url_for('auth.login'))
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    data = {
+        "fecha": request.form.get("fecha_clase"),
+        "semana": request.form.get("semana"),
+        "temas": request.form.get("temas"),
+        "tipo": request.form.get("tipo"),
+        "modalidad": request.form.get("modalidad"),
+        "id_curso": course_id
+    }
+    requests.post(
+        'http://127.0.0.1:5000/clases',
+        json=data,
+        headers=headers
+    )
+    return redirect(
+        url_for(
+            'courses.course_detail',
+            course_id=course_id,
+            tab='calendar'
+        )
+    )
 
-    headers = {'Authorization': f'Bearer {token}'}
-    data    = request.get_json()
-    data['id_curso'] = course_id
-    response = requests.post('http://127.0.0.1:5000/clases', json=data, headers=headers)
-    return response.json(), response.status_code
-
-
-@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/eliminar', methods=['DELETE'])
+@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/eliminar', methods=['POST'])
 def eliminar_clase(course_id, id_clase):
-    token    = session.get('token')
-    headers  = {'Authorization': f'Bearer {token}'}
-    response = requests.delete(f'http://127.0.0.1:5000/clases/{id_clase}', headers=headers)
-    return response.json(), response.status_code
+    token = session.get('token')
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    requests.delete(
+        f'http://127.0.0.1:5000/clases/{id_clase}',
+        headers=headers
+    )
+    return redirect(
+        url_for(
+            'courses.course_detail',
+            course_id=course_id,
+            tab='calendar'
+        )
+    )
+
+
 
 
 @courses_bp.route('/cursos/<int:course_id>/estudiantes/<int:student_id>', methods=['POST'])
