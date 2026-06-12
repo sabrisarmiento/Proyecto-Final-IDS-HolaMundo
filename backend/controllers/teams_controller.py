@@ -12,7 +12,9 @@ def get_all_teams(filters):
             a.id_alumno,
             a.nombre,
             a.apellido,
-            a.padron
+            a.padron, 
+            a.correo,
+            a.estado_alumno
         FROM equipos e
         LEFT JOIN equipo_alumno ea
             ON e.id_equipo = ea.id_equipo
@@ -44,7 +46,9 @@ def get_all_teams(filters):
                     "id_alumno": row["id_alumno"],
                     "nombre": row["nombre"],
                     "apellido": row["apellido"],
-                    "padron": row["padron"]
+                    "padron": row["padron"],
+                    "correo": row["correo"],
+                    "estado_alumno": row["estado_alumno"]
                 })
         return {
             "ok": True,
