@@ -1,5 +1,5 @@
 import requests
-BASE = "http://localhost:5000"
+BASE = "http://127.0.0.1:5000"
 
 def attendance_get_all(id_clase=None):
     try:
