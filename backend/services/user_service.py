@@ -17,8 +17,8 @@ def user_service(id_user):
     "user": result["data"]
   })
 
-def create_user_service(data):
-  result = create_user(data)
+def create_user_service(data, logged_user):
+  result = create_user(data, logged_user)
   if not result["ok"]:
       return error_response(result)
   return success_response({
@@ -26,16 +26,16 @@ def create_user_service(data):
   }, 201)
 
 
-def patch_user_service(id_user, data):
-  result = update_user_by_id(id_user, data)
+def patch_user_service(id_user, data, logged_user):
+  result = update_user_by_id(id_user, data, logged_user)
   if not result["ok"]:
       return error_response(result)
   return success_response({
     "message" : result["message"]
   })
 
-def delete_user_service(id_user):
-  result = delete_user_by_id(id_user)
+def delete_user_service(id_user, logged_user):
+  result = delete_user_by_id(id_user, logged_user)
   if not result["ok"]:
       return error_response(result)
   return success_response({

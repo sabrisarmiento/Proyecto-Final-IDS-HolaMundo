@@ -1,5 +1,19 @@
-from flask import jsonify
 from database.db import query_db, modify_db
+
+def get_role_by_id(id_rol):
+    sql = """
+        SELECT id_rol, nombre, nivel_administracion
+        FROM roles
+        WHERE id_rol = %s
+    """
+
+    result = query_db(sql, (int(id_rol),))
+
+    if result:
+        return result[0]
+
+    return None
+
 _FILTER_COLUMNS = {
     "id_roles": "id_roles",
     "name": "nombre",

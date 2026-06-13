@@ -60,7 +60,8 @@ def login_user(data):
                 "nombre": user["nombre"],
                 "apellido": user["apellido"],
                 "correo": user["correo"],
-                "id_rol": user["id_rol"]
+                "id_rol": user["id_rol"],
+                "nivel": user["nivel_administracion"]
             }
         }
 
