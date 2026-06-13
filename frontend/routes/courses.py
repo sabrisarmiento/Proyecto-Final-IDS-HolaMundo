@@ -6,6 +6,7 @@ from services.courses_service import get_courses, get_course_by_id, post_course
 from services.students_services import post_student, patch_student
 from services.exams_service import get_exams_by_course_id
 from services.subjects_service import get_my_subjects
+from services.material_frontend_service import get_materials_by_course, create_material
 from config import get_headers
 
 BACKEND_URL = 'http://127.0.0.1:5000'
@@ -344,6 +345,8 @@ def course_detail(course_id):
     except Exception:
         dash_data = {}
 
+    materiales = get_materials_by_course(course_id) if active_tab == 'materials' else []
+
     return render_template(
         'course_detail.html',
         course=course,
@@ -357,6 +360,7 @@ def course_detail(course_id):
         active_tab=active_tab,
         attendance=attendance_records,
         class_id=class_id_sel,
+        materiales=materiales,
         evaluaciones=evaluaciones,
         tipos_evaluacion=tipos_evaluacion,
         eval_seleccionada=eval_seleccionada,
@@ -783,3 +787,16 @@ def update_course_config(course_id):
         session['config_ok']  = False
 
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
+
+@courses_bp.route('/cursos/<int:course_id>/materiales', methods=['POST'])
+def create_material_view(course_id):
+    data = {
+        "titulo": request.form.get('titulo'),
+        "descripcion": request.form.get('descripcion'),
+        "url_externo": request.form.get('url_externo'),
+        "id_curso": course_id,
+    }
+    result, status = create_material(data)
+    if status >= 400:
+        flash(result.get("errors", [{}])[0].get("description", "No se pudo crear el material."))
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='materials'))

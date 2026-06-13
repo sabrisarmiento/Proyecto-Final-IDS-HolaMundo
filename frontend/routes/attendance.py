@@ -64,7 +64,7 @@ def attendance_page():
         code=request.args.get('code'),
     )
 
-@attendance_bp.route('/presente/marcar', methods=['POST'])   
+@attendance_bp.route('/presente/marcar', methods=['POST'])
 def submit_attendance():
     payload = request.get_json(silent=True) or {}
     data, status = mark_attendance(payload)

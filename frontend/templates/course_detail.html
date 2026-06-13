@@ -34,6 +34,7 @@
     <a href="?tab=ads"       class="nav-btn {% if active_tab == 'ads'       %}active{% endif %}">Avisos</a>
     <a href="?tab=config"    class="nav-btn {% if active_tab == 'config'    %}active{% endif %}">Configuración</a>
     <a href="?tab=attendance" class="nav-btn {% if active_tab == 'attendance' %}active{% endif %}">Asistencia</a>
+    <a href="?tab=materials" class="nav-btn {% if active_tab == 'materials' %}active{% endif %}">Materiales</a>
   </nav>
 
   <div class="tab-content">
@@ -96,7 +97,12 @@
     <div id="tab-attendance" class="tab-panel {% if active_tab != 'attendance' %}hidden{% endif %}">
     {% include "tabs/attendance_tab.html" %}
     </div>
+
+    <div id="tab-materials" class="tab-panel {% if active_tab != 'materials' %}hidden{% endif %}">
+      {% include "tabs/materials_tab.html" %}
+    </div>
   </div>
+
 </section>
 
 <dialog id="delete-modal" class="confirm-modal">

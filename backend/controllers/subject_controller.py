@@ -22,7 +22,7 @@ def get_all_subjects(filters):
       "message": "Internal Server Error",
       "description": str(e)
     }
-  
+
 def get_subjects_for_user(id_user, is_admin, filters):
     try:
         if is_admin:
