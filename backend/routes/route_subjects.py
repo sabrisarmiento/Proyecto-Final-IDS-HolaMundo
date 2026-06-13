@@ -22,18 +22,18 @@ def get_subject(subject_id):
   return subject_service(subject_id)
 
 @subjects_bp.route('/subjects', methods=['POST'])
-# @require_auth
+@require_auth
 def create_subject():
   data = request.get_json()
   return create_subject_service(data)
 
 @subjects_bp.route('/subjects/<int:subject_id>', methods=['PATCH'])
-# @require_auth
+@require_auth
 def patch_subject(subject_id):
   data = request.get_json()
   return patch_subject_service(subject_id, data)
 
 @subjects_bp.route('/subjects/<int:subject_id>', methods=['DELETE'])
-# @require_auth
+@require_auth
 def delete_subject(subject_id):
   return delete_subject_service(subject_id)

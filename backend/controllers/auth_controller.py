@@ -18,9 +18,17 @@ def login_user(data):
         contrasenia = data.get("contraseña")
         result = query_db(
             """
-            SELECT id_usuario, nombre, apellido, correo, contraseña, id_rol
-            FROM usuarios
-            WHERE correo = %s
+            SELECT 
+                u.id_usuario,
+                u.nombre,
+                u.apellido,
+                u.correo,
+                u.contraseña,
+                u.id_rol,
+                r.nivel_administracion
+            FROM usuarios u
+            JOIN roles r ON u.id_rol = r.id_rol
+            WHERE u.correo = %s
             """,
             (correo,)
         )
@@ -46,6 +54,7 @@ def login_user(data):
             "id_usuario": user["id_usuario"],
             "correo": user["correo"],
             "id_rol": user["id_rol"],
+            "nivel_administracion": user["nivel_administracion"],
             "exp": datetime.now(timezone.utc) + timedelta(hours=2)
         }, os.getenv("SECRET_KEY"), algorithm="HS256")
 
@@ -58,7 +67,8 @@ def login_user(data):
                 "nombre": user["nombre"],
                 "apellido": user["apellido"],
                 "correo": user["correo"],
-                "id_rol": user["id_rol"]
+                "id_rol": user["id_rol"],
+                "nivel_administracion": user["nivel_administracion"]
             }
         }
 
