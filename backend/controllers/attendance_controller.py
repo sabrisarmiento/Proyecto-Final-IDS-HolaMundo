@@ -1,6 +1,10 @@
 import math
 import hashlib
+import os
+from dotenv import load_dotenv
 from database.db import query_db, modify_db
+
+load_dotenv()
 
 def get_attendance(id_clase=None, id_alumno=None):
     try:
@@ -68,7 +72,8 @@ def create_attendance(data):
         lat = data.get("latitud")
         lon = data.get("longitud")
 
-        expected_code = hashlib.sha256(f"{id_alumno}-{id_clase}-2026-secret".encode()).hexdigest()
+        expected_code = hashlib.sha256(f"{id_alumno}-{id_clase}-{os.getenv('ATTENDANCE_SECRET')}".encode()).hexdigest()
+
         if not code or code != expected_code:
             return {
                 "ok": False,

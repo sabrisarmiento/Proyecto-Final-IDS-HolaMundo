@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from services.attendance_frontend_service import attendance_get_all, generate_qr
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from services.attendance_frontend_service import attendance_get_all, generate_qr, mark_attendance
 from services.subjects_service import get_my_subjects
 from services.courses_service import get_my_courses
 from services.calendar_service import calendar_get_all
@@ -47,10 +47,25 @@ def generate_qr_view():
     result = generate_qr(class_id)
     flash(result.get("message", "No se pudieron generar los QR."))
 
-    course_id = request.form.get('course_id')          # NUEVO: vino del tab del curso
+    course_id = request.form.get('course_id')
     if course_id:
         return redirect(url_for('courses.course_detail', course_id=course_id, tab='attendance', clase=class_id))
 
-    subject_id = request.form.get('subject')           # flujo viejo (página /asistencia)
+    subject_id = request.form.get('subject')
     curso_id = request.form.get('curso')
     return redirect(url_for('attendance.attendance', subject=subject_id, curso=curso_id, clase=class_id))
+
+@attendance_bp.route('/presente', methods=['GET'])
+def attendance_page():
+    return render_template(
+        'attendance_checkin.html',
+        id_alumno=request.args.get('id_alumno'),
+        id_clase=request.args.get('id_clase'),
+        code=request.args.get('code'),
+    )
+
+@attendance_bp.route('/presente/marcar', methods=['POST'])   
+def submit_attendance():
+    payload = request.get_json(silent=True) or {}
+    data, status = mark_attendance(payload)
+    return jsonify(data), status
