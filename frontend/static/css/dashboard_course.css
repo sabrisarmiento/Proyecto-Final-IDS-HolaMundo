@@ -207,3 +207,38 @@
   border-color: var(--color-6);
   background: var(--color-45);
 }
+
+.dash-table-wrap {
+  overflow-x: auto;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.dash-table thead tr {
+  background: var(--color-9);
+}
+
+.dash-table thead th {
+  color: var(--color-45);
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+}
+
+.dash-table tbody tr:hover {
+  background: var(--color-5);
+}
+
+.dash-table td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--color-6);
+  color: var(--color-1);
+  vertical-align: middle;
+}
