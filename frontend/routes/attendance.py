@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from services.attendance_frontend_service import attendance_get_all, generate_qr
-from services.subjects_service import get_subjects
-from services.courses_service import get_courses
+from services.subjects_service import get_my_subjects
+from services.courses_service import get_my_courses
 from services.calendar_service import calendar_get_all
 
 attendance_bp = Blueprint('attendance', __name__)
@@ -12,7 +12,7 @@ def attendance():
     course_id = request.args.get('curso')
     class_id = request.args.get('clase')
 
-    subjects = get_subjects()
+    subjects = get_my_subjects()
     courses = []
     classes = []
     attendance_records = []
@@ -20,7 +20,7 @@ def attendance():
     if subject_id:
         subject = next((s for s in subjects if str(s["id_materia"]) == subject_id), None)
         subject_name = subject.get("nombre") if subject else None
-        courses = [c for c in get_courses() if c.get("materia") == subject_name]
+        courses = [c for c in get_my_courses() if c.get("materia") == subject_name]
 
     if course_id:
         classes = calendar_get_all(course_id)

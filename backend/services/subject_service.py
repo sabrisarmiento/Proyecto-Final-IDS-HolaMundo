@@ -5,6 +5,7 @@ from controllers.subject_controller import (
     create_subject,
     patch_subject,
     delete_subject,
+    get_subjects_for_user
 )
 
 def subjects_service(filters):
@@ -22,6 +23,13 @@ def subject_service(subject_id):
   return success_response({
     "subject": result["data"]
   })
+
+def my_subjects_service(id_user, is_admin, filters):
+    result = get_subjects_for_user(id_user, is_admin, filters)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({"subjects": result["data"]})
+
 
 def create_subject_service(data):
   result = create_subject(data)

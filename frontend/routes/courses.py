@@ -5,7 +5,8 @@ from services.advertisements_service import get_advertisements_by_course
 from services.courses_service import get_courses, get_course_by_id, post_course
 from services.students_services import post_student, patch_student
 from services.exams_service import get_exams_by_course_id
-from services.subjects_service import get_subjects
+from services.subjects_service import get_my_subjects
+from config import get_headers
 
 BACKEND_URL = 'http://127.0.0.1:5000'
 
@@ -14,7 +15,7 @@ courses_bp = Blueprint('courses', __name__)
 
 @courses_bp.route('/cursos', methods=['GET', 'POST'])
 def courses():
-    subjects = get_subjects()
+    subjects = get_my_subjects()
 
     if request.method == 'POST':
         try:
@@ -41,7 +42,7 @@ def courses():
             params['materia'] = filtro_materia
         if filtro_anio:
             params['anio'] = filtro_anio
-        response = requests.get(f'{BACKEND_URL}/courses', params=params)
+        response = requests.get(f'{BACKEND_URL}/courses/mias', params=params, headers=get_headers())
         data_courses = response.json().get('courses', []) if response.ok else []
     except Exception as e:
         print(f"Error cargando cursos: {e}")
@@ -54,7 +55,7 @@ def courses():
 
     all_courses_raw = []
     try:
-        all_courses_raw = requests.get(f'{BACKEND_URL}/courses').json().get('courses', [])
+        all_courses_raw = requests.get(f'{BACKEND_URL}/courses/mias', headers=get_headers()).json().get('courses', [])
     except Exception:
         pass
 

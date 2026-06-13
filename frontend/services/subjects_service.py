@@ -1,4 +1,5 @@
 import requests
+from config import BASE_URL, get_headers
 
 def get_subjects():
   try:
@@ -8,6 +9,14 @@ def get_subjects():
   except Exception as e:
     print(f"Error al obtener las materias: {e}")
     return []
+
+def get_my_subjects():
+    try:
+        response = requests.get(f"{BASE_URL}/subjects/mias", headers=get_headers())
+        response.raise_for_status()
+        return response.json().get("subjects", [])
+    except Exception:
+        return []
 
 def get_subject_by_id(id_materia):
     try:

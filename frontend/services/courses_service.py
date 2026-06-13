@@ -8,6 +8,15 @@ def get_courses():
     return response.json().get("courses", [])
   except Exception as e:
     return []
+  
+def get_my_courses():
+    try:
+        response = requests.get(f'{BASE_URL}/courses/mias', headers=get_headers())
+        response.raise_for_status()
+        return response.json().get("courses", [])
+    except Exception:
+        return []
+
 
 def get_course_by_id(id):
   try:
