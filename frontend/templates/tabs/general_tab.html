@@ -144,7 +144,31 @@
 
     </section>
 
+    {% if dash_data.asistencia_detalle %}
+    <section class="dash-chart-card dash-chart-card--wide">
+      <h4 class="dash-chart-title">Asistencia por alumno</h4>
+      <p class="dash-chart-subtitle">Presentes sobre el total de clases</p>
+      <div class="dash-table-wrap">
+        <table class="dash-table">
+          <thead>
+            <tr><th>Alumno</th><th>Presentes</th><th>%</th></tr>
+          </thead>
+          <tbody>
+            {% for a in dash_data.asistencia_detalle %}
+            <tr>
+              <td>{{ a.apellido }}, {{ a.nombre }}</td>
+              <td>{{ a.presentes }} / {{ a.total_clases }}</td>
+              <td>{{ a.porcentaje }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% endif %}
+
   </div>
   {% endif %}
+
 
 </div>
