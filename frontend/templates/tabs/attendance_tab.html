@@ -1,0 +1,59 @@
+{# Tab de Asistencia del curso. Variables que llegan del route course_detail:
+clases, class_id, course_id, attendance #}
+
+{# 1) Mensaje de resultado al generar QR (flash) #}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="attendance-flash">
+    {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="attendance-actions">
+{# 2) Selector de clase: recarga el tab con ?tab=attendance&clase=ID #}
+<form method="GET" class="field">
+    <input type="hidden" name="tab" value="attendance">
+    <span class="field-label">Clase</span>
+    <select name="clase" class="field-select" onchange="this.form.submit()">
+    <option value="" disabled {% if not class_id %}selected{% endif %}>Elegí una clase…</option>
+    {% for cl in clases %}
+        <option value="{{ cl.id_clase }}" {% if cl.id_clase|string == class_id %}selected{% endif %}>
+        Clase {{ cl.id_clase }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}
+        </option>
+    {% endfor %}
+    </select>
+</form>
+
+{# 3) Botón Generar QR: POST al backend con id_clase; course_id para volver al tab #}
+{% if class_id %}
+<form method="POST" action="{{ url_for('attendance.generate_qr_view') }}">
+    <input type="hidden" name="id_clase" value="{{ class_id }}">
+    <input type="hidden" name="course_id" value="{{ course_id }}">
+    <button type="submit" class="btn-qr"><span class="btn-qr-icon">▦</span> Generar QR</button>
+</form>
+{% endif %}
+</div>
+
+{# 4) Tabla de asistencia de la clase elegida #}
+{% if class_id %}
+<div class="attendance-table-wrap">
+<table class="attendance-table">
+    <thead><tr><th>Alumno</th><th>Clase</th><th>Presente</th></tr></thead>
+    <tbody>
+    {% for record in attendance %}
+        <tr>
+        <td>{{ record.id_alumno }}</td>
+        <td>{{ record.id_clase }}</td>
+        <td>
+            {% if record.presente %}<span class="status status-present">Presente</span>
+            {% else %}<span class="status status-absent">Ausente</span>{% endif %}
+        </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="3">No hay registros todavía. Generá los QR para que los alumnos den el presente.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endif %}

@@ -230,6 +230,16 @@ def course_detail(course_id):
         print(f"Error cargando clases: {e}")
         clases = []
 
+    class_id_sel = request.args.get('clase')
+    attendance_records = []
+    if class_id_sel:
+        try:
+            att_res = requests.get(f'{BACKEND_URL}/asistencia',
+                                    params={'id_clase': class_id_sel}, headers=headers)
+            attendance_records = att_res.json().get('attendance', []) if att_res.ok else []
+        except Exception:
+            attendance_records = []
+
     for s in students_data:
         notas_dict = {}
         raw_string = s.get('notas_raw') or ""
@@ -345,6 +355,8 @@ def course_detail(course_id):
         total_pages=total_pages,
         course_id=course_id,
         active_tab=active_tab,
+        attendance=attendance_records,
+        class_id=class_id_sel,
         evaluaciones=evaluaciones,
         tipos_evaluacion=tipos_evaluacion,
         eval_seleccionada=eval_seleccionada,

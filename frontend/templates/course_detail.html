@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/course_teams.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/course_calendar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/config.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/attendance.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 
@@ -32,6 +33,7 @@
     <a href="?tab=marks"     class="nav-btn {% if active_tab == 'marks'     %}active{% endif %}">Notas</a>
     <a href="?tab=ads"       class="nav-btn {% if active_tab == 'ads'       %}active{% endif %}">Avisos</a>
     <a href="?tab=config"    class="nav-btn {% if active_tab == 'config'    %}active{% endif %}">Configuración</a>
+    <a href="?tab=attendance" class="nav-btn {% if active_tab == 'attendance' %}active{% endif %}">Asistencia</a>
   </nav>
 
   <div class="tab-content">
@@ -59,11 +61,11 @@
       <div class="ads-header">
         <h2>Avisos del curso</h2>
         <a class="btn-crear"
-           href="{{ url_for('advertisements.create_advertisement_front', id_curso=course['id_curso']) }}">
+          href="{{ url_for('advertisements.create_advertisement_front', id_curso=course['id_curso']) }}">
           + Crear aviso
         </a>
         <a class="btn-crear"
-           href="{{ url_for('advertisements.connect_slack_front', id_curso=course['id_curso']) }}">
+          href="{{ url_for('advertisements.connect_slack_front', id_curso=course['id_curso']) }}">
           Conectar Slack
         </a>
       </div>
@@ -91,6 +93,9 @@
       {% include "tabs/config_tab.html" %}
     </div>
 
+    <div id="tab-attendance" class="tab-panel {% if active_tab != 'attendance' %}hidden{% endif %}">
+    {% include "tabs/attendance_tab.html" %}
+    </div>
   </div>
 </section>
 

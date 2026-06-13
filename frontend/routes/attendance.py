@@ -43,9 +43,14 @@ def attendance():
 
 @attendance_bp.route('/asistencia/generar-qr', methods=['POST'])
 def generate_qr_view():
-    subject_id = request.form.get('subject')
-    course_id = request.form.get('curso')
     class_id = request.form.get('id_clase')
     result = generate_qr(class_id)
     flash(result.get("message", "No se pudieron generar los QR."))
-    return redirect(url_for('attendance.attendance', subject=subject_id, curso=course_id, clase=class_id))
+
+    course_id = request.form.get('course_id')          # NUEVO: vino del tab del curso
+    if course_id:
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='attendance', clase=class_id))
+
+    subject_id = request.form.get('subject')           # flujo viejo (página /asistencia)
+    curso_id = request.form.get('curso')
+    return redirect(url_for('attendance.attendance', subject=subject_id, curso=curso_id, clase=class_id))
