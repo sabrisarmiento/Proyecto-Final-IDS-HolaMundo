@@ -63,7 +63,7 @@ def connect_slack_front(id_curso):
         return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
     
     response = requests.get(
-        f"http://localhost:5000/slack/install/{id_curso}",
+        f"http://127.0.0.1:5000/slack/install/{id_curso}",
         headers={
             "Authorization": f"Bearer {token}"
         },
