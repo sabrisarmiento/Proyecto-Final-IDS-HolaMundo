@@ -5,6 +5,7 @@ from services.subject_service import (
   create_subject_service,
   patch_subject_service,
   delete_subject_service,
+  my_subjects_service
 )
 from middleware.auth_middleware import require_auth
 
@@ -16,6 +17,15 @@ def get_subjects():
     "name" : request.args.get('nombre')
   }
   return subjects_service(filters)
+
+@subjects_bp.route('/subjects/mias', methods=['GET'])
+@require_auth
+def get_my_subjects():
+    user = request.user
+    is_admin = (user.get("nivel") or 0) >= 3
+    filters = {"name": request.args.get('nombre')}
+    return my_subjects_service(user["id_usuario"], is_admin, filters)
+
 
 @subjects_bp.route('/subjects/<int:subject_id>', methods=['GET'])
 def get_subject(subject_id):

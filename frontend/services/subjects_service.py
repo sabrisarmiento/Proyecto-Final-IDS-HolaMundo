@@ -1,17 +1,26 @@
 import requests
+from config import BASE_URL, get_headers
 
 def get_subjects():
   try:
-    response = requests.get("http://localhost:5000/subjects")
+    response = requests.get("http://127.0.0.1:5000/subjects")
     response.raise_for_status()
     return response.json().get("subjects", [])
   except Exception as e:
     print(f"Error al obtener las materias: {e}")
     return []
 
+def get_my_subjects():
+    try:
+        response = requests.get(f"{BASE_URL}/subjects/mias", headers=get_headers())
+        response.raise_for_status()
+        return response.json().get("subjects", [])
+    except Exception:
+        return []
+
 def get_subject_by_id(id_materia):
     try:
-        response = requests.get(f"http://localhost:5000/subjects/{id_materia}")
+        response = requests.get(f"http://127.0.0.1:5000/subjects/{id_materia}")
         response.raise_for_status()
         return response.json()
     except Exception as e:
@@ -20,7 +29,7 @@ def get_subject_by_id(id_materia):
 
 def get_subject_by_name(name):
   try:
-    res = requests.get("http://localhost:5000/subjects", params={"nombre": str(name)})
+    res = requests.get("http://127.0.0.1:5000/subjects", params={"nombre": str(name)})
     res.raise_for_status()
     return res.json()
   except Exception as e:

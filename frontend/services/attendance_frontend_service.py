@@ -1,5 +1,5 @@
 import requests
-BASE = "http://localhost:5000"
+BASE = "http://127.0.0.1:5000"
 
 def attendance_get_all(id_clase=None):
     try:
@@ -17,3 +17,10 @@ def generate_qr(id_clase):
     except Exception as e:
         print(f"Error: {e}")
         return []
+
+def mark_attendance(payload):
+    try:
+        r = requests.post(f"{BASE}/asistencia", json=payload)
+        return r.json(), r.status_code
+    except Exception as e:
+        return {"errors": [{"description": str(e)}]}, 502

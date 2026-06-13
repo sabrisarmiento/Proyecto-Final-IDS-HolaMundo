@@ -5,31 +5,31 @@ def get_all_materials(filters):
         id_course = filters.get('id_curso')
         title = filters.get('titulo')
 
-        sql = "SELECT id_material, titulo, descripcion, url_externo, id_curso FROM materiales"
+        if id_course:
+            if not str(id_course).isdigit():
+                return {"ok": False, "code": 400, "message": "Bad Request",
+                        "description": "id_curso debe ser un entero"}
+            id_course = int(id_course)
+        else:
+            id_course = None
 
+        sql = "SELECT id_material, titulo, descripcion, url_externo, id_curso FROM materiales"
         condition = " WHERE 1=1"
         params = []
 
         if id_course is not None:
             condition += " AND id_curso = %s"
-            params.append(int(id_course))
-        
-        if title is not None:
-            condition += " AND titulo = %s"
-            params.append(title)
+            params.append(id_course)
+
+        if title:
+            condition += " AND titulo LIKE %s"
+            params.append(f"%{title}%")
 
         result = query_db(sql + condition, params)
-        return {        
-            "ok": True,
-            "data": result
-        }
+        return {"ok": True, "data": result}
     except Exception as e:
-        return {
-            "ok": False,
-            "code": 500,
-            "message": "Internal Server Error",
-            "description": str(e)
-        }
+        return {"ok": False, "code": 500, "message": "Internal Server Error",
+                "description": str(e)}
     
 def create_material(data):
     try:
