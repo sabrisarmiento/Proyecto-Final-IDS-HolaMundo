@@ -1,0 +1,28 @@
+<div class="materials-tab">
+<h2>Materiales del curso</h2>
+
+<form method="POST"
+        action="{{ url_for('courses.create_material_view', course_id=course_id) }}"
+        class="material-form">
+    <input type="text" name="titulo" placeholder="Título" required>
+    <input type="text" name="descripcion" placeholder="Descripción (opcional)">
+    <input type="url" name="url_externo" placeholder="https://… (link al recurso)" required>
+    <button type="submit" class="btn-action">Subir material</button>
+</form>
+
+{% if materiales %}
+    <ul class="material-list">
+    {% for m in materiales %}
+    <li class="material-item">
+        <div class="material-info">
+        <strong>{{ m.titulo }}</strong>
+        {% if m.descripcion %}<p>{{ m.descripcion }}</p>{% endif %}
+        </div>
+        <a href="{{ m.url_externo }}" target="_blank" class="btn-action">Ver recurso</a>
+    </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p class="tab-empty">No hay materiales cargados para este curso.</p>
+{% endif %}
+</div>

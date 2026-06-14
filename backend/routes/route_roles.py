@@ -9,6 +9,7 @@ from middleware.auth_middleware import require_auth
 roles_bp = Blueprint('roles', __name__)
 
 @roles_bp.route("/roles", methods = ["GET"])
+@require_auth
 def list_roles_route():
     filters = {
         "id_roles": request.args.get("id_roles", type=int),
