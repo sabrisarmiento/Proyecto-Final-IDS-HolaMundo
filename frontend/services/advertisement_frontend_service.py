@@ -7,7 +7,7 @@ import requests
 #     def get_all(id_curso=None):
 def get_all_advertisements(id_curso=None):
     try:
-        response = requests.get('http://localhost:5000/advertisements', params={"id_curso": id_curso})
+        response = requests.get('http://127.0.0.1:5000/advertisements', params={"id_curso": id_curso})
         if response.status_code == 200:
             datos_api = response.json()
             return datos_api.get("advertisements", [])     
@@ -19,7 +19,7 @@ def get_all_advertisements(id_curso=None):
 
 def get_slack_advertisements():
     try:
-        response = requests.get('http://localhost:5000/advertisements/slack')
+        response = requests.get('http://127.0.0.1:5000/advertisements/slack')
 
         #print(response.status_code)
         #print(response.text)

@@ -5,7 +5,9 @@ from services.advertisements_service import get_advertisements_by_course
 from services.courses_service import get_courses, get_course_by_id, post_course
 from services.students_services import post_student, patch_student
 from services.exams_service import get_exams_by_course_id
-from services.subjects_service import get_subjects
+from services.subjects_service import get_my_subjects
+from services.material_frontend_service import get_materials_by_course, create_material
+from config import get_headers
 
 BACKEND_URL = 'http://127.0.0.1:5000'
 
@@ -14,7 +16,7 @@ courses_bp = Blueprint('courses', __name__)
 
 @courses_bp.route('/cursos', methods=['GET', 'POST'])
 def courses():
-    subjects = get_subjects()
+    subjects = get_my_subjects()
 
     if request.method == 'POST':
         try:
@@ -41,7 +43,7 @@ def courses():
             params['materia'] = filtro_materia
         if filtro_anio:
             params['anio'] = filtro_anio
-        response = requests.get(f'{BACKEND_URL}/courses', params=params)
+        response = requests.get(f'{BACKEND_URL}/courses/mias', params=params, headers=get_headers())
         data_courses = response.json().get('courses', []) if response.ok else []
     except Exception as e:
         print(f"Error cargando cursos: {e}")
@@ -54,7 +56,7 @@ def courses():
 
     all_courses_raw = []
     try:
-        all_courses_raw = requests.get(f'{BACKEND_URL}/courses').json().get('courses', [])
+        all_courses_raw = requests.get(f'{BACKEND_URL}/courses/mias', headers=get_headers()).json().get('courses', [])
     except Exception:
         pass
 
@@ -229,6 +231,16 @@ def course_detail(course_id):
         print(f"Error cargando clases: {e}")
         clases = []
 
+    class_id_sel = request.args.get('clase')
+    attendance_records = []
+    if class_id_sel:
+        try:
+            att_res = requests.get(f'{BACKEND_URL}/asistencia',
+                                    params={'id_clase': class_id_sel}, headers=headers)
+            attendance_records = att_res.json().get('attendance', []) if att_res.ok else []
+        except Exception:
+            attendance_records = []
+
     for s in students_data:
         notas_dict = {}
         raw_string = s.get('notas_raw') or ""
@@ -333,6 +345,8 @@ def course_detail(course_id):
     except Exception:
         dash_data = {}
 
+    materiales = get_materials_by_course(course_id) if active_tab == 'materials' else []
+
     return render_template(
         'course_detail.html',
         course=course,
@@ -344,6 +358,9 @@ def course_detail(course_id):
         total_pages=total_pages,
         course_id=course_id,
         active_tab=active_tab,
+        attendance=attendance_records,
+        class_id=class_id_sel,
+        materiales=materiales,
         evaluaciones=evaluaciones,
         tipos_evaluacion=tipos_evaluacion,
         eval_seleccionada=eval_seleccionada,
@@ -770,3 +787,16 @@ def update_course_config(course_id):
         session['config_ok']  = False
 
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
+
+@courses_bp.route('/cursos/<int:course_id>/materiales', methods=['POST'])
+def create_material_view(course_id):
+    data = {
+        "titulo": request.form.get('titulo'),
+        "descripcion": request.form.get('descripcion'),
+        "url_externo": request.form.get('url_externo'),
+        "id_curso": course_id,
+    }
+    result, status = create_material(data)
+    if status >= 400:
+        flash(result.get("errors", [{}])[0].get("description", "No se pudo crear el material."))
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='materials'))

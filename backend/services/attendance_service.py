@@ -1,4 +1,5 @@
 import hashlib
+import os
 from flask import jsonify
 from helpers.email_sender import send_attendance_email
 from helpers.responses import error_response, success_response
@@ -9,6 +10,8 @@ from controllers.attendance_controller import (
     delete_attendance,
     students_active_qr,
 )
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5001")
 
 def attendance_get_handler(id_clase, id_alumno):
     result = get_attendance(id_clase, id_alumno)
@@ -76,11 +79,11 @@ def generate_qr_service(id_clase):
 
         enviados = 0
         for alumno in alumnos:
-            raw_data = f"{alumno['id_alumno']}-{id_clase}-2026-secret"
+            raw_data = f"{alumno['id_alumno']}-{id_clase}-{os.getenv('ATTENDANCE_SECRET')}"
             qr_hash = hashlib.sha256(raw_data.encode()).hexdigest()
 
-            qr_url = f"https://introds-web.vercel.app/presente?id_alumno={alumno['id_alumno']}&id_clase={id_clase}&code={qr_hash}"
-            
+            qr_url = f"{FRONTEND_URL}/presente?id_alumno={alumno['id_alumno']}&id_clase={id_clase}&code={qr_hash}"
+
             if send_attendance_email(alumno['correo'], alumno['nombre'], qr_url):
                 enviados += 1
 

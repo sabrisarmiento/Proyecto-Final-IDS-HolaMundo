@@ -7,7 +7,8 @@ from services.user_service import (
     delete_user_service
 )
 
-from middleware.auth_middleware import require_auth
+from middleware.auth_middleware import require_auth, require_min_admin_level
+from helpers.constants import NIVEL_PROFESOR
 
 users_bp = Blueprint('users', __name__)
 
@@ -32,19 +33,25 @@ def get_user(id_user):
 
 @users_bp.route("/users",methods=["POST"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR) #lo ideal es crear una constante para ese 2, ese dos es el nivel de administracion. 
 def create_user():
     data = request.get_json()
-    return create_user_service(data)
+    logged_user = request.user
+    return create_user_service(data, logged_user)
 
 
 @users_bp.route("/users/<int:id_user>",methods=["PATCH"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def patch_user(id_user):
     data = request.get_json()
-    return patch_user_service(id_user, data)
+    logged_user = request.user
+    return patch_user_service(id_user, data, logged_user)
 
 
 @users_bp.route("/users/<int:id_user>",methods=["DELETE"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def delete_user(id_user):
-    return delete_user_service(id_user)
+    logged_user = request.user
+    return delete_user_service(id_user, logged_user)
