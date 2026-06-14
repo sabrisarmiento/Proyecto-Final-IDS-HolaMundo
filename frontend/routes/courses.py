@@ -156,30 +156,6 @@ def set_general():
 
 @courses_bp.route('/cursos/<int:course_id>', methods=['GET', 'POST'])
 def course_detail(course_id):
-    if request.method == 'POST':
-        if request.form.get("delete_team"):
-            team_id = request.form.get("delete_team")
-            try:
-                token = session.get("token")
-                headers = {"Authorization": f"Bearer {token}"}
-                requests.delete(f"http://127.0.0.1:5000/equipos/{team_id}", headers=headers)
-            except Exception as e:
-                print(f"Error deleting team: {e}")
-            return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
-        try:
-            data = {
-                "nombre":   request.form.get('nombre'),
-                "apellido": request.form.get('apellido'),
-                "padron":   int(request.form.get('padron')),
-                "correo":   request.form.get('correo'),
-                "id_curso": course_id
-            }
-            post_student(data)
-        except Exception as e:
-            print(f"Error al crear alumno: {e}")
-
-        return redirect(url_for('courses.course_detail', course_id=course_id, tab='students'))
-
     active_tab = request.args.get('tab', 'general')
     page       = request.args.get('page', 1, type=int)
     per_page   = 10
@@ -365,7 +341,7 @@ def buscar_alumno(course_id):
             "nombre": al["nombre"],
             "apellido": al["apellido"],
             "correo": al["correo"],
-            "estado": al["estado_alumno"]
+            "estado": "Activo" if al["estado_alumno"] else "Inactivo"
         })
     except Exception as e:
         print("ERROR BUSCAR ALUMNO:", e)
@@ -432,6 +408,16 @@ def remove_student_from_team(course_id):
         print("Error removing student:", e)
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
+@courses_bp.route('/cursos/<int:course_id>/equipos/eliminar', methods=['POST'])
+def delete_teams(course_id):
+    headers = {"Authorization": f"Bearer {session.get('token')}"}
+    equipos = [t for t in request.form.get("selected_teams", "").split(",") if t]
+    for team_id in equipos:
+        try:
+            requests.delete(f"http://127.0.0.1:5000/equipos/{team_id}", headers=headers)
+        except Exception as e:
+            print(f"Error eliminando equipo {team_id}: {e}")
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cursos/<int:course_id>/importar-alumnos', methods=['POST'])
 def importar_alumnos(course_id):
