@@ -76,7 +76,18 @@ block extra_styles %}
       </div>
     </div>
   </div>
+  {% endif %} {% if cursos and cursos[0].regimen_aprobacion %}
+  <div class="regimen-dropdown">
+    <button onclick="this.nextElementSibling.classList.toggle('open')">
+      Régimen de aprobación ▼
+    </button>
+  <div class="regimen-content">
+    <p>{{ cursos[0].regimen_aprobacion}}</p>
+  </div>
+</div>
   {% endif %}
+
+
 </section>
 
 {% if temas %}

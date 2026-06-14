@@ -156,3 +156,10 @@
         grid-template-columns: 1fr;
     }
 }
+
+textarea.config-input {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;       
+    min-height: 100px;
+}

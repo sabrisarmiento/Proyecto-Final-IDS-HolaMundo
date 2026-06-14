@@ -38,6 +38,7 @@ CREATE TABLE cursos (
     anio INT NOT NULL,
     slack_url VARCHAR(500),
     youtube_url VARCHAR (500),
+    regimen_aprobacion TEXT,
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 );
@@ -217,7 +218,7 @@ CREATE TABLE curso_slack_config (
 
 
 
---CREATE TABLE slack_config_logs (
+-CREATE TABLE slack_config_logs (
 --    id_log INT AUTO_INCREMENT PRIMARY KEY,
 --    id_curso INT NOT NULL,
 --    id_usuario INT,
