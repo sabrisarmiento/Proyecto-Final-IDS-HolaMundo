@@ -223,11 +223,30 @@ def delete_exam_by_id(id_exam):
 
 def save_notes_to_db(id_exam, notes_dict, id_corrector, correctores_dict=None):
     try:
-        if correctores_dict is None:
-            correctores_dict = {}
+        corrector_nombre = None
+        if id_corrector:
+            user_result = query_db(
+                "SELECT nombre, apellido FROM usuarios WHERE id_usuario = %s",
+                (id_corrector,)
+            )
+            if user_result:
+                corrector_nombre = f"{user_result[0]['nombre']} {user_result[0]['apellido']}"
 
         for id_alumno, nota in notes_dict.items():
-            corrector_texto = correctores_dict.get(str(id_alumno)) or None
+            existing = query_db(
+                "SELECT nota, corrector_nombre FROM notas WHERE id_alumno = %s AND id_evaluacion = %s",
+                (id_alumno, id_exam)
+            )
+
+            if existing:
+                nota_actual = existing[0]['nota']
+                corrector_actual = existing[0]['corrector_nombre']
+                if float(nota_actual) == float(nota):
+                    final_corrector = corrector_actual
+                else:
+                    final_corrector = corrector_nombre
+            else:
+                final_corrector = corrector_nombre
 
             sql = """
                 INSERT INTO notas (id_alumno, id_evaluacion, nota, corrector_nombre)
@@ -236,7 +255,7 @@ def save_notes_to_db(id_exam, notes_dict, id_corrector, correctores_dict=None):
                     nota = VALUES(nota),
                     corrector_nombre = VALUES(corrector_nombre)
             """
-            modify_db(sql, (id_alumno, id_exam, nota, corrector_texto))
+            modify_db(sql, (id_alumno, id_exam, nota, final_corrector))
 
         return {
             "ok": True

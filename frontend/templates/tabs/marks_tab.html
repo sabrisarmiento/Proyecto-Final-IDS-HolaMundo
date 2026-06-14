@@ -160,6 +160,10 @@
                 <span class="qg-tipo-badge qg-tipo-badge--individual">Individual</span>
               </h2>
               <p class="qg-subtitle">Escribe directamente los números (escala 0-10) del alumno correspondiente</p>
+              <p class="qg-subtitle qg-corrector-aviso">
+                Las notas que guardes ahora quedarán registradas como corregidas por
+                <strong>{{ current_user_name or 'tu usuario' }}</strong>
+              </p>
             </div>
             <div class="qg-right-controls">
               <div class="promedio-bubble">
@@ -220,12 +224,15 @@
                       {% set corrector_activo = s.correctores_todas[eval_seleccionada.id_evaluacion|string] %}
                     {% endif %}
                   {% endif %}
-                  <input
-                    type="text"
-                    name="corrector_alumno_{{ s.id_alumno }}"
-                    value="{{ corrector_activo }}"
-                    placeholder="Corrector"
-                    class="corrector-input">
+                  <div class="corrector-display" title="Corrector asignado automáticamente según tu usuario">
+                    {% if corrector_activo %}
+                      <span class="corrector-icon">✓</span>
+                      <span class="corrector-name">{{ corrector_activo }}</span>
+                    {% else %}
+                      <span class="corrector-icon corrector-icon--pending">○</span>
+                      <span class="corrector-name corrector-name--pending">{{ current_user_name or 'Sin corregir' }}</span>
+                    {% endif %}
+                  </div>
                 </div>
               </div>
               {% endif %}
@@ -246,6 +253,10 @@
                 <span class="qg-tipo-badge qg-tipo-badge--grupal">Grupal</span>
               </h2>
               <p class="qg-subtitle">Asigna una nota por equipo | Se aplica a todos sus integrantes</p>
+              <p class="qg-subtitle qg-corrector-aviso">
+                Las notas que guardes ahora quedarán registradas como corregidas por
+                <strong>{{ current_user_name or 'tu usuario' }}</strong>.
+              </p>
             </div>
             <div class="qg-right-controls">
               <div class="promedio-bubble">
@@ -315,12 +326,15 @@
                       placeholder="—">
                     <span class="nota-dot {% if ns.primera_nota != '' %}{% if ns.primera_nota|float >= 4 %}dot-verde{% else %}dot-rojo{% endif %}{% endif %}"></span>
                   </div>
-                  <input
-                    type="text"
-                    name="corrector_equipo_{{ team.id_equipo }}"
-                    value="{{ ns.primer_corrector }}"
-                    placeholder="Corrector"
-                    class="corrector-input grupal-corrector-inline">
+                  <div class="corrector-display grupal-corrector-inline" title="Corrector asignado automáticamente según tu usuario">
+                    {% if ns.primer_corrector %}
+                      <span class="corrector-icon">✓</span>
+                      <span class="corrector-name">{{ ns.primer_corrector }}</span>
+                    {% else %}
+                      <span class="corrector-icon corrector-icon--pending">○</span>
+                      <span class="corrector-name corrector-name--pending">{{ current_user_name or 'Sin corregir' }}</span>
+                    {% endif %}
+                  </div>
                   <input type="hidden" name="id_equipo_{{ team.id_equipo }}" value="{{ team.id_equipo }}">
                 </div>
               </div>
