@@ -82,51 +82,19 @@ block extra_styles %}
   {% endif %}
 </section>
 
+{% if temas %}
 <section class="topics-section">
   <h2>¿Qué aprenderás en la materia?</h2>
   <div class="topics-grid">
+    {% for tema in temas %}
     <div class="topic-card">
-      <i class="fa-brands fa-linux"></i>
-      <span>Linux</span>
+      <i class="{{ tema.icono }}"></i>
+      <span>{{ tema.nombre }}</span>
     </div>
-    <div class="topic-card">
-      <i class="fa-solid fa-code"></i>
-      <span>Entorno de Programación</span>
-    </div>
-    <div class="topic-card">
-      <i class="fa-solid fa-bug"></i>
-      <span>Debugging</span>
-    </div>
-    <div class="topic-card">
-      <i class="fa-solid fa-terminal"></i>
-      <span>Terminal</span>
-    </div>
-    <div class="topic-card">
-      <i class="fa-brands fa-git-alt"></i>
-      <span>Control de Versiones</span>
-    </div>
-    <div class="topic-card">
-      <i class="fa-solid fa-file-code"></i>
-      <span>Shell Scripting</span>
-    </div>
-    <div class="topic-card">
-      <i class="fa-solid fa-diagram-project"></i>
-      <span>Ingeniería de Software</span>
-    </div>
-    <div class="topic-card">
-      <i class="fa-solid fa-globe"></i>
-      <span>Desarrollo Web</span>
-    </div>
-    <div class="topic-card">
-      <i class="fa-solid fa-database"></i>
-      <span>Bases de Datos</span>
-    </div>
-    <div class="topic-card">
-      <i class="fa-brands fa-docker"></i>
-      <span>Docker</span>
-    </div>
+    {% endfor %}
   </div>
 </section>
+{% endif %}
 
 <section class="teachers-section">
   <h2>Equipo Docente</h2>

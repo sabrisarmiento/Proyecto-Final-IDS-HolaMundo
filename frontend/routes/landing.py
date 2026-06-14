@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, session, request
-from services.subjects_service import get_subjects, get_subject_by_id
+from services.subjects_service import get_subjects, get_subject_by_id, get_topics_by_subject_id
 from services.courses_service import get_courses
 import requests
 
@@ -17,6 +17,7 @@ def landing():
     clases = []
     cursos = []
     subject = {}
+    temas = []
 
     if id_subject:
         try:
@@ -50,6 +51,12 @@ def landing():
             print(f"Error en obtener materia: {e}")
             subject = {}
 
+        try:
+            temas = get_topics_by_subject_id(id_subject)
+        except Exception as e:
+            print(f"Error en obtener temas de la materia: {e}")
+            temas = []
+
     try:
         subjects = get_subjects()
     except Exception as e:
@@ -65,6 +72,7 @@ def landing():
         subject=subject,
         subjects=subjects,
         cursos=cursos,
+        temas=temas,
         active_page="landing",
         selected_subject=selected_subject
     )

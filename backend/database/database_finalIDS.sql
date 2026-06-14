@@ -90,6 +90,16 @@ CREATE TABLE clases (
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
+-- materia_temas --
+CREATE TABLE materia_temas (
+    id_tema INT AUTO_INCREMENT PRIMARY KEY,
+    id_materia INT NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    icono VARCHAR(100),
+    orden INT DEFAULT 0,
+    FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE
+);
+
 -- materiales --
 CREATE TABLE materiales (
     id_material INT AUTO_INCREMENT PRIMARY KEY,

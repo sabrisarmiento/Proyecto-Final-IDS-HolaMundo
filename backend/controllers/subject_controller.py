@@ -75,6 +75,38 @@ def get_subject_by_id(id):
       "description": str(e)
     }
 
+def get_topics_by_subject_id(id):
+    try:
+        if id <= 0:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": "El ID debe ser un número entero positivo"
+            }
+
+        exists = query_db("SELECT id_materia FROM materias WHERE id_materia = %s", (id,))
+        if not exists:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Not Found",
+                "description": f"No existe una materia con ID {id}"
+            }
+
+        result = query_db(
+            "SELECT id_tema, nombre, icono, orden FROM materia_temas WHERE id_materia = %s ORDER BY orden ASC",
+            (id,)
+        )
+        return {"ok": True, "data": result}
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
+
 def create_subject(data):
   try:
     if not data:
