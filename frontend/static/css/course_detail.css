@@ -1176,8 +1176,6 @@
 }
 
 .calendar-table { padding: 2rem; }
-.calendar-header { color: black; }
-.calendar-columns { color: black; }
 
 .eval-tipo-pill-wrapper {
   margin-top: 0.75rem;
@@ -1420,3 +1418,4 @@
   color: var(--color-15);
   line-height: 1.5;
 }
+
