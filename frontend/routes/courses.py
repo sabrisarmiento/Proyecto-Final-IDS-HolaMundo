@@ -223,12 +223,19 @@ def course_detail(course_id):
         students_data = []
         total         = 0
 
+    filtro_modalidad=request.args.get("modalidad")
+    filtro_tipo=request.args.get("tipo")
+    id_clase_editar = request.args.get("editar", type=int)
     try:
         clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
         clases_json = clases_res.json()
         clases      = clases_json.get("classes", [])
+        if filtro_modalidad:
+            clases=[c for c in clases if c.get('modalidad')==filtro_modalidad]
+        if filtro_tipo:
+            clases=[c for c in clases if c.get('tipo')==filtro_tipo]  
     except Exception as e:
-        print(f"Error cargando clases: {e}")
+        print(e)
         clases = []
 
     class_id_sel = request.args.get('clase')
@@ -354,6 +361,9 @@ def course_detail(course_id):
         students=students_data,
         teams=teams,
         clases=clases,
+        filtro_modalidad=filtro_modalidad,
+        filtro_tipo=filtro_tipo,
+        id_clase_editar=id_clase_editar,
         active_page='courses',
         page=page,
         total_pages=total_pages,
@@ -692,7 +702,6 @@ def course_dashboard_data(course_id):
 
 @courses_bp.route('/cursos/<int:course_id>/clases/crear', methods=['POST'])
 def crear_clase(course_id):
-    print("ENTRO A CREAR_CLASE")
     token = session.get('token')
     if not token:
         return redirect(url_for('auth.login'))
@@ -707,37 +716,116 @@ def crear_clase(course_id):
         "modalidad": request.form.get("modalidad"),
         "id_curso": course_id
     }
-    requests.post(
-        'http://127.0.0.1:5000/clases',
-        json=data,
-        headers=headers
-    )
-    return redirect(
-        url_for(
-            'courses.course_detail',
-            course_id=course_id,
-            tab='calendar'
-        )
-    )
 
-@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/eliminar', methods=['POST'])
+    if not data['fecha'] or not data['semana'] or not data['temas'] or not data['tipo'] or not data['modalidad']:
+        flash('Falta ingresar datos.', 'error')
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+    try:
+        clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
+        clases_json = clases_res.json()
+        clases = clases_json.get("classes", [])
+
+        tema_nuevo=data["temas"].strip().lower()
+        fecha_nueva=data["fecha"]
+        semana_nueva=int(data["semana"])
+        semana_anterior_existe=False
+        for clase in clases:
+            tema_existente=clase.get("temas","").strip().lower()
+            fecha_existente=clase.get("fecha","")
+            if int(clase.get("semana", 0)) == semana_nueva - 1:
+                semana_anterior_existe=True
+            if tema_existente==tema_nuevo:
+                flash(f'Ya existe una clase con ese tema','error')
+                return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+            if fecha_existente==fecha_nueva:
+                flash(f'Ya existe una clase con esa fecha','error')
+                return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+        if semana_nueva > 1 and not semana_anterior_existe:
+            flash(f'Debe existir una clase en la semana {semana_nueva - 1}.','error')
+            return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+        res=requests.post('http://127.0.0.1:5000/clases',json=data,headers=headers)
+        if res.status_code==201:
+            flash('Clase creada correctamente.', 'success')
+        else:
+            flash(f'Error al crear la clase', 'error')
+    except Exception as e:
+        print(f"Error guardando clase: {e}")
+        flash('Hubo un error al guardar la clase.', 'error')
+    return redirect(url_for('courses.course_detail',course_id=course_id,tab='calendar'))
+
+
+
+
+# --------------------------------EDITAR CLASE-------------------------
+
+@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/editar', methods=['POST'])
+def editar_clase(course_id, id_clase):
+    token = session.get('token')
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    data = {
+        "fecha": request.form.get("fecha_clase"),
+        "semana": request.form.get("semana"),
+        "temas": request.form.get("temas"),
+        "tipo": request.form.get("tipo"),
+        "modalidad": request.form.get("modalidad"),
+        "id_curso": course_id
+    }
+    if not data['fecha'] or not data['semana'] or not data['temas'] or not data['tipo'] or not data['modalidad']:
+        flash('Falta ingresar datos.', 'error')
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+    try:
+        clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
+        clases_json = clases_res.json()
+        clases = clases_json.get("classes", [])
+
+        tema_nuevo=data["temas"].strip().lower()
+        fecha_nueva=data["fecha"]
+        semana_nueva=int(data["semana"])
+        semana_anterior_existe=False
+        for clase in clases:
+            if clase["id_clase"]==id_clase:
+                continue
+            tema_existente=clase.get("temas","").strip().lower()
+            fecha_existente=clase.get("fecha","")
+            if int(clase.get("semana", 0)) == semana_nueva - 1:
+                semana_anterior_existe=True
+            if tema_existente==tema_nuevo:
+                flash(f'Ya existe una clase con ese tema','error')
+                return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+            if fecha_existente==fecha_nueva:
+                flash(f'Ya existe una clase con esa fecha','error')
+                return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+        if semana_nueva > 1 and not semana_anterior_existe:
+            flash(f'Debe existir una clase en la semana {semana_nueva - 1}.','error')
+            return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+        res=requests.patch(f'http://127.0.0.1:5000/clases/{id_clase}',json=data,headers=headers)
+        if res.status_code==200:
+            flash('Clase actualizada correctamente','success')
+        else:
+            flash('Hubo un error al actualizar la clase','error')
+
+    except Exception as e:
+        print(e)
+        flash('Hubo un error al actualizar la clase','error')
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+
+
+
+
+
+
+
+@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/eliminar', methods=['GET'])
 def eliminar_clase(course_id, id_clase):
     token = session.get('token')
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    requests.delete(
-        f'http://127.0.0.1:5000/clases/{id_clase}',
-        headers=headers
-    )
-    return redirect(
-        url_for(
-            'courses.course_detail',
-            course_id=course_id,
-            tab='calendar'
-        )
-    )
-
+    requests.delete(f'http://127.0.0.1:5000/clases/{id_clase}',headers=headers)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
 
 
 
