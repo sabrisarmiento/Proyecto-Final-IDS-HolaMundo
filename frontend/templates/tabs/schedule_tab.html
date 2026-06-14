@@ -40,11 +40,48 @@
       <option value="Virtual">Virtual</option>
     </select>
   </div>
-
+  
   <button type="submit" class="btn-primary">
     Agregar clase
   </button>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 </form>
+
+  <form method="GET">
+    <input type="hidden" name="tab" value="calendar">
+    <select name="modalidad">
+
+      <option value="">Todas las modalidades</option>
+
+      <option value="Presencial" 
+      {% if filtro_modalidad == "Presencial" %}selected{% endif %}>
+      Presencial
+     </option>
+
+     <option value="Virtual" {% if filtro_modalidad == "Presencial" %}selected{% endif %}>
+      Virtual
+     </option>
+
+    <input type="hidden" name="tab" value="calendar">
+    <select name="tipo">
+      <option value="">Todos los tipos</option>
+      <option value="">Teórica</option>
+      <option value="">Práctica</option>
+    </select>
+    <button type="submit">
+      Filtrar
+    </button>
+  </form>
 
 {% if clases %}
 <table class="calendar-table">
@@ -58,14 +95,49 @@
     </tr>
   </thead>
 
-  <tbody>
+  <td>
+    <tbody>
     {% for clase in clases %}
     <tr class="calendar-columns">
+    <form action="{{ url_for('courses.editar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}" method="POST">
+      {% if id_clase_editar==clase.id_clase %}
+      <td><input type="number" name="semana" value="{{ clase.semana }}"></td>
+      <td><input type="date" name="fecha_clase" value="{{ clase.fecha }}"></td>
+      <td><input type="text" name="temas" value="{{ clase.temas }}"></td>
+      <td>
+          <select name="tipo">
+            <option value="Practica"> Práctica </option>
+            <option value="Teorica"> Teórica </option>
+          </select>
+      </td>
+      <td>
+          <select name="modalidad">
+            <option value="Presencial"> Presencial </option>
+            <option value="Virtual"> Virtual </option>
+          </select>
+      </td>
+
+      <td>
+        <button type="submit">
+          Guardar
+        </button>
+      </td>
+    </form>
+      <td>
+        <form method="GET">
+          <input type="hidden" name="tab" value="calendar" >
+          <button type="submit">
+            Cancelar
+          </button>
+        </form>
+      </td>
+    {% else %}
       <td>{{ clase.semana }}</td>
       <td>{{ clase.fecha }}</td>
       <td>{{ clase.temas }}</td>
       <td>{{ clase.tipo }}</td>
       <td>{{ clase.modalidad }}</td>
+      
       <td>
         <form action="{{ url_for('courses.eliminar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}" 
         method="POST" style="display:inline;">
@@ -74,7 +146,18 @@
           </button>
         </form>
       </td>
-    </tr>
+      <td>
+        <form method="GET">
+          <input type="hidden" name="tab" value="calendar" >
+          <input type="hidden" name="editar" value="{{ clase.id_clase }}" >
+          <button type="submit">
+            Editar
+          </button>
+        </form>
+    {% endif %}
+      </td>
+  </td>
+  </tr>
     {% endfor %}
   </tbody>
 </table>
