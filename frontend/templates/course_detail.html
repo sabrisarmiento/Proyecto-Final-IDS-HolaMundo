@@ -66,11 +66,15 @@
           + Crear aviso
         </a>
         <a class="btn-crear"
-          href="{{ url_for('advertisements.connect_slack_front', id_curso=course['id_curso']) }}">
-          Conectar Slack
+          href="{{ url_for('advertisements.configure_slack_front', id_curso=course['id_curso']) }}">
+          Configurar Slack
         </a>
+        <form method="POST" action="{{ url_for('advertisements.disconnect_slack_front', id_curso=course['id_curso']) }}">
+          <button type="submit" class="btn-crear">
+            Desconectar Slack
+          </button>
+        </form>
       </div>
-
       {% if advertisements %}
         <div class="advertisements-list">
           {% for aviso in advertisements %}

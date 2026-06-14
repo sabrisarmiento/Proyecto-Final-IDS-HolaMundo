@@ -7,7 +7,7 @@ from services.advertisement_service import (
   delete_advertisement_service,
   advertisements_by_subject_service
 )
-from services.slack_advertisement_service import slack_advertisements_service
+
 from middleware.auth_middleware import require_auth
 
 advertisements_bp = Blueprint('advertisements', __name__)
@@ -22,9 +22,9 @@ def get_advertisements():
   }
   return advertisements_service(filters)
 
-@advertisements_bp.route('/advertisements/slack', methods=['GET'])
-def get_slack_advertisements_route():
-  return slack_advertisements_service()
+# @advertisements_bp.route('/advertisements/slack', methods=['GET'])
+# def get_slack_advertisements_route():
+#   return slack_advertisements_service()
 
 @advertisements_bp.route('/advertisements/<id_advertisement>', methods=['GET'])
 def get_advertisement_by_id_route(id_advertisement):
