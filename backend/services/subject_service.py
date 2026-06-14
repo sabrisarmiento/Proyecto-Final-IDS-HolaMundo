@@ -2,6 +2,7 @@ from helpers.responses import error_response, success_response
 from controllers.subject_controller import (
     get_all_subjects,
     get_subject_by_id,
+    get_topics_by_subject_id,
     create_subject,
     patch_subject,
     delete_subject,
@@ -30,6 +31,12 @@ def my_subjects_service(id_user, is_admin, filters):
         return error_response(result)
     return success_response({"subjects": result["data"]})
 
+
+def get_topics_service(subject_id):
+    result = get_topics_by_subject_id(subject_id)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({"topics": result["data"]})
 
 def create_subject_service(data):
   result = create_subject(data)
