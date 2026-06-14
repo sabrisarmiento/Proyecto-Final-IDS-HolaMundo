@@ -1,7 +1,7 @@
 <div class="subject-select-container">
   <select title="subject-select" id="subject-select" onchange="changeSubject(this.value)">
     <option value="general" {% if not selected_subject %}selected{% endif %}>
-      General
+      {{ select_placeholder | default("General") }}
     </option>
     {% for s in subjects %}
       <option value="{{ s.id_materia }}"

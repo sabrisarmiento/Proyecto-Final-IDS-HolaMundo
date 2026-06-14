@@ -9,14 +9,11 @@ block extra_styles %}
 />
 {% endblock %} {% block content %}
 
+{% if subject.subject and subject.subject.nombre %}
+
 <section class="hero">
-  <h2>
-    {% if subject.subject and subject.subject.nombre %} {{
-    subject.subject.nombre }} {% else %} Panel FIUBA {% endif %}
-  </h2>
-  <p>
-    FIUBA{% if subjects and subject.nombre %} - {{ subject.nombre }}{% endif %}
-  </p>
+  <h2>{{ subject.subject.nombre }}</h2>
+  <p>FIUBA</p>
 </section>
 
 {% if cursos and cursos[0].slack_url %}
@@ -34,7 +31,7 @@ block extra_styles %}
 <section class="info-panel">
   {% if clases %}
   <div
-    class="info-panel-classes {% if not courses[0].youtube_url %}full-width{% endif %}"
+    class="info-panel-classes {% if not cursos[0].youtube_url %}full-width{% endif %}"
   >
     <h3 class="week-title">
       <i class="fa-solid fa-calendar-days"></i>
@@ -96,27 +93,22 @@ block extra_styles %}
 </section>
 {% endif %}
 
+{% if docentes %}
 <section class="teachers-section">
   <h2>Equipo Docente</h2>
-  <!-- hasta que no esten bien definidos roles se mantiene fija esta sección-->
   <div class="teachers-grid">
+    {% for docente in docentes %}
     <div class="teacher-card">
       <div class="teacher-avatar">
         <i class="fa-solid fa-user-tie"></i>
       </div>
-      <h3>Bruno Lanzillotta</h3>
-      <p>Profesor Titular</p>
+      <h3>{{ docente.nombre }} {{ docente.apellido }}</h3>
+      <p>{{ docente.rol }}</p>
     </div>
-    <div class="teacher-card">
-      <div class="teacher-avatar">
-        <!-- <i class="fa-solid fa-user-graduate"></i>  una Mousekeherramienta que servira mas tarde-->
-        <i class="fa-solid fa-user-tie"></i>
-      </div>
-      <h3>Tómas Rodríguez</h3>
-      <p>Profesor</p>
-    </div>
+    {% endfor %}
   </div>
 </section>
+{% endif %}
 
 <button
   class="floating-announcements"
@@ -130,4 +122,20 @@ block extra_styles %}
 <article class="modal-aviso">
   <h4>{{ aviso.titulo }}</h4>
 </article>
-{% endfor %} {% endcall %} {% endblock %}
+{% endfor %} {% endcall %}
+
+{% else %}
+
+<section class="hero hero-welcome">
+  <h2>Bienvenido a Panel FIUBA</h2>
+  <p>Seleccioná tu materia para ver la información de tu cátedra</p>
+
+  {% if subjects %}
+    {% set select_placeholder = "Seleccioná tu materia" %}
+    {% include "components/subject_select.html" %}
+  {% endif %}
+</section>
+
+{% endif %}
+
+{% endblock %}
