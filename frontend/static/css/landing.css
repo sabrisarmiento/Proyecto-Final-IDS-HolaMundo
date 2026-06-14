@@ -178,6 +178,11 @@
   color: var(--color-9);
 }
 
+/* ============ REGIMEN DE APROBACION ========== */
+
+.regimen-content { display: none; padding: 1rem; }
+.regimen-content.open { display: block; }
+
 /* ===== CALENDER BUTTON ===== */
 .classes-container button {
   width: fit-content;

@@ -95,6 +95,22 @@
     </div>
   </div>
 
+<div class="config-section">
+    <h3 class="config-section-title">Regimen de aprobación</h3>
+
+    <div class="config-field">
+      <label class="config-label">
+        Introduzca su regimen de aprobación <br>(Escriba un mensaje)
+      </label>
+      <textarea
+      class="config-input"
+      id="cfg-regimen"
+      name="regimen_aprobacion"
+      rows="5"
+      placeholder="Ej: 75% de asistencia, 2 parciales obligatorios..."
+    >{{ course.regimen_aprobacion or '' }}</textarea>
+    </div>
+
   <div class="config-actions">
     <button type="submit" class="config-btn-save">Guardar cambios</button>
   </div>

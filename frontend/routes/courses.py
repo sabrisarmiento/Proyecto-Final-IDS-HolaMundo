@@ -752,10 +752,14 @@ def update_course_config(course_id):
     }
     slack_url   = request.form.get('slack_url', '').strip()
     youtube_url = request.form.get('youtube_url', '').strip()
+    regimen_aprobacion = request.form.get('regimen_aprobacion', '').strip()
+    
     if slack_url:
         data['slack_url'] = slack_url
     if youtube_url:
         data['youtube_url'] = youtube_url
+    if regimen_aprobacion:
+        data['regimen_aprobacion'] = regimen_aprobacion
 
     try:
         res = requests.patch(f'http://127.0.0.1:5000/courses/{course_id}', json=data, headers=headers)

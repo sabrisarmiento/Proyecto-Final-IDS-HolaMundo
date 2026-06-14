@@ -14,7 +14,8 @@ def get_all_courses(filters):
                 c.cuatrimestre,
                 c.anio,
                 c.slack_url,
-                c.youtube_url
+                c.youtube_url,
+                c.regimen_aprobacion
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
         """
@@ -49,7 +50,7 @@ def get_all_courses(filters):
 def get_course_id(id_course):
     try:
         sql = """
-            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio,  c.slack_url, c.youtube_url
+            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio,  c.slack_url, c.youtube_url, c.regimen_aprobacion
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
             WHERE c.id_curso = %s
@@ -109,7 +110,7 @@ def patch_course(id_course, data):
         id_profe = data.get('id_profesor')
         slack_url   = data.get('slack_url')
         youtube_url = data.get('youtube_url')
-
+        regimen_aprobacion = data.get('regimen_aprobacion')
         updates = []
         params = []
 
@@ -134,6 +135,9 @@ def patch_course(id_course, data):
         if youtube_url is not None:
             updates.append("youtube_url = %s")
             params.append(youtube_url)
+        if regimen_aprobacion is not None:
+            updates.append("regimen_aprobacion = %s")
+            params.append(regimen_aprobacion)
 
         if not updates:
             return {
