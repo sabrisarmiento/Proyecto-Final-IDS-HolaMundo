@@ -46,21 +46,33 @@ def get_advertisements_by_subject(id_subject):
         return []
 
 
-def get_slack_advertisements():
+# def get_slack_advertisements():
+#     try:
+#         response = requests.get(f"{API_URL}/advertisements/slack")
+#         response.raise_for_status()
+
+#         return response.json().get("advertisements", [])
+
+#     except Exception as e:
+#         print(f"Error al obtener avisos de Slack: {e}")
+#         return []
+def get_slack_advertisements_by_course(id_course):
     try:
-        response = requests.get(f"{API_URL}/advertisements/slack")
+        response = requests.get(
+            f"{API_URL}/courses/{id_course}/slack/messages"
+        )
+
         response.raise_for_status()
 
-        return response.json().get("advertisements", [])
+        return response.json().get("messages", [])
 
     except Exception as e:
-        print(f"Error al obtener avisos de Slack: {e}")
+        print(f"Error al obtener avisos de Slack del curso {id_course}: {e}")
         return []
-
 
 def get_all_combined_advertisements(id_course=None):
     normal_advertisements = get_advertisements_by_course(id_course)
-    slack_advertisements = get_slack_advertisements()
+    slack_advertisements = get_slack_advertisements_by_course(id_course)
 
     advertisements = normal_advertisements + slack_advertisements
 
@@ -116,3 +128,46 @@ def create_advertisement(id_course, title, message, token):
             "status_code": 500,
             "data": str(e)
         }
+    
+def configure_slack_course(id_course, slack_bot_token, slack_channel_id, slack_channel_name, permite_escritura, permite_lectura, token):
+    try:
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "slack_bot_token": slack_bot_token,
+            "slack_channel_id": slack_channel_id,
+            "slack_channel_name": slack_channel_name,
+            "permite_escritura": permite_escritura,
+            "permite_lectura": permite_lectura
+        }
+
+        response = requests.post(
+            f"{API_URL}/courses/{id_course}/slack/config",
+            json=data,
+            headers=headers
+        )
+
+        if response.status_code in [200, 201]:
+            return {
+                "ok": True,
+                "data": response.json()
+            }
+
+        return {
+            "ok": False,
+            "status_code": response.status_code,
+            "data": response.json()
+        }
+
+    except Exception as e:
+        print(f"Error al configurar Slack: {e}")
+
+        return {
+            "ok": False,
+            "status_code": 500,
+            "data": str(e)
+        }
+    

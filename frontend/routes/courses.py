@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify, Response
 
 import requests
-from services.advertisements_service import get_advertisements_by_course
+from services.advertisements_service import get_advertisements_by_course, get_all_combined_advertisements
 from services.courses_service import get_courses, get_course_by_id, post_course
 from services.students_services import post_student, patch_student
 from services.exams_service import get_exams_by_course_id
@@ -335,6 +335,7 @@ def course_detail(course_id):
     pending_team_change = session.get("pending_team_change")
 
     try:
+        #advertisements = get_advertisements_by_course(course_id)
         advertisements = get_advertisements_by_course(course_id)
     except Exception:
         advertisements = []

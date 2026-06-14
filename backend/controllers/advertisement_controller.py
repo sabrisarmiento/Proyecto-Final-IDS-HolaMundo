@@ -64,9 +64,9 @@ def get_advertisement_by_id(id_advertisement):
         mensaje,
         fecha
       FROM avisos
-      WHERE id_usuario = %s
+      WHERE id_aviso = %s
     """
-    result = query_db(sql, (id_advertisement,))\
+    result = query_db(sql, (id_advertisement,))
     
     if not result:
       return {
@@ -94,7 +94,6 @@ def create_advertisement(data, user):
     title = data.get("titulo")
     message = data.get("mensaje")
 #    user_mail = user["correo"]
-    print("USER DEL TOKEN:", user)
     user_mail = user.get("correo", "Usuario Panel FIUBA")
     
     if not id_course or not title or not message:
@@ -164,7 +163,7 @@ def patch_advertisement_by_id(id_advertisement, data):
         "description": "No se enviaron campos para actualizar"
       }
 
-    sql = f"UPDATE avisos SET {', '.join(updates)} WHERE id_usuario = %s"
+    sql = f"UPDATE avisos SET {', '.join(updates)} WHERE id_aviso = %s"
     params.append(id_advertisement)
 
     modify_row = modify_db(sql, params)
@@ -191,7 +190,7 @@ def patch_advertisement_by_id(id_advertisement, data):
 
 def delete_advertisement_by_id(id_advertisement):
   try:
-    sql = "DELETE FROM avisos WHERE id_usuario = %s"
+    sql = "DELETE FROM avisos WHERE id_aviso = %s"
 
     modify_row = modify_db(sql, (id_advertisement,))
 
