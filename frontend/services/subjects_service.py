@@ -27,6 +27,15 @@ def get_subject_by_id(id_materia):
         print(f"Error al obtener la materia {id_materia}: {e}")
         return []
 
+def get_topics_by_subject_id(id_materia):
+    try:
+        response = requests.get(f"http://127.0.0.1:5000/subjects/{id_materia}/temas")
+        response.raise_for_status()
+        return response.json().get("temas", [])
+    except Exception as e:
+        print(f"Error al obtener temas de la materia {id_materia}: {e}")
+        return []
+
 def get_subject_by_name(name):
   try:
     res = requests.get("http://127.0.0.1:5000/subjects", params={"nombre": str(name)})

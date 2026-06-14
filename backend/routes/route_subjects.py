@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from services.subject_service import (
   subjects_service,
   subject_service,
+  get_topics_service,
   create_subject_service,
   patch_subject_service,
   delete_subject_service,
@@ -30,6 +31,10 @@ def get_my_subjects():
 @subjects_bp.route('/subjects/<int:subject_id>', methods=['GET'])
 def get_subject(subject_id):
   return subject_service(subject_id)
+
+@subjects_bp.route('/subjects/<int:subject_id>/temas', methods=['GET'])
+def get_subject_topics(subject_id):
+    return get_topics_service(subject_id)
 
 @subjects_bp.route('/subjects', methods=['POST'])
 @require_auth
