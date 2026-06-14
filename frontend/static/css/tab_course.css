@@ -1,0 +1,120 @@
+.tab-panel{}
+
+.hidden{
+    display: none;
+}
+
+.tab-panel section{}
+
+.btn-create-student{
+    border: none;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.2s;
+    margin-bottom: 15px;
+    background: var(--color-3);
+    color: var(--color-10);
+}
+
+.btn-create-student:hover {
+    background: var(--color-25);
+}
+
+.tab-table{
+    border-collapse: collapse;
+    overflow: hidden;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.tab-table thead{}
+
+.tab-table a{
+    text-decoration: none;
+    color: var(--color-45);
+}
+
+.tab-table tbody{}
+
+.tab-table tbody tr:hover {
+    background: var(--color-6);
+}
+
+.tab-table tr{}
+
+.tab-table th{
+    text-align: left;
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+    background: var(--color-9);
+    color: var(--color-5);
+}
+
+.tab-table td{
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--color-6);
+    font-size: 0.8rem;
+    color: var(--color-15);
+}
+
+/* SWITCH DEL ESTADO ALUMNO */
+.switch-container{
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch-container input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-container input:checked + .slider {
+    background-color: #4caf50;
+}
+
+.switch-container input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.slider{
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    transition: 0.4s;
+    border-radius: 28px;
+    background: #ccc;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    transition: 0.4s;
+    border-radius: 50%;
+    background: white;
+}
+
+.btn-edit-student{}
+
+.tab-empty{
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    border: 1.5px dashed var(--color-6);
+    border-radius: 10px;
+    padding: 0.85rem 1.2rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    background: var(--color-45);
+    color: var(--color-8);
+}

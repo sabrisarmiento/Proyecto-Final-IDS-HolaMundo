@@ -5,10 +5,11 @@
 
 .course-detail-header h1 {
   margin-bottom: 0;
+  margin-top: 0.7rem;
 }
 
 .course-detail-header p {
-  margin-top: 0.3rem;
+  margin-top: 0;
   color: var(--color-8);
 }
 
@@ -28,8 +29,6 @@
 .course-detail-content {
   width: 97dvw;
   margin: 0 auto;
-  padding-top: 1.5rem !important;
-  margin-top: 0.5rem !important;
 }
 
 .course-nav {
@@ -71,41 +70,6 @@
   font-size: 1.02rem;
   padding-top: 1rem;
   padding-bottom: 1.25rem;
-}
-
-.tab-panel {
-}
-
-.hidden {
-  display: none;
-}
-
-.tab-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.tab-table th {
-  text-align: left;
-  padding: 0.75rem 1rem;
-  background: var(--color-9);
-  color: var(--color-5);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-}
-
-.tab-table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--color-6);
-  color: var(--color-15);
-  font-size: 1rem;
-}
-
-.tab-table tbody tr:hover {
-  background: var(--color-6);
 }
 
 .status-active {
@@ -274,19 +238,6 @@
 
 .qg-subtitle {
   font-size: 0.88rem;
-}
-
-.tab-empty {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  background: var(--color-45);
-  border: 1.5px dashed var(--color-6);
-  border-radius: 10px;
-  padding: 0.85rem 1.2rem;
-  margin: 1.5rem 0;
-  color: var(--color-8);
-  font-size: 0.95rem;
 }
 
 .qg-right-controls {
@@ -590,9 +541,10 @@
 .pagination {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   align-items: center;
   flex-wrap: wrap;
+  font-size: 0.7rem;
 }
 
 .page-btn {
@@ -601,7 +553,6 @@
   border: 1px solid var(--color-6);
   color: var(--color-9);
   text-decoration: none;
-  font-size: 0.9rem;
   transition: background-color 0.2s;
 }
 
@@ -1098,22 +1049,6 @@
   border-color: var(--color-3);
 }
 
-.btn-create-student {
-  background: var(--color-3);
-  color: var(--color-10);
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-  margin-bottom: 15px;
-}
-
-.btn-create-student:hover {
-  background: var(--color-25);
-}
-
 .team-card {
   border: 1px solid var(--color-6);
   border-radius: 10px;
@@ -1243,48 +1178,6 @@
 .calendar-table { padding: 2rem; }
 .calendar-header { color: black; }
 .calendar-columns { color: black; }
-
-.switch-container {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 28px;
-}
-
-.switch-container input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #ccc;
-  transition: 0.4s;
-  border-radius: 28px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 22px;
-  width: 22px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-.switch-container input:checked + .slider {
-  background-color: #4caf50;
-}
-
-.switch-container input:checked + .slider:before {
-  transform: translateX(22px);
-}
 
 .eval-tipo-pill-wrapper {
   margin-top: 0.75rem;
@@ -1461,4 +1354,8 @@
 
 .eval-select-tipo:focus {
   border-color: var(--color-7);
+}
+
+.nav-btn {
+  text-decoration: none;
 }
