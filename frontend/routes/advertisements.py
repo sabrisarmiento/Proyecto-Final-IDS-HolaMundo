@@ -245,7 +245,11 @@ def delete_advertisement_front(id_aviso):
   if not token:
     return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
 
-  delete_advertisement(id_aviso, token)
+  result = delete_advertisement(id_aviso, token)
+
+  if not result["ok"]:
+    if result.get("status_code") == 403:
+      return redirect(url_for("advertisements.public_advertisements") + "?error=No tenés permiso para borrar este aviso")
 
   if id_curso:
     return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")

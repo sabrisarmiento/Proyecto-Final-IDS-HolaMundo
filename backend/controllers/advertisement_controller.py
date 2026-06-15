@@ -78,7 +78,7 @@ def get_advertisement_by_id(id_advertisement):
       }
     return {
       "ok": True,
-      "data": result
+      "data": result[0]
     }
   except Exception as e:
     return {
@@ -133,8 +133,24 @@ def create_advertisement(data, user):
       "description": str(e)
     }
 
-def patch_advertisement_by_id(id_advertisement, data):
+def patch_advertisement_by_id(id_advertisement, data, user):
   try:
+    advertisement_result = get_advertisement_by_id(id_advertisement)
+    if not advertisement_result["ok"]:
+      return advertisement_result
+
+    advertisement = advertisement_result["data"]
+
+    id_course = advertisement["id_curso"]
+    id_user = user["id_usuario"]
+
+    if not user_belongs_to_course(id_user, id_course):
+      return {
+        "ok": False,
+        "code": 403,
+        "message": "Forbidden",
+        "description": "No tenés permiso para editar este aviso"
+      }
     title = data.get("titulo")
     message = data.get("mensaje")
 
@@ -181,8 +197,24 @@ def patch_advertisement_by_id(id_advertisement, data):
       "description": str(e)
     }
 
-def delete_advertisement_by_id(id_advertisement):
+def delete_advertisement_by_id(id_advertisement, user):
   try:
+    advertisement_result = get_advertisement_by_id(id_advertisement)
+    if not advertisement_result["ok"]:
+      return advertisement_result
+
+    advertisement = advertisement_result["data"]
+
+    id_course = advertisement["id_curso"]
+    id_user = user["id_usuario"]
+
+    if not user_belongs_to_course(id_user, id_course):
+      return {
+        "ok": False,
+        "code": 403,
+        "message": "Forbidden",
+        "description": "No tenés permiso para eliminar este aviso"
+      }
     sql = "DELETE FROM avisos WHERE id_aviso = %s"
 
     modify_row = modify_db(sql, (id_advertisement,))
@@ -196,7 +228,7 @@ def delete_advertisement_by_id(id_advertisement):
       }
     return {
       "ok": True,
-      "data": f"Aviso con ID {id_advertisement} eliminado correctamente"
+      "message": f"Aviso con ID {id_advertisement} eliminado correctamente"
     }
   except Exception as e:
     return {

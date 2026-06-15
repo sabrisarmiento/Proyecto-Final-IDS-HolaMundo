@@ -25,16 +25,16 @@ def advertisement_service(id_advertisement):
       "advertisement": result["data"]
   })
 
-def patch_advertisement_service(id_advertisement, data):
-  result = patch_advertisement_by_id(id_advertisement, data)
+def patch_advertisement_service(id_advertisement, data, user):
+  result = patch_advertisement_by_id(id_advertisement, data, user)
   if not result["ok"]:
       return error_response(result)
   return success_response({
       "message": result["message"]
   })
 
-def delete_advertisement_service(id_advertisement):
-  result = delete_advertisement_by_id(id_advertisement)
+def delete_advertisement_service(id_advertisement, user):
+  result = delete_advertisement_by_id(id_advertisement, user)
   if not result["ok"]:
       return error_response(result)
   return success_response({
