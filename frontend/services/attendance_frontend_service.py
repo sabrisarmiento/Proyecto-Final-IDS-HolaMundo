@@ -24,3 +24,10 @@ def mark_attendance(payload):
         return r.json(), r.status_code
     except Exception as e:
         return {"errors": [{"description": str(e)}]}, 502
+    
+def get_class(id_clase):
+    try:
+        r = requests.get(f"{BASE}/clases/{id_clase}")
+        return r.json().get("class") if r.status_code == 200 else None
+    except Exception:
+        return None

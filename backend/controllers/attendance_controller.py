@@ -94,21 +94,25 @@ def create_attendance(data):
                 "description": "El alumno figura como abandonó la cursada"
             }
 
-        if lat is None or lon is None:
-            return {
-                "ok": False,
-                "code": 400,
-                "message": "Bad Request",
-                "description": "Se requiere ubicación GPS para validar asistencia"
-            }
+        clase = query_db("SELECT modalidad FROM clases WHERE id_clase = %s", (id_clase,))
+        is_virtual = bool(clase) and clase[0]["modalidad"] == "Virtual"
 
-        if not proximity_fiuba(float(lat), float(lon)):
-            return {
-                "ok": False,
-                "code": 403,
-                "message": "Forbidden",
-                "description": "Ubicación fuera del rango permitido"
-            }
+        if not is_virtual:
+            if lat is None or lon is None:
+                return {
+                    "ok": False,
+                    "code": 400,
+                    "message": "Bad Request",
+                    "description": "Se requiere ubicación GPS para validar asistencia"
+                }
+
+            if not proximity_fiuba(float(lat), float(lon)):
+                return {
+                    "ok": False,
+                    "code": 403,
+                    "message": "Forbidden",
+                    "description": "Ubicación fuera del rango permitido"
+                }
         
         belongs = query_db(
             "SELECT 1 FROM alumnos a JOIN clases c ON a.id_curso = c.id_curso WHERE a.id_alumno = %s AND c.id_clase = %s",

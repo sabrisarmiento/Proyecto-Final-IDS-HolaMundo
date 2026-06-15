@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from services.attendance_frontend_service import attendance_get_all, generate_qr, mark_attendance
+from services.attendance_frontend_service import attendance_get_all, generate_qr, mark_attendance, get_class
 from services.subjects_service import get_my_subjects
 from services.courses_service import get_my_courses
 from services.calendar_service import calendar_get_all
@@ -57,11 +57,15 @@ def generate_qr_view():
 
 @attendance_bp.route('/presente', methods=['GET'])
 def attendance_page():
+    id_clase = request.args.get('id_clase')
+    clase = get_class(id_clase)
+    is_virtual = bool(clase) and clase.get("modalidad") == "Virtual"
     return render_template(
         'attendance_checkin.html',
         id_alumno=request.args.get('id_alumno'),
-        id_clase=request.args.get('id_clase'),
+        id_clase=id_clase,
         code=request.args.get('code'),
+        is_virtual=is_virtual,
     )
 
 @attendance_bp.route('/presente/marcar', methods=['POST'])
