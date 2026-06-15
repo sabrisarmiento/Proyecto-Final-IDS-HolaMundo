@@ -42,6 +42,9 @@ def students_active_qr(id_clase):
         return query_db(sql, (id_clase,))
     except Exception:
         return []
+    
+def mark_qr_generated(id_clase):
+    modify_db("UPDATE clases SET qr_generado_en = NOW() WHERE id_clase = %s", (id_clase,))
 
 def proximity_fiuba(user_lat, user_lon):
     FACULTAD_LAT = -34.61771131976023
@@ -106,7 +109,43 @@ def create_attendance(data):
                 "message": "Forbidden",
                 "description": "Ubicación fuera del rango permitido"
             }
+        
+        belongs = query_db(
+            "SELECT 1 FROM alumnos a JOIN clases c ON a.id_curso = c.id_curso WHERE a.id_alumno = %s AND c.id_clase = %s",
+            (id_alumno, id_clase),
+        )
+        if not belongs:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "El alumno no pertenece al curso de esta clase"
+            }
 
+        window_open = query_db(
+            "SELECT 1 FROM clases WHERE id_clase = %s AND qr_generado_en IS NOT NULL AND NOW() <= qr_generado_en + INTERVAL 3 HOUR",
+            (id_clase,),
+        )
+        if not window_open:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "El código QR expiró o no fue generado para esta clase"
+            }
+
+        already = query_db(
+            "SELECT id_asistencia FROM asistencia WHERE id_alumno = %s AND id_clase = %s",
+            (id_alumno, id_clase),
+        )
+        if already:
+            return {
+                "ok": False,
+                "code": 409,
+                "message": "Conflict",
+                "description": "La asistencia para esta clase ya fue registrada"
+            }
+        
         sql = "INSERT INTO asistencia (id_alumno, id_clase, presente) VALUES (%s, %s, %s)"
         modify_db(sql, (data["id_alumno"], data["id_clase"], data.get("presente", True)))
         return {

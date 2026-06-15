@@ -9,6 +9,7 @@ from controllers.attendance_controller import (
     update_attendance,
     delete_attendance,
     students_active_qr,
+    mark_qr_generated,
 )
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5001")
@@ -76,6 +77,8 @@ def generate_qr_service(id_clase):
 
         if not alumnos:
             return jsonify({"message": "No se encontraron alumnos activos para esta clase"}), 404
+
+        mark_qr_generated(id_clase)
 
         enviados = 0
         for alumno in alumnos:
