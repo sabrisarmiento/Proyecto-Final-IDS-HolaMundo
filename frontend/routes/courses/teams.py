@@ -10,11 +10,16 @@ def create_team(course_id):
             "nombre_equipo": request.form.get("nombre_equipo"),
             "id_curso": course_id
         })
-        if response.status_code == 409:
-            flash(response.json().get("description"), "error")
+        if response.ok:
+            flash("Equipo creado correctamente.", "success")
+        elif response.status_code == 409:
+            flash(response.json()["errors"][0]["description"], "error")
+        else:
+            flash("No se pudo crear el equipo.", "error")
     except Exception as e:
         print("Error creando equipo:", e)
-    return redirect(url_for("courses.course_detail", course_id=course_id, tab="teams"))
+        flash("Ocurrió un error al crear el equipo.", "error")
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cursos/<int:course_id>/equipos/eliminar', methods=['POST'])
 def delete_teams(course_id):
