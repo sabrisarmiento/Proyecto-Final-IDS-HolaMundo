@@ -62,14 +62,18 @@ def add_student_to_team(course_id):
 @courses_bp.route('/cursos/<int:course_id>/equipos/cambiar', methods=['POST'])
 def change_student_team(course_id):
     try:
-        requests.post(f"{BACKEND_URL}/equipo-alumno", headers=auth_headers(), json={
-            "id_equipo": request.form.get("id_equipo"),
-            "padron": request.form.get("padron"),
-            "forzar": True
-        })
+        requests.post(f"{BACKEND_URL}/equipo-alumno", headers=auth_headers(),
+            json={
+                "id_equipo": request.form.get("id_equipo"),
+                "padron": request.form.get("padron"),
+                "forzar": True
+            }
+        )
         session.pop("pending_team_change", None)
+        flash("Alumno cambiado de equipo correctamente.", "success")
     except Exception as e:
         print("Error cambiando alumno de equipo:", e)
+        flash("No se pudo cambiar al alumno de equipo.", "error")
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cursos/<int:course_id>/equipos/cancelar-cambio', methods=['POST'])
