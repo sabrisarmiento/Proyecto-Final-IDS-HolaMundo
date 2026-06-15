@@ -68,7 +68,9 @@ def get_team_by_id(id):
             a.id_alumno,
             a.nombre,
             a.apellido,
-            a.padron
+            a.padron,
+            a.correo,
+            a.estado_alumno
         FROM equipos e
         LEFT JOIN equipo_alumno ea ON e.id_equipo = ea.id_equipo
         LEFT JOIN alumnos a ON ea.id_alumno = a.id_alumno
@@ -94,7 +96,9 @@ def get_team_by_id(id):
                     "id_alumno": row["id_alumno"],
                     "nombre": row["nombre"],
                     "apellido": row["apellido"],
-                    "padron": row["padron"]
+                    "padron": row["padron"],
+                    "correo": row["correo"],
+                    "estado_alumno": row["estado_alumno"]
                 })
         return {
             "ok": True,
