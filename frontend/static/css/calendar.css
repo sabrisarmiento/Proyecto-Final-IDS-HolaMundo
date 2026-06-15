@@ -14,8 +14,8 @@
 /* Encabezado */
 .section-header-schedule {
     display: flex;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
     gap: 0.5rem;
     margin: 2rem auto 1rem;
     text-align: center;
@@ -37,7 +37,6 @@
 .section-schedule {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
     gap: 1.5rem;
     width: 100%;
     max-width: 1200px;
@@ -46,7 +45,13 @@
     box-sizing: border-box;
 }
 
-/* Selector de materia */
+.schedule-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
 #select-courses {
     width: 100%;
     max-width: 22rem;
@@ -71,7 +76,19 @@
     box-shadow: 0 0 0 3px var(--color-16);
 }
 
-/* Lista de semanas */
+.schedule-search {
+    width: 100%;
+    max-width: 280px;
+    height: 38px;
+    padding: 0 0.9rem;
+    border: 1px solid var(--color-6);
+    border-radius: 0.75rem;
+    background: var(--color-45);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    margin: 0;
+}
+
 .classes-container {
     display: grid;
     grid-template-columns: 1fr;
@@ -155,58 +172,4 @@
     font-weight: 600;
     text-transform: capitalize;
     width: fit-content;
-}
-
-.schedule-search{
-    width:100%;
-    max-width:420px;
-    margin-top:1rem;
-    padding:.75rem 1rem;
-    border:1px solid var(--color-6);
-    border-radius:.75rem;
-    background:var(--color-45);
-    font-size:.95rem;
-}
-
-.schedule-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap; /* por si pantalla chica */
-}
-
-/* SELECT */
-#select-courses {
-  height: 38px;
-  padding: 0 0.9rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-6);
-  background: var(--color-45);
-  color: var(--color-8);
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-}
-
-/* INPUT BUSCADOR */
-.schedule-search {
-  height: 38px;
-  padding: 0 0.9rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--color-6);
-  background: var(--color-45);
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  margin: 0;
-  line-height: 38px;
-}
-
-.schedule-search {
-    width: 100%;
-    max-width: 280px;
-    padding: 0.65rem 0.9rem;
-    border: 1px solid var(--color-6);
-    border-radius: 0.75rem;
-    background: var(--color-45);
-    font-size: 0.95rem;
 }
