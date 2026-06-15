@@ -12,6 +12,12 @@
 <body>
 <main class="checkin">
     <h1>Marcar asistencia</h1>
+    {% if clase %}
+    <div class="class-info">
+        <p><strong>Clase N.º {{ clase.numero }}</strong> — {{ clase.materia }} (Cátedra {{ clase.catedra }})</p>
+        <p>Fecha: {{ clase.fecha }} · Tema: {{ clase.temas or '—' }}</p>
+    </div>
+    {% endif %}
     <p>{% if is_virtual %}Confirmá tu asistencia a la clase virtual.{% else %}Necesitamos tu ubicación para validar que estás en la facultad.{% endif %}</p>
     <button id="btn" class="btn-action">Dar el presente</button>
     <div id="result"></div>

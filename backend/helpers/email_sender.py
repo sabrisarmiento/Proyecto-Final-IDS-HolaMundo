@@ -6,22 +6,26 @@ from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
 
-def send_attendance_email(destinatario, nombre_alumno, qr_link, valido_hasta=None):
-    # cuenta de google para enviar los mails
+def send_attendance_email(destinatario, nombre_alumno, qr_link, valido_hasta=None, clase=None):
     remitente = os.getenv("EMAIL_USER")
     password = os.getenv("EMAIL_PASS")
     
     mensaje = MIMEMultipart()
     mensaje['From'] = remitente
     mensaje['To'] = destinatario
-    mensaje['Subject'] = "Asistencia - Código QR Dinámico"
+    mensaje['Subject'] = f"Asistencia - Clase {clase['numero']} de {clase['materia']}" if clase else "Asistencia - Código QR Dinámico"
 
     validez = f"<p>El código es válido hasta las <b>{valido_hasta}</b>.</p>" if valido_hasta else ""
+    detail = (
+        f"<p><b>Clase N.º {clase['numero']}</b> — {clase['materia']} (Cátedra {clase['catedra']})</p>"
+        f"<p>Fecha: {clase['fecha']} · Tema: {clase['temas'] or '—'}</p>"
+    ) if clase else ""
 
     cuerpo = f"""
     <html>
         <body>
             <h3>Hola {nombre_alumno},</h3>
+            {detail}
             <p>Para marcar la asistencia, escaneá el código QR o hacé clic en el enlace:</p>
             <a href="{qr_link}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
                 Dar el Presente

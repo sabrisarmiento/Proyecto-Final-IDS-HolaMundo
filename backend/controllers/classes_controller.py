@@ -39,7 +39,20 @@ def get_classes(filters):
 
 def get_class_id(id_clase):
     try:
-        query = "SELECT id_clase, fecha, temas, tipo, modalidad, semana, id_curso FROM clases WHERE id_clase = %s"
+        query = """
+            SELECT
+                c.id_clase, c.fecha, c.temas, c.tipo, c.modalidad, c.semana, c.id_curso,
+                cur.catedra,
+                m.nombre AS materia,
+                (SELECT COUNT(*) FROM clases c2
+                WHERE c2.id_curso = c.id_curso
+                AND (c2.fecha < c.fecha OR (c2.fecha = c.fecha AND c2.id_clase <= c.id_clase))
+                ) AS numero
+            FROM clases c
+            JOIN cursos cur ON c.id_curso = cur.id_curso
+            JOIN materias m ON cur.id_materia = m.id_materia
+            WHERE c.id_clase = %s
+        """
         result = query_db(query, (id_clase,))
 
         if not result:

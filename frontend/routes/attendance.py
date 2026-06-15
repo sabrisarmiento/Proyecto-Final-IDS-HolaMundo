@@ -68,6 +68,7 @@ def attendance_page():
         id_clase=id_clase,
         code=request.args.get('code'),
         is_virtual=is_virtual,
+        clase=clase,
     )
 
 @attendance_bp.route('/presente/marcar', methods=['POST'])

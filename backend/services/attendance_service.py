@@ -11,6 +11,7 @@ from controllers.attendance_controller import (
     students_active_qr,
     mark_qr_generated,
 )
+from controllers.classes_controller import get_class_id
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5001")
 
@@ -91,6 +92,9 @@ def generate_qr_service(id_clase, horas=None, minutos=None):
         valido_hasta = mark_qr_generated(id_clase, total_minutos)
         hora_str = valido_hasta.strftime("%H:%M") if valido_hasta else ""
 
+        context = get_class_id(id_clase)
+        clase = context["data"] if context.get("ok") else None
+
         enviados = 0
         for alumno in alumnos:
             raw_data = f"{alumno['id_alumno']}-{id_clase}-{os.getenv('ATTENDANCE_SECRET')}"
@@ -98,7 +102,7 @@ def generate_qr_service(id_clase, horas=None, minutos=None):
 
             qr_url = f"{FRONTEND_URL}/presente?id_alumno={alumno['id_alumno']}&id_clase={id_clase}&code={qr_hash}"
 
-            if send_attendance_email(alumno['correo'], alumno['nombre'], qr_url, hora_str):
+            if send_attendance_email(alumno['correo'], alumno['nombre'], qr_url, hora_str, clase):
                 enviados += 1
 
             print(f"Enviando QR a {alumno['correo']}: {qr_url}")
