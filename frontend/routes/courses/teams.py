@@ -23,12 +23,17 @@ def create_team(course_id):
 
 @courses_bp.route('/cursos/<int:course_id>/equipos/eliminar', methods=['POST'])
 def delete_teams(course_id):
+    equipos = [t for t in request.form.get("selected_teams", "").split(",") if t]
+    if not equipos:
+        flash("No se seleccionó ningún equipo.", "warning")
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
     try:
-        selected_teams = [t for t in request.form.get("selected_teams", "").split(",") if t]
-        for team_id in selected_teams:
+        for team_id in equipos:
             requests.delete(f"{BACKEND_URL}/equipos/{team_id}", headers=auth_headers())
+        flash("Equipo eliminado correctamente." if len(equipos) == 1 else f"{len(equipos)} equipos eliminados correctamente.", "success")
     except Exception as e:
         print("Error eliminando equipos:", e)
+        flash("No se pudieron eliminar los equipos.", "error")
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cursos/<int:course_id>/equipos/agregar-alumno', methods=['POST'])
