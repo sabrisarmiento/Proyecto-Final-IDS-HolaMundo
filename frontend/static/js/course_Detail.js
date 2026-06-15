@@ -346,3 +346,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".flash-message").forEach(msg => {
+        msg.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+        setTimeout(() => {
+            msg.style.opacity = "0";
+            msg.style.transform = "translateY(-8px)";
+        }, 4500);
+        setTimeout(() => msg.remove(), 5000);
+    });
+});
