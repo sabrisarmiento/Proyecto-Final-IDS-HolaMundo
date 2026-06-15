@@ -3,7 +3,7 @@ import requests
 #from services.advertisement_frontend_service import AdvertisementFrontendService
 #from services.slack_advertisement_frontend_service import SlackAdvertisementFrontendService
 from services.subjects_service import get_subjects
-from services.advertisements_service import get_advertisements_by_subject, create_advertisement
+from services.advertisements_service import get_advertisements_by_subject, create_advertisement, get_advertisement_by_id, update_advertisement, delete_advertisement
 from services.courses_service import get_courses
 
 advertisements_bp = Blueprint('advertisements', __name__)
@@ -182,3 +182,72 @@ def disconnect_slack_front(id_curso):
     )
 
     return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
+
+@advertisements_bp.route('/avisos/<int:id_aviso>/editar', methods=['GET', 'POST'])
+def edit_advertisement_front(id_aviso):
+  token = session.get("token")
+
+  if not token:
+    return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
+
+  if request.method == 'POST':
+    title = request.form.get("titulo")
+    message = request.form.get("mensaje")
+    id_curso = request.form.get("id_curso")
+
+    result = update_advertisement(id_aviso, title, message, token)
+
+    if result["ok"]:
+      if id_curso:
+        return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
+
+      return redirect(url_for("advertisements.public_advertisements"))
+
+    aviso = {
+      "id_aviso": id_aviso,
+      "titulo": title,
+      "mensaje": message,
+      "id_curso": id_curso
+    }
+
+    return render_template(
+      "edit_advertisement.html",
+      aviso=aviso,
+      id_curso=id_curso,
+      error="No se pudo editar el aviso"
+    )
+  id_curso = request.args.get("id_curso")
+
+  result = get_advertisement_by_id(id_aviso, token)
+
+  if not result["ok"]:
+    return redirect(url_for("advertisements.public_advertisements") + "?error=No se pudo obtener el aviso")
+
+  aviso = result["data"]
+
+  if isinstance(aviso, list):
+    if len(aviso) == 0:
+      return redirect(url_for("advertisements.public_advertisements") + "?error=No se encontró el aviso")
+    aviso = aviso[0]
+
+  return render_template(
+    "edit_advertisement.html",
+    aviso=aviso,
+    id_curso=id_curso
+  )
+
+
+@advertisements_bp.route('/avisos/<int:id_aviso>/eliminar', methods=['POST'])
+def delete_advertisement_front(id_aviso):
+  token = session.get("token")
+  id_curso = request.form.get("id_curso")
+
+  if not token:
+    return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
+
+  delete_advertisement(id_aviso, token)
+
+  if id_curso:
+    return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
+
+  return redirect(url_for("advertisements.public_advertisements"))

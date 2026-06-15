@@ -218,7 +218,7 @@ CREATE TABLE curso_slack_config (
 
 
 
--CREATE TABLE slack_config_logs (
+-- CREATE TABLE slack_config_logs (
 --    id_log INT AUTO_INCREMENT PRIMARY KEY,
 --    id_curso INT NOT NULL,
 --    id_usuario INT,
