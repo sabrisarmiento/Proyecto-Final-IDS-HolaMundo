@@ -22,8 +22,7 @@ def get_all_teams(filters):
         condition = " WHERE 1=1 "
         params = []
         if id_student is not None:
-            sql += """INNER JOIN equipo_alumno ea ON e.id_equipo = ea.id_equipo"""
-            condition += " AND ea.id_alumno = %s "
+            condition += " AND e.id_equipo IN (SELECT id_equipo FROM equipo_alumno WHERE id_alumno = %s) "
             params.append(int(id_student))
         if id_course is not None:
             condition += " AND e.id_curso = %s"
@@ -116,11 +115,10 @@ def create_team(data):
         id_team = modify_db(sql, (name, id_course))
         return {
             "ok": True,
-            "data": {
-                "id_equipo": id_team,
-                "nombre_equipo": name,
-                "id_curso": id_course
-            }
+            "message": "Equipo creado correctamente",
+            "id_equipo": id_team,
+            "nombre_equipo": name,
+            "id_curso": id_course
         }
     except Exception as e:
         return {
