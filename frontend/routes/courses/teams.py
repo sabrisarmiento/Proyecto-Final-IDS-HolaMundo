@@ -84,12 +84,17 @@ def cancel_team_change(course_id):
 @courses_bp.route('/cursos/<int:course_id>/equipos/quitar-alumno', methods=['POST'])
 def remove_student_from_team(course_id):
     try:
-        requests.delete(f"{BACKEND_URL}/equipo-alumno", headers=auth_headers(), json={
+        response = requests.delete(f"{BACKEND_URL}/equipo-alumno", headers=auth_headers(), json={
             "id_equipo": request.form.get("id_equipo"),
             "id_alumno": request.form.get("id_alumno")
         })
+        if response.ok:
+            flash("Alumno quitado del equipo correctamente.", "success")
+        else:
+            flash("No se pudo quitar el alumno del equipo.", "error")
     except Exception as e:
         print("Error quitando alumno del equipo:", e)
+        flash("Ocurrió un error al quitar al alumno.", "error")
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cursos/<int:course_id>/buscar-alumno')
