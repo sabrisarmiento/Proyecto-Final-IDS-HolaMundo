@@ -44,7 +44,9 @@ def attendance():
 @attendance_bp.route('/asistencia/generar-qr', methods=['POST'])
 def generate_qr_view():
     class_id = request.form.get('id_clase')
-    result = generate_qr(class_id)
+    horas = request.form.get('horas')
+    minutos = request.form.get('minutos')
+    result = generate_qr(class_id, horas, minutos)
     flash(result.get("message", "No se pudieron generar los QR."))
 
     course_id = request.form.get('course_id')

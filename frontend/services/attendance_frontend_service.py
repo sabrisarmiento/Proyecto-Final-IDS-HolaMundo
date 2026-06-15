@@ -1,4 +1,5 @@
 import requests
+from config import BASE_URL
 BASE = "http://127.0.0.1:5000"
 
 def attendance_get_all(id_clase=None):
@@ -10,9 +11,9 @@ def attendance_get_all(id_clase=None):
         print(f"Error: {e}")
         return []
 
-def generate_qr(id_clase):
+def generate_qr(id_clase, horas=None, minutos=None):
     try:
-        r = requests.post(f"{BASE}/asistencia/generar-qr", json={"id_clase": id_clase})
+        r = requests.post(f"{BASE}/asistencia/generar-qr", json={"id_clase": id_clase, "horas": horas, "minutos": minutos})
         return r.json()
     except Exception as e:
         print(f"Error: {e}")
@@ -27,7 +28,7 @@ def mark_attendance(payload):
     
 def get_class(id_clase):
     try:
-        r = requests.get(f"{BASE}/clases/{id_clase}")
+        r = requests.get(f"{BASE_URL}/clases/{id_clase}")
         return r.json().get("class") if r.status_code == 200 else None
     except Exception:
         return None

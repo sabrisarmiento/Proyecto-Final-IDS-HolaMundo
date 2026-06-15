@@ -74,6 +74,10 @@
             <input type="hidden" name="subject" value="{{ subject_id }}">
             <input type="hidden" name="curso" value="{{ course_id }}">
             <input type="hidden" name="id_clase" value="{{ class_id }}">
+            <label>Validez del QR:
+                <input type="number" name="horas" min="0" max="24" value="3"> h
+                <input type="number" name="minutos" min="0" max="59" value="0"> min
+            </label>
             <button type="submit" class="btn-qr">
                 <span class="btn-qr-icon">▦</span> Generar QR
             </button>

@@ -88,6 +88,7 @@ CREATE TABLE clases (
     tipo VARCHAR(50),
     modalidad VARCHAR(50),
     qr_generado_en DATETIME NULL,
+    qr_valido_hasta DATETIME NULL,
     id_curso INT NOT NULL,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );

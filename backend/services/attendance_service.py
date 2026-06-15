@@ -68,17 +68,28 @@ def generate_class_qr_service(id_clase):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def generate_qr_service(id_clase):
+def generate_qr_service(id_clase, horas=None, minutos=None):
     try:
         if not id_clase:
             return jsonify({"error": "ID de clase no proporcionado"}), 400
+
+        try:
+            horas = int(horas) if horas not in (None, "") else 3
+            minutos = int(minutos) if minutos not in (None, "") else 0
+        except (ValueError, TypeError):
+            return jsonify({"error": "Horas y minutos deben ser numéricos"}), 400
+
+        total_minutos = horas * 60 + minutos
+        if total_minutos <= 0 or total_minutos > 24 * 60:
+            return jsonify({"error": "La duración debe estar entre 1 minuto y 24 horas"}), 400
 
         alumnos = students_active_qr(id_clase)
 
         if not alumnos:
             return jsonify({"message": "No se encontraron alumnos activos para esta clase"}), 404
 
-        mark_qr_generated(id_clase)
+        valido_hasta = mark_qr_generated(id_clase, total_minutos)
+        hora_str = valido_hasta.strftime("%H:%M") if valido_hasta else ""
 
         enviados = 0
         for alumno in alumnos:
@@ -87,7 +98,7 @@ def generate_qr_service(id_clase):
 
             qr_url = f"{FRONTEND_URL}/presente?id_alumno={alumno['id_alumno']}&id_clase={id_clase}&code={qr_hash}"
 
-            if send_attendance_email(alumno['correo'], alumno['nombre'], qr_url):
+            if send_attendance_email(alumno['correo'], alumno['nombre'], qr_url, hora_str):
                 enviados += 1
 
             print(f"Enviando QR a {alumno['correo']}: {qr_url}")

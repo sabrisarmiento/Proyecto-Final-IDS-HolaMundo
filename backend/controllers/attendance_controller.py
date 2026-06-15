@@ -43,8 +43,13 @@ def students_active_qr(id_clase):
     except Exception:
         return []
     
-def mark_qr_generated(id_clase):
-    modify_db("UPDATE clases SET qr_generado_en = NOW() WHERE id_clase = %s", (id_clase,))
+def mark_qr_generated(id_clase, total_minutos):
+    modify_db(
+        "UPDATE clases SET qr_generado_en = NOW(), qr_valido_hasta = NOW() + INTERVAL %s MINUTE WHERE id_clase = %s",
+        (total_minutos, id_clase),
+    )
+    result = query_db("SELECT qr_valido_hasta FROM clases WHERE id_clase = %s", (id_clase,))
+    return result[0]["qr_valido_hasta"] if result else None
 
 def proximity_fiuba(user_lat, user_lon):
     FACULTAD_LAT = -34.61771131976023
@@ -127,7 +132,7 @@ def create_attendance(data):
             }
 
         window_open = query_db(
-            "SELECT 1 FROM clases WHERE id_clase = %s AND qr_generado_en IS NOT NULL AND NOW() <= qr_generado_en + INTERVAL 3 HOUR",
+            "SELECT 1 FROM clases WHERE id_clase = %s AND qr_valido_hasta IS NOT NULL AND NOW() <= qr_valido_hasta",
             (id_clase,),
         )
         if not window_open:

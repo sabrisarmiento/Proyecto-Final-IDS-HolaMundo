@@ -24,7 +24,7 @@ def post_attendance():
 @attendance_bp.route("/asistencia/generar-qr", methods=["POST"])
 def post_generate_qr():
     data = request.get_json()
-    return generate_qr_service(data.get("id_clase"))
+    return generate_qr_service(data.get("id_clase"), data.get("horas"), data.get("minutos"))
 
 @attendance_bp.route("/asistencia/<int:id>", methods=["PATCH"])
 @require_auth
