@@ -31,8 +31,10 @@ def get_all_students(filters):
         order_by = filters.get("order_by", None)
         order = filters.pop("order", None)
 
-        if order_by and order:
-            sql += f" ORDER BY {order_by} {order.upper()}"
+        allowed_order_by = {"id_alumno", "nombre", "apellido", "padron", "correo", "estado_alumno", "id_curso"}
+        if order_by in allowed_order_by and order:
+            direction = "DESC" if str(order).upper() == "DESC" else "ASC"
+            sql += f" ORDER BY {order_by} {direction}"
 
         total = query_db(count_sql, params)[0]['total']
 
