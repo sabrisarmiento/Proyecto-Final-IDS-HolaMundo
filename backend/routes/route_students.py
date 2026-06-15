@@ -21,6 +21,7 @@ def get_students():
     filters = {
         "nombre": request.args.get('nombre'),
         "apellido": request.args.get('apellido'),
+        "padron": request.args.get('padron'),
         "mail": request.args.get('mail'),
         "password": request.args.get('password'),
         "id_rol": request.args.get('id_rol'),

@@ -12,7 +12,9 @@ def get_all_teams(filters):
             a.id_alumno,
             a.nombre,
             a.apellido,
-            a.padron
+            a.padron,
+            a.correo,
+            a.estado_alumno
         FROM equipos e
         LEFT JOIN equipo_alumno ea
             ON e.id_equipo = ea.id_equipo
@@ -44,7 +46,9 @@ def get_all_teams(filters):
                     "id_alumno": row["id_alumno"],
                     "nombre": row["nombre"],
                     "apellido": row["apellido"],
-                    "padron": row["padron"]
+                    "padron": row["padron"],
+                    "correo": row["correo"],
+                    "estado_alumno": row["estado_alumno"]
                 })
         return {
             "ok": True,
@@ -68,7 +72,9 @@ def get_team_by_id(id):
             a.id_alumno,
             a.nombre,
             a.apellido,
-            a.padron
+            a.padron,
+            a.correo,
+            a.estado_alumno
         FROM equipos e
         LEFT JOIN equipo_alumno ea ON e.id_equipo = ea.id_equipo
         LEFT JOIN alumnos a ON ea.id_alumno = a.id_alumno
@@ -94,7 +100,9 @@ def get_team_by_id(id):
                     "id_alumno": row["id_alumno"],
                     "nombre": row["nombre"],
                     "apellido": row["apellido"],
-                    "padron": row["padron"]
+                    "padron": row["padron"],
+                    "correo": row["correo"],
+                    "estado_alumno": row["estado_alumno"]
                 })
         return {
             "ok": True,
@@ -110,8 +118,16 @@ def get_team_by_id(id):
 
 def create_team(data):
     try:
-        name = data.get("nombre_equipo")
+        name = data.get("nombre_equipo", "").strip()
         id_course = data.get("id_curso")
+        existing = query_db("SELECT id_equipo FROM equipos WHERE id_curso = %s AND LOWER(nombre_equipo) = LOWER(%s)", (id_course, name))
+        if existing:
+            return {
+                "ok": False,
+                "code": 409,
+                "message": "Conflict",
+                "description": "Ya existe un equipo con ese nombre"
+            }
         sql = """INSERT INTO equipos(nombre_equipo, id_curso) VALUES (%s, %s);"""
         id_team = modify_db(sql, (name, id_course))
         return {
