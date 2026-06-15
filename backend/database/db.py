@@ -42,3 +42,15 @@ def modify_db(query, params=None):
     finally:
         cursor.close()
         connection.close()
+
+def insert_db(query, params=None):
+    connection = connect_db()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(query, params or ())
+        connection.commit()
+        return cursor.lastrowid
+    finally:
+        cursor.close()
+        connection.close()

@@ -1,4 +1,4 @@
-from database.db import query_db, modify_db
+from database.db import query_db, modify_db, insert_db
 
 def get_all_teams(filters):
     try:
@@ -112,7 +112,7 @@ def create_team(data):
         name = data.get("nombre_equipo")
         id_course = data.get("id_curso")
         sql = """INSERT INTO equipos(nombre_equipo, id_curso) VALUES (%s, %s);"""
-        id_team = modify_db(sql, (name, id_course))
+        id_team = insert_db(sql, (name, id_course))
         return {
             "ok": True,
             "message": "Equipo creado correctamente",
