@@ -38,6 +38,7 @@ CREATE TABLE cursos (
     anio INT NOT NULL,
     slack_url VARCHAR(500),
     youtube_url VARCHAR (500),
+    regimen_aprobacion TEXT,
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 );
@@ -88,6 +89,16 @@ CREATE TABLE clases (
     modalidad VARCHAR(50),
     id_curso INT NOT NULL,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
+);
+
+-- materia_temas --
+CREATE TABLE materia_temas (
+    id_tema INT AUTO_INCREMENT PRIMARY KEY,
+    id_materia INT NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    icono VARCHAR(100),
+    orden INT DEFAULT 0,
+    FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE
 );
 
 -- materiales --
@@ -179,21 +190,35 @@ CREATE TABLE curso_promocion_config (
 
 CREATE TABLE curso_slack_config (
     id_curso INT PRIMARY KEY,
-    slack_team_id VARCHAR(100),
-    slack_channel_id VARCHAR(100),
+    slack_channel_id VARCHAR(100) NOT NULL,
     slack_channel_name VARCHAR(100),
-    slack_bot_token VARCHAR(500),
-    slack_webhook_url VARCHAR(1000),
+    slack_bot_token VARCHAR(500) NOT NULL,
+    permite_escritura BOOLEAN DEFAULT FALSE,
+    permite_lectura BOOLEAN DEFAULT FALSE,
     instalado_por INT,
-    creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
     actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
     FOREIGN KEY (instalado_por) REFERENCES usuarios(id_usuario)
 );
 
+-- CREATE TABLE curso_slack_config (
+--     id_curso INT PRIMARY KEY,
+--     slack_team_id VARCHAR(100),
+--     slack_channel_id VARCHAR(100),
+--     slack_channel_name VARCHAR(100),
+--     slack_bot_token VARCHAR(500),
+--     slack_webhook_url VARCHAR(1000),
+--     instalado_por INT,
+--     creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+--     FOREIGN KEY (instalado_por) REFERENCES usuarios(id_usuario)
+-- );
 
 
---CREATE TABLE slack_config_logs (
+
+-CREATE TABLE slack_config_logs (
 --    id_log INT AUTO_INCREMENT PRIMARY KEY,
 --    id_curso INT NOT NULL,
 --    id_usuario INT,

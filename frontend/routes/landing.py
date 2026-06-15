@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, session, request
-from services.subjects_service import get_subjects, get_subject_by_id
+from services.subjects_service import get_subjects, get_subject_by_id, get_topics_by_subject_id
 from services.courses_service import get_courses
 import requests
 
@@ -17,6 +17,8 @@ def landing():
     clases = []
     cursos = []
     subject = {}
+    temas = []
+    docentes = []
 
     if id_subject:
         try:
@@ -42,6 +44,32 @@ def landing():
                     clases.extend(resp_clases.get("classes", []))
                 except Exception as e:
                     print(f"Error en obtener clases de los cursos: {e}")
+
+                try:
+                    resp_course = requests.get(f"http://127.0.0.1:5000/courses/{id_course}").json()
+                    course_detail = resp_course.get("course", {})
+                    seen_ids = {d["id_usuario"] for d in docentes}
+
+                    if course_detail.get("profesor_id") and course_detail["profesor_id"] not in seen_ids:
+                        docentes.append({
+                            "id_usuario": course_detail["profesor_id"],
+                            "nombre": course_detail["profesor_nombre"],
+                            "apellido": course_detail["profesor_apellido"],
+                            "rol": "Profesor Titular"
+                        })
+                        seen_ids.add(course_detail["profesor_id"])
+
+                    for ayudante in course_detail.get("ayudantes", []):
+                        if ayudante["id_usuario"] not in seen_ids:
+                            docentes.append({
+                                "id_usuario": ayudante["id_usuario"],
+                                "nombre": ayudante["nombre"],
+                                "apellido": ayudante["apellido"],
+                                "rol": "Ayudante"
+                            })
+                            seen_ids.add(ayudante["id_usuario"])
+                except Exception as e:
+                    print(f"Error en obtener docentes del curso: {e}")
         except Exception as e:
             print(f"Error en obtener cursos por materia: {e}")
         try:
@@ -49,6 +77,12 @@ def landing():
         except Exception as e:
             print(f"Error en obtener materia: {e}")
             subject = {}
+
+        try:
+            temas = get_topics_by_subject_id(id_subject)
+        except Exception as e:
+            print(f"Error en obtener temas de la materia: {e}")
+            temas = []
 
     try:
         subjects = get_subjects()
@@ -65,6 +99,8 @@ def landing():
         subject=subject,
         subjects=subjects,
         cursos=cursos,
+        temas=temas,
+        docentes=docentes,
         active_page="landing",
         selected_subject=selected_subject
     )

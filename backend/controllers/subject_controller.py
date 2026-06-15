@@ -23,6 +23,28 @@ def get_all_subjects(filters):
       "description": str(e)
     }
 
+def get_subjects_for_user(id_user, is_admin, filters):
+    try:
+        if is_admin:
+            return get_all_subjects(filters)
+
+        sql = "SELECT id_materia, nombre, codigo FROM materias"
+        condition = """
+            WHERE id_materia IN (
+                SELECT DISTINCT id_materia FROM cursos
+                WHERE id_profesor = %s
+                OR id_curso IN (SELECT id_curso FROM curso_ayudantes WHERE id_usuario = %s)
+            )
+        """
+        params = [id_user, id_user]
+        if filters.get("name"):
+            condition += " AND nombre = %s"; params.append(filters["name"])
+
+        return {"ok": True, "data": query_db(sql + condition, params)}
+    except Exception as e:
+        return {"ok": False, "code": 500, "message": "Internal Server Error", "description": str(e)}
+
+
 def get_subject_by_id(id):
   try:
     if id <= 0:
@@ -52,6 +74,38 @@ def get_subject_by_id(id):
       "message": "Internal Server Error",
       "description": str(e)
     }
+
+def get_topics_by_subject_id(id):
+    try:
+        if id <= 0:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": "El ID debe ser un número entero positivo"
+            }
+
+        exists = query_db("SELECT id_materia FROM materias WHERE id_materia = %s", (id,))
+        if not exists:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Not Found",
+                "description": f"No existe una materia con ID {id}"
+            }
+
+        result = query_db(
+            "SELECT id_tema, nombre, icono, orden FROM materia_temas WHERE id_materia = %s ORDER BY orden ASC",
+            (id,)
+        )
+        return {"ok": True, "data": result}
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
 
 def create_subject(data):
   try:

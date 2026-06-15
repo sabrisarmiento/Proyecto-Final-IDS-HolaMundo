@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify, Response
 
 import requests
-from services.advertisements_service import get_advertisements_by_course
+from services.advertisements_service import get_advertisements_by_course, get_all_combined_advertisements
 from services.courses_service import get_courses, get_course_by_id, post_course
 from services.students_services import post_student, patch_student
 from services.exams_service import get_exams_by_course_id
-from services.subjects_service import get_subjects
+from services.subjects_service import get_my_subjects
+from services.material_frontend_service import get_materials_by_course, create_material
+from config import get_headers
 
 BACKEND_URL = 'http://127.0.0.1:5000'
 
@@ -14,7 +16,7 @@ courses_bp = Blueprint('courses', __name__)
 
 @courses_bp.route('/cursos', methods=['GET', 'POST'])
 def courses():
-    subjects = get_subjects()
+    subjects = get_my_subjects()
 
     if request.method == 'POST':
         try:
@@ -41,7 +43,7 @@ def courses():
             params['materia'] = filtro_materia
         if filtro_anio:
             params['anio'] = filtro_anio
-        response = requests.get(f'{BACKEND_URL}/courses', params=params)
+        response = requests.get(f'{BACKEND_URL}/courses/mias', params=params, headers=get_headers())
         data_courses = response.json().get('courses', []) if response.ok else []
     except Exception as e:
         print(f"Error cargando cursos: {e}")
@@ -54,7 +56,7 @@ def courses():
 
     all_courses_raw = []
     try:
-        all_courses_raw = requests.get(f'{BACKEND_URL}/courses').json().get('courses', [])
+        all_courses_raw = requests.get(f'{BACKEND_URL}/courses/mias', headers=get_headers()).json().get('courses', [])
     except Exception:
         pass
 
@@ -197,12 +199,30 @@ def course_detail(course_id):
         students_data = []
         total         = 0
 
+    filtro_modalidad=request.args.get("modalidad")
+    filtro_tipo=request.args.get("tipo")
+    id_clase_editar = request.args.get("editar", type=int)
     try:
         clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
-        clases      = clases_res.json().get("classes", [])
+        clases_json = clases_res.json()
+        clases      = clases_json.get("classes", [])
+        if filtro_modalidad:
+            clases=[c for c in clases if c.get('modalidad')==filtro_modalidad]
+        if filtro_tipo:
+            clases=[c for c in clases if c.get('tipo')==filtro_tipo]  
     except Exception as e:
-        print(f"Error cargando clases: {e}")
+        print(e)
         clases = []
+
+    class_id_sel = request.args.get('clase')
+    attendance_records = []
+    if class_id_sel:
+        try:
+            att_res = requests.get(f'{BACKEND_URL}/asistencia',
+                                    params={'id_clase': class_id_sel}, headers=headers)
+            attendance_records = att_res.json().get('attendance', []) if att_res.ok else []
+        except Exception:
+            attendance_records = []
 
     for s in students_data:
         notas_dict = {}
@@ -212,11 +232,16 @@ def course_detail(course_id):
                 if ':' in par:
                     id_ev, nota = par.split(':', 1)
                     try:
-                        notas_dict[int(id_ev.strip())] = nota.strip()
+                        # Guardar con AMBAS claves (int y string) para maxima compatibilidad
+                        key_int = int(id_ev.strip())
+                        key_str = str(key_int)
+                        notas_dict[key_int] = nota.strip()
+                        notas_dict[key_str] = nota.strip()
                     except ValueError:
                         pass
         s['notas_todas'] = notas_dict
-        s['notas_json']  = {str(k): v for k, v in notas_dict.items()}
+        # notas_json solo con claves string (sin duplicar)
+        s['notas_json']  = {str(k): v for k, v in notas_dict.items() if isinstance(k, int)}
 
         correctores_dict = {}
         raw_corr = s.get('correctores_raw') or ""
@@ -227,13 +252,15 @@ def course_detail(course_id):
                     try:
                         val = nombre_corr.strip()
                         if val:
-                            correctores_dict[int(id_ev.strip())] = val
+                            key_int = int(id_ev.strip())
+                            correctores_dict[key_int] = val
+                            correctores_dict[str(key_int)] = val
                     except ValueError:
                         pass
         s['correctores_todas'] = correctores_dict
 
         if not s.get('promedio_final') and notas_dict:
-            valores = [float(v) for v in notas_dict.values() if v not in ('', None)]
+            valores = [float(v) for k, v in notas_dict.items() if isinstance(k, int) and v not in ('', None)]
             s['promedio_final'] = round(sum(valores) / len(valores), 1) if valores else None
 
     eval_id_sel    = session.get('eval_seleccionada')
@@ -255,8 +282,8 @@ def course_detail(course_id):
 
     todos_los_valores = []
     for s in students_data:
-        for nota in (s.get('notas_todas') or {}).values():
-            if nota not in (None, ''):
+        for k, nota in (s.get('notas_todas') or {}).items():
+            if isinstance(k, int) and nota not in (None, ''):
                 try:
                     todos_los_valores.append(float(nota))
                 except ValueError:
@@ -291,6 +318,7 @@ def course_detail(course_id):
     pending_team_change = session.get("pending_team_change")
 
     try:
+        #advertisements = get_advertisements_by_course(course_id)
         advertisements = get_advertisements_by_course(course_id)
     except Exception:
         advertisements = []
@@ -301,17 +329,25 @@ def course_detail(course_id):
     except Exception:
         dash_data = {}
 
+    materiales = get_materials_by_course(course_id) if active_tab == 'materials' else []
+
     return render_template(
         'course_detail.html',
         course=course,
         students=students_data,
         teams=teams,
         clases=clases,
+        filtro_modalidad=filtro_modalidad,
+        filtro_tipo=filtro_tipo,
+        id_clase_editar=id_clase_editar,
         active_page='courses',
         page=page,
         total_pages=total_pages,
         course_id=course_id,
         active_tab=active_tab,
+        attendance=attendance_records,
+        class_id=class_id_sel,
+        materiales=materiales,
         evaluaciones=evaluaciones,
         tipos_evaluacion=tipos_evaluacion,
         eval_seleccionada=eval_seleccionada,
@@ -489,27 +525,31 @@ def guardar_notas(course_id):
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
 
-    headers    = {'Authorization': f'Bearer {token}'}
-    id_eval    = request.form.get('id_evaluacion')
-    notas_dict = {}
+    headers          = {'Authorization': f'Bearer {token}'}
+    id_eval          = request.form.get('id_evaluacion')
+    notas_dict       = {}
     correctores_dict = {}
 
     for key, value in request.form.items():
-        if key.startswith('nota_') and value:
-            id_alumno = key.replace('nota_', '')
+        if key.startswith('nota_alumno_') and value.strip():
+            id_alumno = key.replace('nota_alumno_', '')
             try:
                 notas_dict[id_alumno] = float(value)
             except ValueError:
                 pass
-        elif key.startswith('corrector_') and value:
-            id_alumno = key.replace('corrector_', '')
-            correctores_dict[id_alumno] = value
+        elif key.startswith('corrector_alumno_') and value.strip():
+            id_alumno = key.replace('corrector_alumno_', '')
+            correctores_dict[id_alumno] = value.strip()
 
-    requests.post(
+    print(f"[guardar_notas] id_eval={id_eval} notas={notas_dict} correctores={correctores_dict}")
+
+    resp = requests.post(
         'http://127.0.0.1:5000/notas/guardar',
         json={'id_evaluacion': id_eval, 'notas': notas_dict, 'correctores': correctores_dict},
         headers=headers
     )
+    print(f"[guardar_notas] backend response: {resp.status_code} {resp.text}")
+
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
 
 
@@ -518,12 +558,12 @@ def crear_evaluacion(course_id):
     token = session.get('token')
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
-
-    nombre  = request.form.get('nombre_eval')
-    headers = {'Authorization': f'Bearer {token}'}
+    nombre     = request.form.get('nombre_eval')
+    asociacion = request.form.get('asociacion', 'Individual')
+    headers    = {'Authorization': f'Bearer {token}'}
     requests.post(
         'http://127.0.0.1:5000/evaluaciones',
-        json={'id_curso': course_id, 'id_tipo': 1, 'nombre': nombre},
+        json={'id_curso': course_id, 'id_tipo': 1, 'nombre': nombre, 'asociacion': asociacion},
         headers=headers
     )
     session.pop('eval_seleccionada', None)
@@ -572,6 +612,88 @@ def guardar_promocion(course_id):
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
 
 
+@courses_bp.route('/cursos/<int:course_id>/notas/grupal', methods=['POST'])
+def asociar_nota_grupal(course_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+
+    headers       = {'Authorization': f'Bearer {token}'}
+    id_evaluacion = request.form.get('id_evaluacion')
+
+    equipos_ids = [
+        key.replace('id_equipo_', '')
+        for key in request.form
+        if key.startswith('id_equipo_')
+    ]
+
+    print(f"[asociar_nota_grupal] id_evaluacion={id_evaluacion} equipos_ids={equipos_ids}")
+
+    if not equipos_ids:
+        flash('No se encontraron equipos en el formulario.', 'error')
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
+
+    notas_dict       = {}
+    correctores_dict = {}
+
+    for id_equipo in equipos_ids:
+        nota_raw  = request.form.get(f'nota_equipo_{id_equipo}', '').strip()
+        corrector = request.form.get(f'corrector_equipo_{id_equipo}', '').strip()
+
+        print(f"  equipo {id_equipo}: nota='{nota_raw}' corrector='{corrector}'")
+
+        if not nota_raw:
+            continue
+
+        try:
+            nota = float(nota_raw)
+        except (ValueError, TypeError):
+            continue
+
+        try:
+            team_res  = requests.get(f'http://127.0.0.1:5000/equipos/{id_equipo}', headers=headers)
+            team_json = team_res.json()
+            print(f"  team_json: {team_json}")
+
+            team_data = team_json.get('team') or {}
+            alumnos = team_data.get('alumnos', [])
+
+            print(f"  alumnos: {alumnos}")
+        except Exception as e:
+            print(f"  Error obteniendo equipo {id_equipo}: {e}")
+            continue
+
+        for alumno in alumnos:
+            aid = str(alumno['id_alumno'])
+            notas_dict[aid] = nota
+            if corrector:
+                correctores_dict[aid] = corrector
+
+    print(f"[asociar_nota_grupal] notas_dict={notas_dict}")
+
+    if not notas_dict:
+        flash('No se ingresó ninguna nota válida o los equipos no tienen alumnos.', 'error')
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
+
+    try:
+        resp = requests.post(
+            'http://127.0.0.1:5000/notas/guardar',
+            json={
+                'id_evaluacion': id_evaluacion,
+                'notas':         notas_dict,
+                'correctores':   correctores_dict,
+            },
+            headers=headers
+        )
+        print(f"[asociar_nota_grupal] backend response: {resp.status_code} {resp.text}")
+        flash('Notas grupales guardadas correctamente.', 'ok')
+    except Exception as e:
+        print(f"Error guardando notas grupales: {e}")
+        flash('Hubo un error al guardar las notas.', 'error')
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
+
+
 @courses_bp.route('/cursos/<int:course_id>/dashboard-data', methods=['GET'])
 def course_dashboard_data(course_id):
     try:
@@ -583,25 +705,134 @@ def course_dashboard_data(course_id):
         return jsonify({"error": str(e)}), 502
 
 
+
 @courses_bp.route('/cursos/<int:course_id>/clases/crear', methods=['POST'])
 def crear_clase(course_id):
     token = session.get('token')
     if not token:
         return redirect(url_for('auth.login'))
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    data = {
+        "fecha": request.form.get("fecha_clase"),
+        "semana": request.form.get("semana"),
+        "temas": request.form.get("temas"),
+        "tipo": request.form.get("tipo"),
+        "modalidad": request.form.get("modalidad"),
+        "id_curso": course_id
+    }
 
-    headers = {'Authorization': f'Bearer {token}'}
-    data    = request.get_json()
-    data['id_curso'] = course_id
-    response = requests.post('http://127.0.0.1:5000/clases', json=data, headers=headers)
-    return response.json(), response.status_code
+    if not data['fecha'] or not data['semana'] or not data['temas'] or not data['tipo'] or not data['modalidad']:
+        flash('Falta ingresar datos.', 'error')
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+    try:
+        clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
+        clases_json = clases_res.json()
+        clases = clases_json.get("classes", [])
+
+        tema_nuevo=data["temas"].strip().lower()
+        fecha_nueva=data["fecha"]
+        semana_nueva=int(data["semana"])
+        semana_anterior_existe=False
+        for clase in clases:
+            tema_existente=clase.get("temas","").strip().lower()
+            fecha_existente=clase.get("fecha","")
+            if int(clase.get("semana", 0)) == semana_nueva - 1:
+                semana_anterior_existe=True
+            if tema_existente==tema_nuevo:
+                flash(f'Ya existe una clase con ese tema','error')
+                return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+            if fecha_existente==fecha_nueva:
+                flash(f'Ya existe una clase con esa fecha','error')
+                return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+        if semana_nueva > 1 and not semana_anterior_existe:
+            flash(f'Debe existir una clase en la semana {semana_nueva - 1}.','error')
+            return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+        res=requests.post('http://127.0.0.1:5000/clases',json=data,headers=headers)
+        if res.status_code==201:
+            flash('Clase creada correctamente.', 'success')
+        else:
+            flash(f'Error al crear la clase', 'error')
+    except Exception as e:
+        print(f"Error guardando clase: {e}")
+        flash('Hubo un error al guardar la clase.', 'error')
+    return redirect(url_for('courses.course_detail',course_id=course_id,tab='calendar'))
 
 
-@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/eliminar', methods=['DELETE'])
+
+
+# --------------------------------EDITAR CLASE-------------------------
+
+@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/editar', methods=['POST'])
+def editar_clase(course_id, id_clase):
+    token = session.get('token')
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    data = {
+        "fecha": request.form.get("fecha_clase"),
+        "semana": request.form.get("semana"),
+        "temas": request.form.get("temas"),
+        "tipo": request.form.get("tipo"),
+        "modalidad": request.form.get("modalidad"),
+        "id_curso": course_id
+    }
+    if not data['fecha'] or not data['semana'] or not data['temas'] or not data['tipo'] or not data['modalidad']:
+        flash('Falta ingresar datos.', 'error')
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+    try:
+        clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
+        clases_json = clases_res.json()
+        clases = clases_json.get("classes", [])
+
+        tema_nuevo=data["temas"].strip().lower()
+        fecha_nueva=data["fecha"]
+        semana_nueva=int(data["semana"])
+        semana_anterior_existe=False
+        for clase in clases:
+            if clase["id_clase"]==id_clase:
+                continue
+            tema_existente=clase.get("temas","").strip().lower()
+            fecha_existente=clase.get("fecha","")
+            if int(clase.get("semana", 0)) == semana_nueva - 1:
+                semana_anterior_existe=True
+            if tema_existente==tema_nuevo:
+                flash(f'Ya existe una clase con ese tema','error')
+                return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+            if fecha_existente==fecha_nueva:
+                flash(f'Ya existe una clase con esa fecha','error')
+                return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+        if semana_nueva > 1 and not semana_anterior_existe:
+            flash(f'Debe existir una clase en la semana {semana_nueva - 1}.','error')
+            return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+        res=requests.patch(f'http://127.0.0.1:5000/clases/{id_clase}',json=data,headers=headers)
+        if res.status_code==200:
+            flash('Clase actualizada correctamente','success')
+        else:
+            flash('Hubo un error al actualizar la clase','error')
+
+    except Exception as e:
+        print(e)
+        flash('Hubo un error al actualizar la clase','error')
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+
+
+
+
+
+
+
+@courses_bp.route('/cursos/<int:course_id>/clases/<int:id_clase>/eliminar', methods=['GET'])
 def eliminar_clase(course_id, id_clase):
-    token    = session.get('token')
-    headers  = {'Authorization': f'Bearer {token}'}
-    response = requests.delete(f'http://127.0.0.1:5000/clases/{id_clase}', headers=headers)
-    return response.json(), response.status_code
+    token = session.get('token')
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    requests.delete(f'http://127.0.0.1:5000/clases/{id_clase}',headers=headers)
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='calendar'))
+
 
 
 @courses_bp.route('/cursos/<int:course_id>/estudiantes/<int:student_id>', methods=['POST'])
@@ -633,10 +864,14 @@ def update_course_config(course_id):
     }
     slack_url   = request.form.get('slack_url', '').strip()
     youtube_url = request.form.get('youtube_url', '').strip()
+    regimen_aprobacion = request.form.get('regimen_aprobacion', '').strip()
+    
     if slack_url:
         data['slack_url'] = slack_url
     if youtube_url:
         data['youtube_url'] = youtube_url
+    if regimen_aprobacion:
+        data['regimen_aprobacion'] = regimen_aprobacion
 
     try:
         res = requests.patch(f'http://127.0.0.1:5000/courses/{course_id}', json=data, headers=headers)
@@ -651,3 +886,16 @@ def update_course_config(course_id):
         session['config_ok']  = False
 
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
+
+@courses_bp.route('/cursos/<int:course_id>/materiales', methods=['POST'])
+def create_material_view(course_id):
+    data = {
+        "titulo": request.form.get('titulo'),
+        "descripcion": request.form.get('descripcion'),
+        "url_externo": request.form.get('url_externo'),
+        "id_curso": course_id,
+    }
+    result, status = create_material(data)
+    if status >= 400:
+        flash(result.get("errors", [{}])[0].get("description", "No se pudo crear el material."))
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='materials'))

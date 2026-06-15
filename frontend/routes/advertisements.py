@@ -55,25 +55,25 @@ def create_advertisement_front(id_curso):
     id_curso=id_curso
   )
 
-@advertisements_bp.route("/cursos/<int:id_curso>/slack/conectar")
-def connect_slack_front(id_curso):
-    token = session.get("token")
+# @advertisements_bp.route("/cursos/<int:id_curso>/slack/conectar")
+# def connect_slack_front(id_curso):
+#     token = session.get("token")
 
-    if not token:
-        return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
+#     if not token:
+#         return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
     
-    response = requests.get(
-        f"http://localhost:5000/slack/install/{id_curso}",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
-        allow_redirects=False
-    )
+#     response = requests.get(
+#         f"http://127.0.0.1:5000/slack/install/{id_curso}",
+#         headers={
+#             "Authorization": f"Bearer {token}"
+#         },
+#         allow_redirects=False
+#     )
 
-    if response.status_code in [301, 302]:
-        return redirect(response.headers["Location"])
+#     if response.status_code in [301, 302]:
+#         return redirect(response.headers["Location"])
 
-    return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
+#     return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
 
 # @advertisements_bp.route('/avisos/slack')
 # def slack_advertisements():
@@ -122,3 +122,63 @@ def public_advertisements():
     avisos=avisos,
     courses=courses
   )
+
+@advertisements_bp.route("/cursos/<int:id_curso>/slack/configurar", methods=["GET", "POST"])
+def configure_slack_front(id_curso):
+    token = session.get("token")
+
+    if not token:
+        return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
+
+    if request.method == "POST":
+        slack_bot_token = request.form.get("slack_bot_token")
+        slack_channel_id = request.form.get("slack_channel_id")
+        slack_channel_name = request.form.get("slack_channel_name")
+
+        permite_escritura = request.form.get("permite_escritura") == "on"
+        permite_lectura = request.form.get("permite_lectura") == "on"
+
+        response = requests.post(
+            f"http://127.0.0.1:5000/courses/{id_curso}/slack/config",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "slack_bot_token": slack_bot_token,
+                "slack_channel_id": slack_channel_id,
+                "slack_channel_name": slack_channel_name,
+                "permite_escritura": permite_escritura,
+                "permite_lectura": permite_lectura
+            }
+        )
+
+        if response.status_code in [200, 201]:
+            return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
+
+        return render_template(
+            "configure_slack.html",
+            id_curso=id_curso,
+            error="No se pudo configurar Slack"
+        )
+
+    return render_template(
+        "configure_slack.html",
+        id_curso=id_curso
+    )
+
+@advertisements_bp.route("/cursos/<int:id_curso>/slack/desconectar", methods=["POST"])
+def disconnect_slack_front(id_curso):
+    token = session.get("token")
+
+    if not token:
+        return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
+
+    requests.delete(
+        f"http://127.0.0.1:5000/courses/{id_curso}/slack/disconnect",
+        headers={
+            "Authorization": f"Bearer {token}"
+        }
+    )
+
+    return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")

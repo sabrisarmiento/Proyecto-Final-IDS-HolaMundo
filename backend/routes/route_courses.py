@@ -4,7 +4,8 @@ from services.courses_service import (
     course_service,
     create_course_service,
     patch_course_service,
-    delete_course_service
+    delete_course_service,
+    my_courses_service
 )
 from middleware.auth_middleware import require_auth
 
@@ -19,18 +20,31 @@ def get_courses():
     }
     return courses_service(filters)
 
+@courses_bp.route('/courses/mias', methods=['GET'])
+@require_auth
+def get_my_courses():
+    user = request.user
+    is_admin = (user.get("nivel") or 0) >= 3
+    filters = {
+        "materia": request.args.get('materia'),
+        "catedra": request.args.get('catedra'),
+        "anio": request.args.get('anio'),
+    }
+    return my_courses_service(user["id_usuario"], is_admin, filters)
+
+
 @courses_bp.route('/courses/<int:id_course>', methods=['GET'])
 def get_course(id_course):
     return course_service(id_course)
 
 @courses_bp.route('/courses', methods=['POST'])
-# @require_auth descomentar cuanto este listo
+@require_auth
 def create_course_route():
     data = request.get_json()
     return create_course_service(data)
 
 @courses_bp.route('/courses/<int:id_course>', methods=['PATCH'])
-# @require_auth descomentar cuando este listo
+@require_auth
 def patch_course_route(id_course):
     data = request.get_json()
     return patch_course_service(id_course, data)

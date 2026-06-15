@@ -6,12 +6,13 @@ def get_course_dashboard(id_curso):
         # alumnos
         alumnos_raw = query_db(
             """
-            SELECT id_alumno, estado_alumno
+            SELECT id_alumno, nombre, apellido, estado_alumno
             FROM alumnos
             WHERE id_curso = %s
             """,
             (id_curso,)
         )
+
         total_alumnos = len(alumnos_raw)
         activos       = [a for a in alumnos_raw if a["estado_alumno"]]
         abandonaron   = total_alumnos - len(activos)
@@ -142,6 +143,7 @@ def get_course_dashboard(id_curso):
         total_clases = len(clases)
 
         asistencia_stats = {"regulares": 0, "en_riesgo": 0, "sin_datos": 0}
+        attendance_by_student = []
         if total_clases > 0 and ids_activos:
             fmt = ",".join(["%s"] * len(ids_activos))
             presencias = query_db(
@@ -154,15 +156,27 @@ def get_course_dashboard(id_curso):
                 ids_activos
             )
             presencias_map = {r["id_alumno"]: r["presentes"] for r in presencias}
+            names_map = {a["id_alumno"]: a for a in activos}
 
             for aid in ids_activos:
-                pct = (presencias_map.get(aid, 0) / total_clases) * 100
+                presentes = presencias_map.get(aid, 0)
+                pct = (presentes / total_clases) * 100
                 if pct >= 75:
                     asistencia_stats["regulares"] += 1
                 else:
                     asistencia_stats["en_riesgo"] += 1
+                alumno = names_map.get(aid, {})
+                attendance_by_student.append({
+                    "id_alumno": aid,
+                    "nombre": alumno.get("nombre"),
+                    "apellido": alumno.get("apellido"),
+                    "presentes": presentes,
+                    "total_clases": total_clases,
+                    "porcentaje": round(pct, 1),
+                })
         else:
             asistencia_stats["sin_datos"] = len(ids_activos)
+
 
         return {
             "ok": True,
@@ -189,6 +203,7 @@ def get_course_dashboard(id_curso):
                     for ev in evaluaciones
                 ],
                 "asistencia": asistencia_stats,
+                "asistencia_detalle": attendance_by_student,
                 "es_promocionable": es_promocionable,
             }
         }

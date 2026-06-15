@@ -1,0 +1,62 @@
+{% extends "base_private.html" %}
+
+{% block title %}Configurar Slack{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create_advertisement.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="course-detail-header">
+  <h1 class="advertisement-title">Configurar Slack</h1>
+</section>
+
+<section class="course-detail-content">
+  {% if error %}
+    <p class="advertisement-error">{{ error }}</p>
+  {% endif %}
+
+  <form method="POST" class="advertisement-form">
+    <label for="slack_bot_token">Bot Token</label>
+    <input
+      type="text"
+      id="slack_bot_token"
+      name="slack_bot_token"
+      placeholder="xoxb-..."
+      required
+    >
+
+    <label for="slack_channel_id">Channel ID</label>
+    <input
+      type="text"
+      id="slack_channel_id"
+      name="slack_channel_id"
+      placeholder="C..."
+      required
+    >
+
+    <label for="slack_channel_name">Nombre del canal</label>
+    <input
+      type="text"
+      id="slack_channel_name"
+      name="slack_channel_name"
+      placeholder="general"
+    >
+
+    <label>
+      <input type="checkbox" name="permite_escritura">
+      Permitir enviar avisos desde la web a Slack
+    </label>
+
+    <label>
+      <input type="checkbox" name="permite_lectura">
+      Permitir leer mensajes de Slack en la web
+    </label>
+
+    <button type="submit" class="btn-action btn-publicar">
+      Guardar configuración
+    </button>
+  </form>
+</section>
+{% endblock %}

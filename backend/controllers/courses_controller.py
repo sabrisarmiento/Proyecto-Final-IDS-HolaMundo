@@ -14,7 +14,8 @@ def get_all_courses(filters):
                 c.cuatrimestre,
                 c.anio,
                 c.slack_url,
-                c.youtube_url
+                c.youtube_url,
+                c.regimen_aprobacion
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
         """
@@ -46,12 +47,42 @@ def get_all_courses(filters):
             "description": str(e)
         }
 
+def get_courses_for_user(id_user, is_admin, filters):
+    try:
+        if is_admin:
+            return get_all_courses(filters)   # superadmin ve todo
+
+        sql = """
+            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url
+            FROM cursos c
+            JOIN materias m ON c.id_materia = m.id_materia
+        """
+        condition = """
+            WHERE (c.id_profesor = %s
+            OR c.id_curso IN (SELECT id_curso FROM curso_ayudantes WHERE id_usuario = %s))
+        """
+        params = [id_user, id_user]
+
+        if filters.get('materia'):
+            condition += " AND m.nombre LIKE %s"; params.append(f"%{filters['materia']}%")
+        if filters.get('catedra'):
+            condition += " AND c.catedra LIKE %s"; params.append(f"%{filters['catedra']}%")
+        if filters.get('anio'):
+            condition += " AND c.anio = %s"; params.append(int(filters['anio']))
+
+        return {"ok": True, "data": query_db(sql + condition, params)}
+    except Exception as e:
+        return {"ok": False, "code": 500, "message": "Internal Server Error", "description": str(e)}
+
+
 def get_course_id(id_course):
     try:
         sql = """
-            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio,  c.slack_url, c.youtube_url
+            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url, c.regimen_aprobacion,
+                   u.id_usuario AS profesor_id, u.nombre AS profesor_nombre, u.apellido AS profesor_apellido
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
+            LEFT JOIN usuarios u ON c.id_profesor = u.id_usuario
             WHERE c.id_curso = %s
         """
         result = query_db(sql, (id_course,))
@@ -63,9 +94,21 @@ def get_course_id(id_course):
                 "message": "Not Found",
                 "description": f"No existe un curso con ID {id_course}"
             }
+
+        course = result[0]
+
+        ayudantes = query_db("""
+            SELECT u.id_usuario, u.nombre, u.apellido
+            FROM curso_ayudantes ca
+            JOIN usuarios u ON ca.id_usuario = u.id_usuario
+            WHERE ca.id_curso = %s
+        """, (id_course,))
+
+        course["ayudantes"] = ayudantes
+
         return {
             "ok": True,
-            "data": result[0]
+            "data": course
         }
     except Exception as e:
         return {
@@ -109,7 +152,7 @@ def patch_course(id_course, data):
         id_profe = data.get('id_profesor')
         slack_url   = data.get('slack_url')
         youtube_url = data.get('youtube_url')
-
+        regimen_aprobacion = data.get('regimen_aprobacion')
         updates = []
         params = []
 
@@ -134,6 +177,9 @@ def patch_course(id_course, data):
         if youtube_url is not None:
             updates.append("youtube_url = %s")
             params.append(youtube_url)
+        if regimen_aprobacion is not None:
+            updates.append("regimen_aprobacion = %s")
+            params.append(regimen_aprobacion)
 
         if not updates:
             return {

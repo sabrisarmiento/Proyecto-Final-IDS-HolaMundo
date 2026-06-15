@@ -1,6 +1,7 @@
 /* ===== HERO ===== */
 .hero {
   width: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -177,6 +178,11 @@
 .week-title i {
   color: var(--color-9);
 }
+
+/* ============ REGIMEN DE APROBACION ========== */
+
+.regimen-content { display: none; padding: 1rem; }
+.regimen-content.open { display: block; }
 
 /* ===== CALENDER BUTTON ===== */
 .classes-container button {

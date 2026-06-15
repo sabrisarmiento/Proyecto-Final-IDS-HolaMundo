@@ -155,7 +155,7 @@
 
           <form method="POST"
                 action="{{ url_for('dashboard.eliminar_rol', id_rol=r.id_rol) }}"
-                onsubmit="return confirm('¿Eliminar el rol \"{{ r.nombre }}\"? Los usuarios con este rol pueden quedar sin asignación.')">
+                onsubmit="return confirm('¿Eliminar el rol {{ r.nombre }}? Los usuarios con este rol pueden quedar sin asignación.')">
             <button type="submit" class="dg-btn-icon dg-btn-icon--danger" title="Eliminar rol">Eliminar rol</button>
           </form>
         </div>
