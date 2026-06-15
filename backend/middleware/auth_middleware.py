@@ -67,9 +67,9 @@ def require_min_admin_level(min_admin_level):
                     "description": "Usuario no autenticado"
                 })
             
-            user_role = user.get("id_rol")
+            user_level = user.get("nivel")
 
-            if user_role is None or user_role < min_admin_level:
+            if user_level is None or user_level < min_admin_level:
                 return error_response({
                     "code": 403,
                     "message": "Forbidden",
