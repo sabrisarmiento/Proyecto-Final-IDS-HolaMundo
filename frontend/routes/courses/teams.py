@@ -1,4 +1,4 @@
-from flask import jsonify, redirect, request, session, url_for
+from flask import jsonify, redirect, request, session, url_for, flash
 import requests
 from . import courses_bp
 from .common import BACKEND_URL, auth_headers
@@ -6,13 +6,15 @@ from .common import BACKEND_URL, auth_headers
 @courses_bp.route('/cursos/<int:course_id>/equipos/crear', methods=['POST'])
 def create_team(course_id):
     try:
-        requests.post(f"{BACKEND_URL}/equipos", headers=auth_headers(), json={
+        response = requests.post(f"{BACKEND_URL}/equipos", headers=auth_headers(), json={
             "nombre_equipo": request.form.get("nombre_equipo"),
             "id_curso": course_id
         })
+        if response.status_code == 409:
+            flash(response.json().get("description"), "error")
     except Exception as e:
         print("Error creando equipo:", e)
-    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+    return redirect(url_for("courses.course_detail", course_id=course_id, tab="teams"))
 
 @courses_bp.route('/cursos/<int:course_id>/equipos/eliminar', methods=['POST'])
 def delete_teams(course_id):

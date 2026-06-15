@@ -118,8 +118,16 @@ def get_team_by_id(id):
 
 def create_team(data):
     try:
-        name = data.get("nombre_equipo")
+        name = data.get("nombre_equipo", "").strip()
         id_course = data.get("id_curso")
+        existing = query_db("SELECT id_equipo FROM equipos WHERE id_curso = %s AND LOWER(nombre_equipo) = LOWER(%s)", (id_course, name))
+        if existing:
+            return {
+                "ok": False,
+                "code": 409,
+                "message": "Conflict",
+                "description": "Ya existe un equipo con ese nombre"
+            }
         sql = """INSERT INTO equipos(nombre_equipo, id_curso) VALUES (%s, %s);"""
         id_team = modify_db(sql, (name, id_course))
         return {
