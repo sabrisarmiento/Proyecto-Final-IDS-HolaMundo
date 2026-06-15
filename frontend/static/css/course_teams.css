@@ -317,3 +317,56 @@
 .hidden {
   display: none;
 }
+
+.flash-message {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .9rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: .85rem;
+    border: 1px solid transparent;
+    font-size: .92rem;
+    font-weight: 500;
+    animation: flashAppear .25s ease;
+}
+
+.flash-message::before {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.flash-error, .flash-success, .flash-warning {
+    border-color: rgba(146, 20, 12, .2);
+}
+
+.flash-error {
+    background: rgba(146, 20, 12, .08);
+    color: var(--color-3);
+}
+.flash-error::before {
+    content: "⚠";
+}
+
+.flash-success {
+    background: rgba(45, 210, 0, .08);
+    border-color: rgba(45, 210, 0, .2);
+    color: #1f7d17;
+}
+.flash-success::before {
+    content: "✓";
+}
+
+.flash-warning {
+    background: rgba(255, 207, 153, .35);
+    border-color: var(--color-7);
+    color: var(--color-85);
+}
+.flash-warning::before {
+    content: "!";
+}
+
+@keyframes flashAppear {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,10 +1,10 @@
 <div id="tab-teams" class="tab-panel {% if active_tab != 'teams' %}hidden{% endif %}">
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="flash-message">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
     {% endwith %}
     <section>
         <div class="teams-actions">
