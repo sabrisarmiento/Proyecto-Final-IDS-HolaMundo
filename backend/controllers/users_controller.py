@@ -36,7 +36,6 @@ def get_all_users(filters):
         nombre,
         apellido,
         correo,
-        contraseña,
         creado,
         id_rol
         FROM usuarios
@@ -89,7 +88,6 @@ def get_user_by_id(id_user):
         nombre,
         apellido,
         correo,
-        contraseña,
         creado,
         id_rol
       FROM usuarios
