@@ -86,6 +86,37 @@
               </div>
               <h3>{{ aviso.titulo }}</h3>
               <p>{{ aviso.mensaje }}</p>
+              {% if session.get("token") and aviso.id_aviso %}
+                <div class="advertisement-actions">
+
+                  <a
+                    href="{{ url_for('advertisements.edit_advertisement_front', id_aviso=aviso.id_aviso) }}?id_curso={{ course['id_curso'] }}"
+                    class="btn-edit-advertisement"
+                  >
+                    Editar
+                  </a>
+
+                  <form
+                    method="POST"
+                    action="{{ url_for('advertisements.delete_advertisement_front', id_aviso=aviso.id_aviso) }}"
+                    class="delete-advertisement-form"
+                  >
+                    <input
+                      type="hidden"
+                      name="id_curso"
+                      value="{{ course['id_curso'] }}"
+                    >
+
+                    <button
+                      type="submit"
+                      class="btn-delete-advertisement"
+                      onclick="return confirm('¿Seguro que querés borrar este aviso?')"
+                    >
+                      Borrar
+                    </button>
+                  </form>
+                </div>
+              {% endif %}
             </article>
           {% endfor %}
         </div>

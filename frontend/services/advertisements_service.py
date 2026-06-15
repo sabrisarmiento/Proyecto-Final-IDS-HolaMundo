@@ -170,4 +170,109 @@ def configure_slack_course(id_course, slack_bot_token, slack_channel_id, slack_c
             "status_code": 500,
             "data": str(e)
         }
-    
+
+def get_advertisement_by_id(id_advertisement, token):
+    try:
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+
+        response = requests.get(
+            f"{API_URL}/advertisements/{id_advertisement}",
+            headers=headers
+        )
+
+        response.raise_for_status()
+
+        body = response.json()
+
+        return {
+            "ok": True,
+            "data": body.get("advertisement")
+        }
+
+    except Exception as e:
+        print(f"Error al obtener el aviso {id_advertisement}: {e}")
+
+        return {
+            "ok": False,
+            "data": None
+        }
+  
+
+def update_advertisement(id_advertisement, title, message, token):
+    try:
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+
+        data = {
+            "titulo": title,
+            "mensaje": message
+        }
+
+        response = requests.patch(
+            f"{API_URL}/advertisements/{id_advertisement}",
+            json=data,
+            headers=headers
+        )
+
+        print("STATUS UPDATE AD:", response.status_code)
+        print("TEXT UPDATE AD:", response.text)
+
+        if response.status_code in [200, 204]:
+            return {
+                "ok": True,
+                "data": response.json() if response.text else None
+            }
+
+        return {
+            "ok": False,
+            "status_code": response.status_code,
+            "data": response.json() if response.text else None
+        }
+
+    except Exception as e:
+        print(f"Error al editar aviso: {e}")
+
+        return {
+            "ok": False,
+            "status_code": 500,
+            "data": str(e)
+        }
+
+
+def delete_advertisement(id_advertisement, token):
+    try:
+        headers = {
+            "Authorization": f"Bearer {token}"
+        }
+
+        response = requests.delete(
+            f"{API_URL}/advertisements/{id_advertisement}",
+            headers=headers
+        )
+
+        print("STATUS DELETE AD:", response.status_code)
+        print("TEXT DELETE AD:", response.text)
+
+        if response.status_code in [200, 204]:
+            return {
+                "ok": True,
+                "data": response.json() if response.text else None
+            }
+
+        return {
+            "ok": False,
+            "status_code": response.status_code,
+            "data": response.json() if response.text else None
+        }
+
+    except Exception as e:
+        print(f"Error al eliminar aviso: {e}")
+
+        return {
+            "ok": False,
+            "status_code": 500,
+            "data": str(e)
+        }

@@ -60,6 +60,7 @@ def get_advertisement_by_id(id_advertisement):
       SELECT
         id_aviso,
         id_usuario,
+        id_curso,
         titulo,
         mensaje,
         fecha
@@ -134,26 +135,18 @@ def create_advertisement(data, user):
 
 def patch_advertisement_by_id(id_advertisement, data):
   try:
-    id_user = data.get("id_usuario")
     title = data.get("titulo")
     message = data.get("mensaje")
-    date = data.get("fecha")
 
     updates = []
     params = []
 
-    if id_user is not None:
-      updates.append("id_usuario = %s")
-      params.append(int(id_user))
     if title is not None:
       updates.append("titulo = %s")
       params.append(title)
     if message is not None:
       updates.append("mensaje = %s")
       params.append(message)
-    if date is not None:
-      updates.append("fecha = %s")
-      params.append(date)
 
     if not updates:
       return {
@@ -177,14 +170,14 @@ def patch_advertisement_by_id(id_advertisement, data):
     
     return {
       "ok": True,
-      "data": "aviso actualizado correctamente",
+      "message": "aviso actualizado correctamente",
       "id_aviso": id_advertisement
     }
   except Exception as e:
     return {
       "ok": False,
-      "code": 400,
-      "message": "Bad Request",
+      "code": 500,
+      "message": "Internal Server Error",
       "description": str(e)
     }
 
