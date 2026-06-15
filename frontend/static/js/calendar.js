@@ -25,7 +25,6 @@ select.addEventListener('change', function () {
 });
 
 function filterSchedule() {
-    
   const text = document.getElementById("schedule-search").value.toLowerCase();
     document.querySelectorAll(".class").forEach(weekCard => {
         let visibleArticles = 0;
@@ -41,14 +40,14 @@ function filterSchedule() {
 document.addEventListener("DOMContentLoaded", () => {
   const select = document.getElementById("select-courses");
   const search = document.getElementById("schedule-search");
-
   if (!select || !search) return;
-
+  search.style.display = "none";
   select.addEventListener("change", () => {
-    if (select.value) {
-      search.classList.remove("hidden");
+    if (select.value !== "") {
+      search.style.display = "block";
     } else {
-      search.classList.add("hidden");
+      search.style.display = "none";
+      search.value = "";
     }
   });
 });
