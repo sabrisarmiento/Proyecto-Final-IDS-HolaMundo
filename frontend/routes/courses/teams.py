@@ -50,8 +50,13 @@ def add_student_to_team(course_id):
                 "padron": request.form.get("padron"),
                 "id_equipo": request.form.get("id_equipo")
             }
+        elif response.ok:
+            flash("Alumno agregado al equipo correctamente.", "success")
+        else:
+            flash("No se pudo agregar el alumno.", "error")
     except Exception as e:
-        print("Error agregando alumno al equipo:", e)
+        print("Error agregando alumno:", e)
+        flash("Ocurrió un error al agregar el alumno.", "error")
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
 @courses_bp.route('/cursos/<int:course_id>/equipos/cambiar', methods=['POST'])
