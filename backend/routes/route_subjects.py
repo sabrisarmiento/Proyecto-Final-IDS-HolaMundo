@@ -9,11 +9,12 @@ from services.subject_service import (
   my_subjects_service,
   get_professors_by_subject_service,
   assign_professor_to_subject_service,
-  remove_professor_from_subject_service
+  remove_professor_from_subject_service,
+  get_subjects_assigned_to_professor_service
   
 )
 from middleware.auth_middleware import require_auth, require_min_admin_level
-from helpers.constants import NIVEL_SUPERADMIN
+from helpers.constants import NIVEL_SUPERADMIN, NIVEL_PROFESOR
 
 subjects_bp = Blueprint('subjects', __name__)
 
@@ -76,3 +77,11 @@ def assign_professor_to_subject_route(id_materia):
 @require_min_admin_level(NIVEL_SUPERADMIN)
 def remove_professor_from_subject_route(id_materia, id_profesor):
     return remove_professor_from_subject_service(id_materia, id_profesor)
+
+@subjects_bp.route("/subjects/my-assigned", methods=["GET"])
+@require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
+def get_my_assigned_subjects_route():
+    id_profesor = request.user["id_usuario"]
+
+    return get_subjects_assigned_to_professor_service(id_profesor)

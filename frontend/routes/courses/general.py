@@ -12,14 +12,27 @@ from config import get_headers
 def courses():
     subjects = get_my_subjects()
 
+    assigned_subjects = []
+
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/subjects/my-assigned',
+            headers=get_headers()
+        )
+        assigned_subjects = response.json().get('subjects', []) if response.ok else []
+    except Exception as e:
+        print(f"Error cargando materias asignadas: {e}")
+
     if request.method == 'POST':
         try:
+            user = session.get("user", {})
+            id_profesor = user.get("id_usuario")
             data = {
                 "catedra":      request.form.get('catedra'),
                 "cuatrimestre": request.form.get('cuatrimestre'),
                 "anio":         int(request.form.get('anio')),
                 "id_materia":   int(request.form.get('id_materia')),
-                "id_profesor":  int(request.form.get('id_profesor')),
+                "id_profesor":  int(id_profesor),
             }
             post_course(data)
             return redirect(url_for('courses.courses'))
@@ -61,6 +74,7 @@ def courses():
     return render_template(
         'courses.html',
         courses=data_courses,
+        assigned_subjects=assigned_subjects,
         subjects=subjects,
         active_page='courses',
         filtro_materia=filtro_materia,

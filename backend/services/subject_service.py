@@ -9,7 +9,8 @@ from controllers.subject_controller import (
     get_subjects_for_user,
     get_professors_by_subject,
     assign_professor_to_subject,
-    remove_professor_from_subject
+    remove_professor_from_subject,
+    get_subjects_assigned_to_professor
 )
 
 def subjects_service(filters):
@@ -88,4 +89,12 @@ def remove_professor_from_subject_service(id_materia, id_profesor):
         return error_response(result)
     return success_response({
         "message": result["message"]
+    })
+
+def get_subjects_assigned_to_professor_service(id_profesor):
+    result = get_subjects_assigned_to_professor(id_profesor)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({
+        "subjects": result["data"]
     })

@@ -384,3 +384,32 @@ def remove_professor_from_subject(id_materia, id_profesor):
       "message": "Internal Server Error",
       "description": str(e)
     }
+  
+
+def get_subjects_assigned_to_professor(id_profesor):
+    try:
+        query = """
+            SELECT 
+                m.id_materia,
+                m.nombre,
+                m.codigo,
+                m.descripcion
+            FROM materia_profesores mp
+            JOIN materias m ON m.id_materia = mp.id_materia
+            WHERE mp.id_usuario = %s
+        """
+
+        subjects = query_db(query, (id_profesor,))
+
+        return {
+            "ok": True,
+            "data": subjects
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
