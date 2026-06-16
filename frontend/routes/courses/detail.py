@@ -12,12 +12,53 @@ from services.material_frontend_service import get_materials_by_course
 
 @courses_bp.route('/cursos/<int:course_id>', methods=['GET', 'POST'])
 def course_detail(course_id):
+    token = session.get("token")
+    user = session.get("user", {})
+    id_user = user.get("id_usuario")
+
+    if not token or not id_user:
+        return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
+
+    try:
+        course = get_course_by_id(course_id)
+    except Exception:
+        course = {}
+
+    if not course:
+        return redirect(url_for("landing.landing") + "?error=Curso no encontrado")
+
+    id_profesor = course.get("profesor_id")
+    ayudantes = course.get("ayudantes", [])
+
+    try:
+        id_user = int(id_user)
+        id_profesor = int(id_profesor)
+    except (TypeError, ValueError):
+        return redirect(url_for("landing.landing") + "?error=No se pudo validar el permiso")
+
+    es_profesor = id_user == id_profesor
+
+    es_ayudante = False
+
+    for ayudante in ayudantes:
+        try:
+            id_ayudante = int(ayudante.get("id_usuario"))
+            if id_ayudante == id_user:
+                es_ayudante = True
+        except (TypeError, ValueError, AttributeError):
+            pass
+
+    if not es_profesor and not es_ayudante:
+        return redirect(url_for("landing.landing") + "?error=No tenés permiso para ver este curso")
+
+    
+    
     if request.method == 'POST':
         if request.form.get("delete_team"):
             team_id = request.form.get("delete_team")
             try:
-                token = session.get("token")
-                headers = {"Authorization": f"Bearer {token}"}
+                # token = session.get("token")
+                # headers = {"Authorization": f"Bearer {token}"}
                 requests.delete(f"http://127.0.0.1:5000/equipos/{team_id}", headers=headers)
             except Exception as e:
                 print(f"Error deleting team: {e}")
@@ -45,10 +86,10 @@ def course_detail(course_id):
     token   = session.get('token')
     headers = {'Authorization': f'Bearer {token}'}
 
-    try:
-        course = get_course_by_id(course_id)
-    except Exception:
-        course = {}
+    # try:
+    #     course = get_course_by_id(course_id)
+    # except Exception:
+    #     course = {}
 
     try:
         evaluaciones = get_exams_by_course_id(course_id)
