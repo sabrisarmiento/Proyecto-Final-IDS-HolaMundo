@@ -19,6 +19,9 @@
     </div>
     {% endif %}
     <p>{% if is_virtual %}Confirmá tu asistencia a la clase virtual.{% else %}Necesitamos tu ubicación para validar que estás en la facultad.{% endif %}</p>
+    {% if clase and clase.qr_vence %}
+    <p>Podés marcar hasta las <strong>{{ clase.qr_vence }}</strong>.</p>
+    {% endif %}
     <button id="btn" class="btn-action">Dar el presente</button>
     <div id="result"></div>
 </main>
