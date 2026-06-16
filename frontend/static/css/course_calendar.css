@@ -197,3 +197,9 @@
   border-radius: 6px;
 }
 
+.calendar-form-group {
+  color: var(--color-15);
+  padding: 0.4rem;
+}
+
+.calendar-table { padding: 2rem; }

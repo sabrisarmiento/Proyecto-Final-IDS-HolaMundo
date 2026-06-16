@@ -12,15 +12,18 @@
   <p>Fechas, temas y modalidades de cada clase del cuatrimestre actual</p>
 </section>
 <section class="section-schedule" >
-  <div>
-    {% if selected_subject%}
+  <div class="schedule-controls">
     <select title="select-course" id="select-courses">
       <option value="" selected>Seleccione una materia</option>
       {% for course in courses %}
-      <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
+        <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
       {% endfor %}
     </select>
-    {% endif %}
+      <input type="text"
+            id="schedule-search"
+            class="schedule-search"
+            placeholder="Buscar tema en el cronograma..."
+            onkeyup="filterSchedule()">
   </div>
   <div>
     {% if selected_subject %}
@@ -33,7 +36,7 @@
         <div class="class" >
           <h2>Semana: {{ week.week }}</h2>
           {% for class in week.classes %}
-          <article data-course="{{ class.id_curso }}">
+          <article data-course="{{ class.id_curso }}" data-search="{{ class.temas|lower }}">
             <h3>{{ class.tipo }} - {{ class.fecha }}</h3>
             <p>{{ class.temas }}</p>
             <span>{{ class.modalidad }}</span>

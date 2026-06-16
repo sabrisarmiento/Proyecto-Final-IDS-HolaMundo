@@ -1,0 +1,230 @@
+.planilla-section {
+  background: var(--color-5);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.planilla-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.planilla-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--color-15);
+  text-transform: uppercase;
+  margin: 0 0 0.3rem;
+}
+
+.planilla-subtitle {
+  font-size: 0.88rem;
+  color: var(--color-8);
+  margin: 0;
+}
+
+.promedio-general-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--color-2);
+  color: var(--color-5);
+  border-radius: 10px;
+  padding: 0.5rem 1.1rem;
+  min-width: 130px;
+}
+
+.promedio-val-big {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.planilla-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin: 0.6rem 0 1rem;
+}
+
+.filter-select-planilla {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--color-45);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  border: 1.5px solid var(--color-6);
+  border-radius: 8px;
+  padding: 0.38rem 2rem 0.38rem 0.7rem;
+  font-size: 0.83rem;
+  color: var(--color-15);
+  cursor: pointer;
+  min-width: 155px;
+  transition: border-color 0.15s;
+}
+
+.filter-select-planilla:hover,
+.filter-select-planilla:focus {
+  border-color: var(--color-7);
+  outline: none;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.planilla-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+  min-width: 600px;
+}
+
+.planilla-table thead tr {
+  background: var(--color-9);
+  color: var(--color-5);
+}
+
+.planilla-table th {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.th-eval { min-width: 120px; }
+.th-final { min-width: 100px; }
+
+.planilla-table td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--color-6);
+  color: var(--color-15);
+  vertical-align: middle;
+}
+
+.planilla-table tbody tr:hover {
+  background: var(--color-6);
+}
+
+.th-eval-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-del-col {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.5;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.btn-del-col:hover { opacity: 1; }
+
+.nota-cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 7px;
+  padding: 0.25rem 0.55rem;
+  min-width: 48px;
+  text-align: center;
+}
+
+.nota-cell--ok {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.nota-cell--mal {
+  background: #fdecea;
+  color: var(--color-3);
+  border: 1px solid var(--color-4);
+}
+
+.nota-num {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.nota-by {
+  font-size: 0.65rem;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.nota-vacia {
+  color: var(--color-8);
+  font-size: 0.9rem;
+}
+
+.nota-final {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 7px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.team-badge {
+  background: var(--color-6);
+  color: var(--color-9);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.th-estado {
+  white-space: nowrap;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-align: center !important;
+}
+
+.td-estado-final {
+  white-space: nowrap;
+  text-align: center !important;
+}
+
+.estado-badge {
+  display: inline-block;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.estado-promociona {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.estado-final {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.estado-recursa {
+  background: #fee2e2;
+  color: #991b1b;
+}

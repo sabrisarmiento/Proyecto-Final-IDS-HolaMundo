@@ -1,5 +1,3 @@
-
-
 {% extends "base.html" %}
 
 {% block title %}Panel FIUBA - Avisos{% endblock %}
@@ -43,6 +41,35 @@
                     </div>
                     <h2 class="advertisement-card-title">{{ aviso.titulo }}</h2>
                     <p class="advertisement-card-message">{{ aviso.mensaje }}</p>
+                    {% if session.get("token") and aviso.id_aviso %}
+                        <div class="advertisement-actions">
+                            <a 
+                                href="{{ url_for('advertisements.edit_advertisement_front', id_aviso=aviso.id_aviso) }}?id_curso={{ aviso.id_curso }}"
+                                class="btn-edit-advertisement"
+                            >
+                                Editar
+                            </a>
+
+                            <form 
+                                method="POST"
+                                action="{{ url_for('advertisements.delete_advertisement_front', id_aviso=aviso.id_aviso) }}"
+                                class="delete-advertisement-form"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="id_curso"
+                                    value="{{ aviso.id_curso }}"
+                                >
+                                <button 
+                                    type="submit" 
+                                    class="btn-delete-advertisement"
+                                    onclick="return confirm('¿Seguro que querés borrar este aviso?')"
+                                >
+                                    Borrar
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
                 </article>
                 {% endfor %}
             {% else %}

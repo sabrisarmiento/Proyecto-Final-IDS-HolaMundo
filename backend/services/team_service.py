@@ -22,8 +22,8 @@ def create_team_service(data):
     if not result["ok"]:
         return error_response(result)
     return success_response({
-        "message": result["message"],
-        "id_equipo": result["id_equipo"]
+        "message": "Equipo creado correctamente",
+        "id_equipo": result["data"]["id_equipo"]
     }, 201)
 
 def patch_team_service(id_team, data):

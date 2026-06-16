@@ -272,3 +272,88 @@ function recalcularEstadoPlanilla() {
 window.addEventListener('DOMContentLoaded', function () {
     recalcularEstadoPlanilla();
 });
+
+let removeStudentForm = null;
+function openRemoveStudentModal(form) {
+    removeStudentForm = form;
+    openModal("remove-student-modal");
+}
+
+function confirmRemoveStudent() {
+    if (removeStudentForm) {
+        removeStudentForm.submit();
+    }
+}
+
+function toggleDeleteMode() {
+    const form = document.getElementById("delete-teams-form");
+    document.querySelectorAll(".team-checkbox").forEach(cb => cb.classList.toggle("hidden"));
+    form.classList.toggle("hidden");
+    const warning = document.getElementById("delete-warning");
+    if (form.classList.contains("hidden")) {
+        warning.classList.add("hidden");
+    } else {
+        warning.innerHTML = "Seleccioná uno o más equipos y luego presioná <strong>Confirmar eliminación</strong>.";
+        warning.classList.remove("hidden");
+    }
+    document.querySelector(".btn-danger").textContent = form.classList.contains("hidden") ? "Eliminar equipos" : "Cancelar";
+}
+
+function submitDeleteTeams() {
+    closeModal("delete-teams-modal");
+    document.getElementById("delete-teams-form").submit();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const deleteForm = document.getElementById("delete-teams-form");
+    if (!deleteForm) return;
+    deleteForm.addEventListener("submit", (e) => {
+        const selected = [...document.querySelectorAll(".team-checkbox:checked")].map(cb => cb.value);
+        if (!selected.length) {
+            e.preventDefault();
+            const warning = document.getElementById("delete-warning");
+            warning.innerHTML = "<strong>⚠ Atención:</strong> Seleccioná al menos un equipo para continuar.";
+            warning.classList.remove("hidden");
+            return;
+        }
+        e.preventDefault();
+        document.getElementById("selected-teams").value = selected.join(",");
+        openModal("delete-teams-modal");
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".padron-input").forEach(input => {
+        input.addEventListener("input", async () => {
+            const padron = input.value;
+            const preview = input.closest("form").querySelector(".student-preview");
+            if (!padron) return preview.innerHTML = "";
+            try {
+                const res = await fetch(`/cursos/${input.dataset.courseId}/buscar-alumno?padron=${padron}`);
+                const data = await res.json();
+                if (!data.found) {
+                    preview.innerHTML = `<span class="student-not-found">Padrón inexistente en este curso</span>`;
+                    return;
+                }
+                preview.innerHTML = `
+                    <div class="student-found">
+                        Alumno encontrado: <strong>${data.nombre} ${data.apellido}</strong><br>
+                        Estado: <strong>${data.estado}</strong>
+                    </div>`;
+            } catch (error) {
+                preview.innerHTML = `<span class="student-not-found">Error al buscar alumno</span>`;
+            }
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".flash-message").forEach(msg => {
+        msg.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+        setTimeout(() => {
+            msg.style.opacity = "0";
+            msg.style.transform = "translateY(-8px)";
+        }, 4500);
+        setTimeout(() => msg.remove(), 5000);
+    });
+});

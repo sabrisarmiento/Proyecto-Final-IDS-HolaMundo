@@ -14,6 +14,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/course_calendar.css') }}"/>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/config.css') }}"/>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/attendance.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/course_marks_exam.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/course_marks_promo.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/course_marks_table.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/materials.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/advertisements.css') }}"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 
@@ -33,9 +38,9 @@
     <a href="?tab=calendar"  class="nav-btn {% if active_tab == 'calendar'  %}active{% endif %}">Cronograma</a>
     <a href="?tab=marks"     class="nav-btn {% if active_tab == 'marks'     %}active{% endif %}">Notas</a>
     <a href="?tab=ads"       class="nav-btn {% if active_tab == 'ads'       %}active{% endif %}">Avisos</a>
-    <a href="?tab=config"    class="nav-btn {% if active_tab == 'config'    %}active{% endif %}">Configuración</a>
     <a href="?tab=attendance" class="nav-btn {% if active_tab == 'attendance' %}active{% endif %}">Asistencia</a>
     <a href="?tab=materials" class="nav-btn {% if active_tab == 'materials' %}active{% endif %}">Materiales</a>
+    <a href="?tab=config"    class="nav-btn {% if active_tab == 'config'    %}active{% endif %}">Configuración</a>
   </nav>
 
   <div class="tab-content">
@@ -86,6 +91,37 @@
               </div>
               <h3>{{ aviso.titulo }}</h3>
               <p>{{ aviso.mensaje }}</p>
+              {% if session.get("token") and aviso.id_aviso %}
+                <div class="advertisement-actions">
+
+                  <a
+                    href="{{ url_for('advertisements.edit_advertisement_front', id_aviso=aviso.id_aviso) }}?id_curso={{ course['id_curso'] }}"
+                    class="btn-edit-advertisement"
+                  >
+                    Editar
+                  </a>
+
+                  <form
+                    method="POST"
+                    action="{{ url_for('advertisements.delete_advertisement_front', id_aviso=aviso.id_aviso) }}"
+                    class="delete-advertisement-form"
+                  >
+                    <input
+                      type="hidden"
+                      name="id_curso"
+                      value="{{ course['id_curso'] }}"
+                    >
+
+                    <button
+                      type="submit"
+                      class="btn-delete-advertisement"
+                      onclick="return confirm('¿Seguro que querés borrar este aviso?')"
+                    >
+                      Borrar
+                    </button>
+                  </form>
+                </div>
+              {% endif %}
             </article>
           {% endfor %}
         </div>
