@@ -7,6 +7,13 @@
     >
     agregar alumno
     </button>
+    <button
+    type="button"
+    class="btn-create-student"
+    onclick="openModal('import-students-modal')"
+    >
+    importar CSV
+    </button>
     {% call modal("create-student-modal", "Crear Alumno") %}
     <form
     action="{{ url_for('courses.course_detail', course_id=course['id_curso']) }}"
@@ -23,7 +30,22 @@
     <button type="submit">Crear</button>
     </form>
     {% endcall %}
+
+    {% call modal("import-students-modal", "Importar alumnos (CSV)") %}
+    <form id="import-students-form"
+        data-action="{{ url_for('courses.importar_alumnos', course_id=course['id_curso']) }}">
+    <div id="csv-dropzone" class="csv-dropzone">
+        <p class="csv-dropzone-text">Arrastrá el archivo .csv acá o hacé clic para elegirlo</p>
+    </div>
+    <input type="file" id="csv-file-input" accept=".csv" hidden />
+    <p id="csv-file-name" class="csv-file-name" hidden></p>
+    <p class="csv-hint">Columnas requeridas (exactas): nombre, apellido, padron, mail</p>
+    <button type="submit" id="csv-submit" disabled>Importar</button>
+    <p id="import-message" class="form-message" hidden></p>
+    </form>
+    {% endcall %}
 </section>
+
 {% if students %} {% set current_order_by = request.args.get('order_by', '') %}
 {% set current_order = request.args.get('order', '') %} {% set students_base_url
 = '?tab=students&page=' ~ page %}
