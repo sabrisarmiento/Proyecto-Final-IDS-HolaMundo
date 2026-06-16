@@ -42,6 +42,14 @@ def students_active_qr(id_clase):
         return query_db(sql, (id_clase,))
     except Exception:
         return []
+    
+def mark_qr_generated(id_clase, total_minutos):
+    modify_db(
+        "UPDATE clases SET qr_generado_en = NOW(), qr_valido_hasta = NOW() + INTERVAL %s MINUTE WHERE id_clase = %s",
+        (total_minutos, id_clase),
+    )
+    result = query_db("SELECT qr_valido_hasta FROM clases WHERE id_clase = %s", (id_clase,))
+    return result[0]["qr_valido_hasta"] if result else None
 
 def proximity_fiuba(user_lat, user_lon):
     FACULTAD_LAT = -34.61771131976023
@@ -91,22 +99,62 @@ def create_attendance(data):
                 "description": "El alumno figura como abandonó la cursada"
             }
 
-        if lat is None or lon is None:
-            return {
-                "ok": False,
-                "code": 400,
-                "message": "Bad Request",
-                "description": "Se requiere ubicación GPS para validar asistencia"
-            }
+        clase = query_db("SELECT modalidad FROM clases WHERE id_clase = %s", (id_clase,))
+        is_virtual = bool(clase) and clase[0]["modalidad"] == "Virtual"
 
-        if not proximity_fiuba(float(lat), float(lon)):
+        if not is_virtual:
+            if lat is None or lon is None:
+                return {
+                    "ok": False,
+                    "code": 400,
+                    "message": "Bad Request",
+                    "description": "Se requiere ubicación GPS para validar asistencia"
+                }
+
+            if not proximity_fiuba(float(lat), float(lon)):
+                return {
+                    "ok": False,
+                    "code": 403,
+                    "message": "Forbidden",
+                    "description": "Ubicación fuera del rango permitido"
+                }
+        
+        belongs = query_db(
+            "SELECT 1 FROM alumnos a JOIN clases c ON a.id_curso = c.id_curso WHERE a.id_alumno = %s AND c.id_clase = %s",
+            (id_alumno, id_clase),
+        )
+        if not belongs:
             return {
                 "ok": False,
                 "code": 403,
                 "message": "Forbidden",
-                "description": "Ubicación fuera del rango permitido"
+                "description": "El alumno no pertenece al curso de esta clase"
             }
 
+        window_open = query_db(
+            "SELECT 1 FROM clases WHERE id_clase = %s AND qr_valido_hasta IS NOT NULL AND NOW() <= qr_valido_hasta",
+            (id_clase,),
+        )
+        if not window_open:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "El código QR expiró o no fue generado para esta clase"
+            }
+
+        already = query_db(
+            "SELECT id_asistencia FROM asistencia WHERE id_alumno = %s AND id_clase = %s",
+            (id_alumno, id_clase),
+        )
+        if already:
+            return {
+                "ok": False,
+                "code": 409,
+                "message": "Conflict",
+                "description": "La asistencia para esta clase ya fue registrada"
+            }
+        
         sql = "INSERT INTO asistencia (id_alumno, id_clase, presente) VALUES (%s, %s, %s)"
         modify_db(sql, (data["id_alumno"], data["id_clase"], data.get("presente", True)))
         return {

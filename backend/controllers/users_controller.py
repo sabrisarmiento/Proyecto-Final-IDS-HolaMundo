@@ -36,7 +36,6 @@ def get_all_users(filters):
         nombre,
         apellido,
         correo,
-        contraseña,
         creado,
         id_rol
         FROM usuarios
@@ -89,7 +88,6 @@ def get_user_by_id(id_user):
         nombre,
         apellido,
         correo,
-        contraseña,
         creado,
         id_rol
       FROM usuarios
@@ -142,7 +140,7 @@ def create_user(data, logged_user):
         "description": "El rol indicado no existe"
       }
 
-    nivel_logged_user = logged_user.get("nivel_administracion")
+    nivel_logged_user = logged_user.get("nivel")
     nivel_to_create = rol_to_create.get("nivel_administracion")
 
     if not can_manage_admin_level(nivel_logged_user, nivel_to_create):
@@ -206,7 +204,7 @@ def update_user_by_id(id_user, data, logged_user):
         "description": f"No existe un usuario con ID {id_user} para actualizar"
       }
 
-    nivel_logged_user = logged_user.get("nivel_administracion")
+    nivel_logged_user = logged_user.get("nivel")
     nivel_target = user_to_update.get("nivel_administracion")
 
     if not can_manage_admin_level(nivel_logged_user, nivel_target):
@@ -304,7 +302,7 @@ def delete_user_by_id(id_user, logged_user):
         "message": "Not Found",
         "description": f"No existe un usuario con ID {id_user} para eliminar"
       }
-    nivel_logged_user = logged_user.get("nivel_administracion")
+    nivel_logged_user = logged_user.get("nivel")
     nivel_target = user_to_delete.get("nivel_administracion")
 
     if not can_manage_admin_level(nivel_logged_user, nivel_target):

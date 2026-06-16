@@ -13,8 +13,8 @@ from helpers.constants import NIVEL_PROFESOR
 users_bp = Blueprint('users', __name__)
 
 @users_bp.route("/users",methods=["GET"])
+@require_auth
 def get_users():
-
     filters = {
         "id_usuario": request.args.get("id_usuario"),
         "nombre": request.args.get("nombre"),
@@ -27,9 +27,9 @@ def get_users():
 
 
 @users_bp.route("/users/<int:id_user>",methods=["GET"])
+@require_auth
 def get_user(id_user):
     return user_service(id_user)
-
 
 @users_bp.route("/users",methods=["POST"])
 @require_auth

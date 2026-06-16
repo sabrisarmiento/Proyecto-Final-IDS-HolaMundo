@@ -1,5 +1,5 @@
 import csv, io
-from database.db import query_db, modify_db
+from database.db import query_db, modify_db, insert_db
 
 _FILTER_COLUMNS = {
     "name": "nombre",
@@ -31,8 +31,10 @@ def get_all_students(filters):
         order_by = filters.get("order_by", None)
         order = filters.pop("order", None)
 
-        if order_by and order:
-            sql += f" ORDER BY {order_by} {order.upper()}"
+        allowed_order_by = {"id_alumno", "nombre", "apellido", "padron", "correo", "estado_alumno", "id_curso"}
+        if order_by in allowed_order_by and order:
+            direction = "DESC" if str(order).upper() == "DESC" else "ASC"
+            sql += f" ORDER BY {order_by} {direction}"
 
         total = query_db(count_sql, params)[0]['total']
 
@@ -83,7 +85,7 @@ def create_student(data):
             return {"ok": False, "code": 409, "message": "Conflict",
                     "description": "El alumno ya existe (correo o padrón duplicado)"}
 
-        new_id = modify_db(
+        new_id = insert_db(
             """INSERT INTO alumnos (nombre, apellido, padron, correo, id_curso)
             VALUES (%s, %s, %s, %s, %s)""",
             (data["nombre"], data["apellido"], data["padron"], data["correo"], data["id_curso"]),

@@ -87,6 +87,8 @@ CREATE TABLE clases (
     semana INT NOT NULL,
     tipo VARCHAR(50),
     modalidad VARCHAR(50),
+    qr_generado_en DATETIME NULL,
+    qr_valido_hasta DATETIME NULL,
     id_curso INT NOT NULL,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
@@ -126,6 +128,7 @@ CREATE TABLE asistencia (
     id_alumno INT NOT NULL,
     id_clase INT NOT NULL,
     presente BOOLEAN DEFAULT FALSE,
+    UNIQUE (id_alumno, id_clase),
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
     FOREIGN KEY (id_clase) REFERENCES clases(id_clase)
 );

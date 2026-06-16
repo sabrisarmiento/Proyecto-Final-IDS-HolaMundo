@@ -12,7 +12,16 @@
 <body>
 <main class="checkin">
     <h1>Marcar asistencia</h1>
-    <p>Necesitamos tu ubicación para validar que estás en la facultad.</p>
+    {% if clase %}
+    <div class="class-info">
+        <p><strong>Clase N.º {{ clase.numero }}</strong> — {{ clase.materia }} (Cátedra {{ clase.catedra }})</p>
+        <p>Fecha: {{ clase.fecha }} · Tema: {{ clase.temas or '—' }}</p>
+    </div>
+    {% endif %}
+    <p>{% if is_virtual %}Confirmá tu asistencia a la clase virtual.{% else %}Necesitamos tu ubicación para validar que estás en la facultad.{% endif %}</p>
+    {% if clase and clase.qr_vence %}
+    <p>Podés marcar hasta las <strong>{{ clase.qr_vence }}</strong>.</p>
+    {% endif %}
     <button id="btn" class="btn-action">Dar el presente</button>
     <div id="result"></div>
 </main>
@@ -23,50 +32,60 @@
     id_clase:  "{{ id_clase }}",
     code:      "{{ code }}"
     };
+    const isVirtual = {{ 'true' if is_virtual else 'false' }};
     const btn = document.getElementById('btn');
     const out = document.getElementById('result');
 
-    btn.addEventListener('click', () => {
-    if (!navigator.geolocation) {
-        out.className = 'err';
-        out.textContent = 'Tu navegador no soporta geolocalización.';
-        return;
-    }
-    btn.disabled = true;
-    out.className = '';
-    out.textContent = 'Obteniendo ubicación…';
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
+    async function send(extra) {
         try {
-        const resp = await fetch('/presente/marcar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-            ...payload,
-            latitud: pos.coords.latitude,
-            longitud: pos.coords.longitude
-            })
-        });
-        const data = await resp.json();
-        if (resp.ok) {
-            out.className = 'ok';
-            out.textContent = '✅ ' + (data.message || 'Asistencia registrada');
-        } else {
-            const desc = (data.errors && data.errors[0] && data.errors[0].description) || 'No se pudo registrar';
+            const resp = await fetch('/presente/marcar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...payload, ...extra })
+            });
+            const data = await resp.json();
+            if (resp.ok) {
+                out.className = 'ok';
+                out.textContent = '✅ ' + (data.message || 'Asistencia registrada');
+            } else {
+                const desc = (data.errors && data.errors[0] && data.errors[0].description) || 'No se pudo registrar';
+                out.className = 'err';
+                out.textContent = '❌ ' + desc;
+                btn.disabled = false;
+            }
+        } catch (e) {
             out.className = 'err';
-            out.textContent = '❌ ' + desc;
+            out.textContent = '❌ Error de red.';
             btn.disabled = false;
         }
-        } catch (e) {
-        out.className = 'err';
-        out.textContent = '❌ Error de red.';
-        btn.disabled = false;
+    }
+
+    btn.addEventListener('click', () => {
+        btn.disabled = true;
+        out.className = '';
+
+        if (isVirtual) {
+            out.textContent = 'Registrando…';
+            send({});
+            return;
         }
-    }, () => {
-        out.className = 'err';
-        out.textContent = '❌ Tenés que permitir la ubicación para marcar asistencia.';
-        btn.disabled = false;
-    });
+
+        if (!navigator.geolocation) {
+            out.className = 'err';
+            out.textContent = 'Tu navegador no soporta geolocalización.';
+            btn.disabled = false;
+            return;
+        }
+
+        out.textContent = 'Obteniendo ubicación…';
+        navigator.geolocation.getCurrentPosition(
+            (pos) => send({ latitud: pos.coords.latitude, longitud: pos.coords.longitude }),
+            () => {
+                out.className = 'err';
+                out.textContent = '❌ Tenés que permitir la ubicación para marcar asistencia.';
+                btn.disabled = false;
+            }
+        );
     });
 </script>
 </body>
