@@ -116,3 +116,60 @@
   </div>
 
 </form>
+
+<div class="config-section">
+  <h3 class="config-section-title">Ayudantes del curso</h3>
+
+  {% if assistants %}
+    <div class="assistants-list">
+      {% for assistant in assistants %}
+        <div class="assistant-card">
+          <p>
+            {{ assistant.nombre }} {{ assistant.apellido }}
+            - {{ assistant.correo }}
+          </p>
+
+          <form
+            method="POST"
+            action="{{ url_for('courses.quitar_ayudante_curso', course_id=course.id_curso, assistant_id=assistant.id_usuario) }}"
+            onsubmit="return confirm('¿Quitar este ayudante del curso?')"
+          >
+            <button type="submit" class="config-btn-save">
+              Quitar
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="config-subtitle">Este curso todavía no tiene ayudantes asignados.</p>
+  {% endif %}
+
+  <h3 class="config-section-title">Agregar ayudante</h3>
+
+  <form
+    method="POST"
+    action="{{ url_for('courses.agregar_ayudante_curso', course_id=course.id_curso) }}"
+    class="config-form"
+  >
+    <div class="config-field">
+      <label class="config-label" for="id_ayudante">Ayudante</label>
+
+      <select class="config-input" name="id_ayudante" id="id_ayudante" required>
+        <option value="">Seleccioná un ayudante</option>
+
+        {% for assistant in available_assistants %}
+          <option value="{{ assistant.id_usuario }}">
+            {{ assistant.nombre }} {{ assistant.apellido }} - {{ assistant.correo }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="config-actions">
+      <button type="submit" class="config-btn-save">
+        Agregar ayudante
+      </button>
+    </div>
+  </form>
+</div>
