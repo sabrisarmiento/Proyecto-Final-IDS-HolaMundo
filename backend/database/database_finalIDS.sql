@@ -205,6 +205,14 @@ CREATE TABLE curso_slack_config (
     FOREIGN KEY (instalado_por) REFERENCES usuarios(id_usuario)
 );
 
+CREATE TABLE curso_ayudantes (
+    id_curso INT NOT NULL,
+    id_usuario INT NOT NULL,
+    PRIMARY KEY (id_curso, id_usuario),
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
 -- CREATE TABLE curso_slack_config (
 --     id_curso INT PRIMARY KEY,
 --     slack_team_id VARCHAR(100),

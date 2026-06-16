@@ -44,6 +44,10 @@
               onsubmit="return confirm('¿Eliminar la materia {{ subject.nombre }}? Esta acción no se puede deshacer.')">
           <button type="submit" class="btn-subject-action btn-subject-delete" title="Eliminar">Eliminar</button>
         </form>
+        <a class="btn-subject-action"
+          href="{{ url_for('courses.profesores_materia', subject_id=subject.id_materia) }}">
+          Profesores
+        </a>
       </div>
     </div>
 
