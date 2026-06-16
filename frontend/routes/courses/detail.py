@@ -14,10 +14,14 @@ from services.material_frontend_service import get_materials_by_course
 def course_detail(course_id):
     token = session.get("token")
     user = session.get("user", {})
-    id_user = user.get("id_usuario")
-
-    if not token or not id_user:
+    
+    if not token or not user:
         return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
+    
+    id_user = user.get("id_usuario")
+    nivel = user.get("nivel")
+    id_rol = user.get("id_rol")
+
 
     try:
         course = get_course_by_id(course_id)
@@ -27,29 +31,46 @@ def course_detail(course_id):
     if not course:
         return redirect(url_for("landing.landing") + "?error=Curso no encontrado")
 
-    id_profesor = course.get("profesor_id")
-    ayudantes = course.get("ayudantes", [])
-
     try:
         id_user = int(id_user)
-        id_profesor = int(id_profesor)
+        nivel = int(nivel)
+        id_rol = int(id_rol)
     except (TypeError, ValueError):
         return redirect(url_for("landing.landing") + "?error=No se pudo validar el permiso")
+    
+    print("USER SESSION:", user)
+    print("id_user:", id_user)
+    print("nivel:", nivel)
+    print("id_rol:", id_rol)
+    print("COURSE:", course)
+    print("profesor_id del curso:", course.get("profesor_id"))
+    print("ayudantes del curso:", course.get("ayudantes", []))
 
-    es_profesor = id_user == id_profesor
+    es_superadmin = id_rol == 1
 
-    es_ayudante = False
+    if not es_superadmin:
+        id_profesor = course.get("profesor_id")
+        ayudantes = course.get("ayudantes", [])
 
-    for ayudante in ayudantes:
         try:
-            id_ayudante = int(ayudante.get("id_usuario"))
-            if id_ayudante == id_user:
-                es_ayudante = True
-        except (TypeError, ValueError, AttributeError):
-            pass
+            id_profesor = int(id_profesor)
+        except (TypeError, ValueError):
+            return redirect(url_for("landing.landing") + "?error=No se pudo validar el profesor del curso")
 
-    if not es_profesor and not es_ayudante:
-        return redirect(url_for("landing.landing") + "?error=No tenés permiso para ver este curso")
+        es_profesor = id_user == id_profesor
+
+        es_ayudante = False
+
+        for ayudante in ayudantes:
+            try:
+                id_ayudante = int(ayudante.get("id_usuario"))
+                if id_ayudante == id_user:
+                    es_ayudante = True
+            except (TypeError, ValueError, AttributeError):
+                pass
+
+        if not es_profesor and not es_ayudante:
+            return redirect(url_for("landing.landing") + "?error=No tenés permiso para ver este curso")
 
     
     
