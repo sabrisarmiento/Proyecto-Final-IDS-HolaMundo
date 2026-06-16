@@ -66,20 +66,16 @@ def assign_assistant_to_course_service(id_curso, data, user):
 
 def get_assistants_by_course_service(id_curso):
     result = get_assistants_by_course(id_curso)
-
     if not result["ok"]:
         return error_response(result)
-
     return success_response({
         "assistants": result["data"]
     })
 
-def remove_assistant_from_course_service(id_curso, id_ayudante):
-    result = remove_assistant_from_course(id_curso, id_ayudante)
-
+def remove_assistant_from_course_service(id_curso, id_ayudante, user):
+    result = remove_assistant_from_course(id_curso, id_ayudante, user)
     if not result["ok"]:
         return error_response(result)
-
     return success_response({
         "message": result["message"]
     })

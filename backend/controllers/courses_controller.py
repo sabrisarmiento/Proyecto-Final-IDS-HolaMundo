@@ -342,8 +342,44 @@ def assign_assistant_to_course(id_curso, id_ayudante, id_user, id_rol):
             "description": str(e)
         }
     
-def remove_assistant_from_course(id_curso, id_ayudante):
+def remove_assistant_from_course(id_curso, id_ayudante, user):
     try:
+        id_user = int(user["id_usuario"])
+        id_rol = int(user["id_rol"])
+        course = query_db(
+            """
+            SELECT id_curso, id_profesor
+            FROM cursos
+            WHERE id_curso = %s
+            """,
+            (id_curso,)
+        )
+
+        if not course:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Not Found",
+                "description": "El curso no existe"
+            }
+
+        course = course[0]
+
+        id_user = int(id_user)
+        id_rol = int(id_rol)
+        id_profesor = int(course["id_profesor"])
+
+        es_superadmin = id_rol == 1
+        es_profesor_del_curso = id_rol == 2 and id_user == id_profesor
+
+        if not es_superadmin and not es_profesor_del_curso:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permiso para quitar ayudantes de este curso"
+            }
+
         query = """
             DELETE FROM curso_ayudantes
             WHERE id_curso = %s
@@ -364,4 +400,3 @@ def remove_assistant_from_course(id_curso, id_ayudante):
             "message": "Internal Server Error",
             "description": str(e)
         }
-    
