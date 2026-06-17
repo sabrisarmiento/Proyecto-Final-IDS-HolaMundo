@@ -38,7 +38,10 @@
     background-color:white;
     border-radius: 16px;
     padding: 2.5rem;
-    box-shadow: 0 4px 12px rgba(136, 118, 114, 0.1)
+    box-shadow: 0 4px 12px rgba(136, 118, 114, 0.1);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
 }
 
 .advertisement-card-header {
@@ -87,6 +90,7 @@
     padding: 3rem;
     border-radius: 12px;
     font-size: 1rem;
+    margin-bottom: 2rem;
 }
 
 .prints{
