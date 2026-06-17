@@ -18,18 +18,25 @@
 
         {% if selected_subject %}
             <div class="advertisements-filter">
-                <select title="select-course" id="select-courses">
-                    <option value="" selected>Seleccione una cátedra</option>
-                    {% for course in courses %}
-                        <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
-                    {% endfor %}
-                </select>
+                {% if courses and courses|length > 0 %}
+                    <select title="select-course" id="select-courses">
+                        <option value="" selected>Seleccione una cátedra</option>
+                        {% for course in courses %}
+                            <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
+                        {% endfor %}
+                    </select>
+            
+                    <p id="msg-select-course">
+                        Por favor, seleccione una cátedra para ver sus avisos.
+                    </p>
+                {% else %}
+                    <div class="advertisement-empty">
+                        <p>No hay cátedras disponibles por el momento</p>
+                    </div>
+                {% endif %}
             </div>
-
-            <p id="msg-select-course">
-                Por favor, seleccione una cátedra para ver sus avisos.
-            </p>
         {% endif %}
+        
         
         <div class="advertisements-list" id="advertisements-container">
             {% if avisos %}
@@ -74,7 +81,7 @@
                 {% endfor %}
             {% else %}
                 <div class="advertisement-empty">
-                    <p>Elija una materia para ver sus avisos</p>
+                    <p>No hay avisos publicados en este momento</p>
                 </div>
             {% endif %}
         </div>
