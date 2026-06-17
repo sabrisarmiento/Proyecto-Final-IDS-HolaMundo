@@ -80,20 +80,27 @@ def guardar_promocion(course_id):
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
 
-    es_promocionable = request.form.get('es_promocionable') == '1'
-    evaluaciones     = []
+    es_promocionable      = request.form.get('es_promocionable') == '1'
+    cuenta_asistencia     = 'cuenta_asistencia' in request.form
+    porcentaje_asistencia = float(request.form.get('porcentaje_asistencia', 75.0) or 75.0)
+    evaluaciones          = []
 
     for eval_id_str in request.form.getlist('eval_ids'):
-        id_eval    = int(eval_id_str)
-        cuenta     = f'cuenta_{id_eval}' in request.form
-        nota_raw   = request.form.get(f'nota_minima_{id_eval}', '')
+        id_eval     = int(eval_id_str)
+        cuenta      = f'cuenta_{id_eval}' in request.form
+        nota_raw    = request.form.get(f'nota_minima_{id_eval}', '')
         nota_minima = float(nota_raw) if nota_raw != '' else None
         evaluaciones.append({'id_evaluacion': id_eval, 'cuenta': cuenta, 'nota_minima': nota_minima})
 
     try:
         requests.post(
             f'{BACKEND_URL}/cursos/{course_id}/promocion',
-            json={'es_promocionable': es_promocionable, 'evaluaciones': evaluaciones},
+            json={
+                'es_promocionable':      es_promocionable,
+                'evaluaciones':          evaluaciones,
+                'cuenta_asistencia':     cuenta_asistencia,
+                'porcentaje_asistencia': porcentaje_asistencia,
+            },
             headers=auth_headers()
         )
     except Exception as e:

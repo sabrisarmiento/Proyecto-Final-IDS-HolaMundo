@@ -84,7 +84,7 @@
     const canvas = document.getElementById("chart-asistencia");
     if (!canvas) return;
 
-    const { regulares = 0, en_riesgo = 0, sin_datos = 0 } = asistencia;
+    const { regulares = 0, en_riesgo = 0, sin_datos = 0, umbral = 75 } = asistencia;
     const total = regulares + en_riesgo + sin_datos;
 
     if (total === 0) {
@@ -100,10 +100,15 @@
       setText("dash-asist-pct", Math.round((regulares / total) * 100) + "%");
     }
 
+    const umbralEl = document.getElementById("dash-asist-umbral");
+    if (umbralEl) {
+      umbralEl.textContent = `Umbral: ${umbral}% de asistencia`;
+    }
+
     new Chart(canvas, {
       type: "doughnut",
       data: {
-        labels: ["Regular", "En riesgo", "Sin datos"],
+        labels: [`Regular (≥${umbral}%)`, `En riesgo (<${umbral}%)`, "Sin datos"],
         datasets: [
           {
             data: [regulares, en_riesgo, sin_datos],
@@ -125,6 +130,11 @@
           legend: {
             position: "bottom",
             labels: { padding: 16, font: { size: 12 } },
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.label}: ${ctx.parsed} alumnos`,
+            },
           },
         },
       },

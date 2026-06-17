@@ -62,18 +62,25 @@ def get_course_dashboard(id_curso):
                     round(sum(vals) / len(vals), 2) if vals else None
                 )
 
-        # promedio general de notas d alumnos activos
         todos_valores = [v for vs in notas_por_alumno.values() for v in vs]
         promedio_general = (
             round(sum(todos_valores) / len(todos_valores), 2) if todos_valores else None
         )
 
-        # alumnos activos
         promo_cfg_raw = query_db(
-            "SELECT es_promocionable FROM curso_promocion_config WHERE id_curso = %s",
+            "SELECT es_promocionable, cuenta_asistencia, porcentaje_asistencia FROM curso_promocion_config WHERE id_curso = %s",
             (id_curso,)
         )
-        es_promocionable = bool(promo_cfg_raw[0]["es_promocionable"]) if promo_cfg_raw else False
+        if promo_cfg_raw:
+            es_promocionable      = bool(promo_cfg_raw[0]["es_promocionable"])
+            cuenta_asistencia     = bool(promo_cfg_raw[0]["cuenta_asistencia"])
+            porcentaje_asistencia = float(promo_cfg_raw[0]["porcentaje_asistencia"])
+        else:
+            es_promocionable      = False
+            cuenta_asistencia     = False
+            porcentaje_asistencia = 75.0
+
+        umbral_asistencia = porcentaje_asistencia if (es_promocionable and cuenta_asistencia) else 75.0
 
         promo_evals = {}
         if es_promocionable:
@@ -135,7 +142,6 @@ def get_course_dashboard(id_curso):
                 else:
                     recursantes += 1
 
-        # asistencia
         clases = query_db(
             "SELECT id_clase FROM clases WHERE id_curso = %s",
             (id_curso,)
@@ -144,13 +150,14 @@ def get_course_dashboard(id_curso):
 
         asistencia_stats = {"regulares": 0, "en_riesgo": 0, "sin_datos": 0}
         attendance_by_student = []
+
         if total_clases > 0 and ids_activos:
             fmt = ",".join(["%s"] * len(ids_activos))
             presencias = query_db(
                 f"""
                 SELECT id_alumno, COUNT(*) AS presentes
                 FROM asistencia
-                WHERE id_alumno IN ({fmt}) AND presente = 1
+                WHERE id_alumno IN ({fmt}) AND presente != 0
                 GROUP BY id_alumno
                 """,
                 ids_activos
@@ -161,50 +168,52 @@ def get_course_dashboard(id_curso):
             for aid in ids_activos:
                 presentes = presencias_map.get(aid, 0)
                 pct = (presentes / total_clases) * 100
-                if pct >= 75:
+                if pct >= umbral_asistencia:
                     asistencia_stats["regulares"] += 1
                 else:
                     asistencia_stats["en_riesgo"] += 1
                 alumno = names_map.get(aid, {})
                 attendance_by_student.append({
-                    "id_alumno": aid,
-                    "nombre": alumno.get("nombre"),
-                    "apellido": alumno.get("apellido"),
-                    "presentes": presentes,
+                    "id_alumno":    aid,
+                    "nombre":       alumno.get("nombre"),
+                    "apellido":     alumno.get("apellido"),
+                    "presentes":    presentes,
                     "total_clases": total_clases,
-                    "porcentaje": round(pct, 1),
+                    "porcentaje":   round(pct, 1),
                 })
         else:
             asistencia_stats["sin_datos"] = len(ids_activos)
-
 
         return {
             "ok": True,
             "data": {
                 "alumnos": {
-                    "total": total_alumnos,
-                    "activos": len(ids_activos),
+                    "total":      total_alumnos,
+                    "activos":    len(ids_activos),
                     "abandonaron": abandonaron,
                 },
                 "equipos": equipos_count,
                 "clasificacion": {
                     "promocionados": promocionados,
-                    "van_a_final": van_a_final,
-                    "recursantes": recursantes,
-                    "abandonaron": abandonaron,
+                    "van_a_final":   van_a_final,
+                    "recursantes":   recursantes,
+                    "abandonaron":   abandonaron,
                 },
                 "promedio_general": promedio_general,
                 "evaluaciones": [
                     {
-                        "id": ev["id_evaluacion"],
-                        "nombre": ev["nombre"],
+                        "id":      ev["id_evaluacion"],
+                        "nombre":  ev["nombre"],
                         "promedio": promedio_por_eval.get(ev["id_evaluacion"]),
                     }
                     for ev in evaluaciones
                 ],
-                "asistencia": asistencia_stats,
+                "asistencia": {
+                    **asistencia_stats,
+                    "umbral": umbral_asistencia,
+                },
                 "asistencia_detalle": attendance_by_student,
-                "es_promocionable": es_promocionable,
+                "es_promocionable":   es_promocionable,
             }
         }
 

@@ -22,6 +22,11 @@
                   <input type="hidden" name="nota_minima_{{ eval.id_evaluacion }}" value="{{ cfg.get('nota_minima') }}">
                 {% endif %}
               {% endfor %}
+              <!-- Pasar también la config de asistencia cuando se hace toggle -->
+              <input type="hidden" name="cuenta_asistencia" id="hidden-cuenta-asistencia"
+                     value="{% if curso_cuenta_asistencia %}on{% endif %}">
+              <input type="hidden" name="porcentaje_asistencia" id="hidden-pct-asistencia"
+                     value="{{ curso_pct_asistencia | default(75) }}">
               <label class="toggle-switch">
                 <input type="checkbox" id="toggle-promocionable"
                   {% if curso_es_promocionable %}checked{% endif %}
@@ -75,11 +80,39 @@
                 {% endfor %}
               </tbody>
             </table>
+            {% else %}
+              <p class="tab-empty" style="margin-top:1rem;">Creá evaluaciones primero para configurar la promoción.</p>
+            {% endif %}
+
+            <!-- Bloque de asistencia para promoción -->
+            <div class="promo-asist-block">
+              <label class="promo-asist-label">
+                <input type="checkbox"
+                       name="cuenta_asistencia"
+                       id="check-asistencia"
+                       {% if curso_cuenta_asistencia %}checked{% endif %}
+                       onchange="togglePctAsistencia(this.checked)">
+                ¿La asistencia cuenta para promocionar?
+              </label>
+
+              <div id="pct-asistencia-wrap" class="promo-asist-pct-row {% if not curso_cuenta_asistencia %}hidden{% endif %}">
+                <label class="promo-asist-pct-label">
+                  Porcentaje mínimo de asistencia:
+                </label>
+                <input type="number"
+                       name="porcentaje_asistencia"
+                       id="pct-asistencia-input"
+                       value="{{ curso_pct_asistencia | default(75) }}"
+                       min="0" max="100" step="5"
+                       class="promo-asist-pct-input">
+                <span class="promo-asist-pct-symbol">%</span>
+              </div>
+            </div>
+
+            {% if evaluaciones %}
             <div class="promo-save-row">
               <button type="submit" class="btn-guardar-promo">Guardar configuración de promoción</button>
             </div>
-            {% else %}
-              <p class="tab-empty" style="margin-top:1rem;">Creá evaluaciones primero para configurar la promoción.</p>
             {% endif %}
           </form>
         </div>
@@ -488,3 +521,15 @@
           </table>
         </div>
       </div>
+
+<script>
+function togglePctAsistencia(checked) {
+  const wrap = document.getElementById('pct-asistencia-wrap');
+  if (!wrap) return;
+  if (checked) {
+    wrap.classList.remove('hidden');
+  } else {
+    wrap.classList.add('hidden');
+  }
+}
+</script>

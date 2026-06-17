@@ -71,11 +71,20 @@ def courses():
     anios_opciones         = sorted({str(c.get('anio', '')) for c in all_courses_raw if c.get('anio')}, reverse=True)
     cuatrimestres_opciones = sorted({str(c.get('cuatrimestre', '')) for c in all_courses_raw if c.get('cuatrimestre')})
 
+    user = session.get("user", {})
+    try:
+        nivel = int(user.get("nivel", 0))
+    except (TypeError, ValueError):
+        nivel = 0
+    es_superadmin = nivel >= 3
+
     return render_template(
         'courses.html',
         courses=data_courses,
         assigned_subjects=assigned_subjects,
         subjects=subjects,
+        nivel=nivel,
+        es_superadmin=es_superadmin,
         active_page='courses',
         filtro_materia=filtro_materia,
         filtro_catedra=filtro_catedra,

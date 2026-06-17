@@ -327,10 +327,12 @@ def get_students_with_notes_db(id_curso, limit=None, offset=0, order_by=None, or
 def get_promocion_config_db(id_curso):
     try:
         flag = query_db(
-            "SELECT es_promocionable FROM curso_promocion_config WHERE id_curso = %s",
+            "SELECT es_promocionable, cuenta_asistencia, porcentaje_asistencia FROM curso_promocion_config WHERE id_curso = %s",
             (id_curso,)
         )
-        es_promocionable = flag[0]['es_promocionable'] if flag else False
+        es_promocionable   = flag[0]['es_promocionable']      if flag else False
+        cuenta_asistencia  = bool(flag[0]['cuenta_asistencia']) if flag else False
+        pct_asistencia     = float(flag[0]['porcentaje_asistencia']) if flag else 75.0
 
         detalle = query_db(
             """
@@ -344,8 +346,10 @@ def get_promocion_config_db(id_curso):
         return {
             "ok": True,
             "data": {
-                "es_promocionable": bool(es_promocionable),
-                "evaluaciones": detalle or []
+                "es_promocionable":      bool(es_promocionable),
+                "cuenta_asistencia":     cuenta_asistencia,
+                "porcentaje_asistencia": pct_asistencia,
+                "evaluaciones":          detalle or []
             }
         }
     except Exception as e:
@@ -357,26 +361,29 @@ def get_promocion_config_db(id_curso):
         }
 
 
-def save_promocion_config_db(id_curso, es_promocionable, evaluaciones):
+def save_promocion_config_db(id_curso, es_promocionable, evaluaciones, cuenta_asistencia=False, porcentaje_asistencia=75.0):
     try:
         modify_db(
             """
-            INSERT INTO curso_promocion_config (id_curso, es_promocionable)
-            VALUES (%s, %s)
-            ON DUPLICATE KEY UPDATE es_promocionable = VALUES(es_promocionable)
+            INSERT INTO curso_promocion_config (id_curso, es_promocionable, cuenta_asistencia, porcentaje_asistencia)
+            VALUES (%s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE 
+                es_promocionable      = VALUES(es_promocionable),
+                cuenta_asistencia     = VALUES(cuenta_asistencia),
+                porcentaje_asistencia = VALUES(porcentaje_asistencia)
             """,
-            (id_curso, bool(es_promocionable))
+            (id_curso, bool(es_promocionable), bool(cuenta_asistencia), float(porcentaje_asistencia))
         )
 
         for ev in evaluaciones:
-            id_eval = ev.get('id_evaluacion')
-            cuenta = bool(ev.get('cuenta', ev.get('cuenta_para_promocion', False)))
-            nota_min = ev.get('nota_minima', None)
-            if nota_min is not None:
-                try:
-                    nota_min = float(nota_min)
-                except (ValueError, TypeError):
-                    nota_min = None
+            id_eval  = ev.get('id_evaluacion')
+            cuenta   = bool(ev.get('cuenta', ev.get('cuenta_para_promocion', False)))
+            nota_raw = ev.get('nota_minima', None)
+            nota_min = float(nota_raw) if nota_raw is not None else None
+            try:
+                nota_min = float(nota_min)
+            except (ValueError, TypeError):
+                nota_min = None
 
             modify_db(
                 """
