@@ -238,3 +238,165 @@ def delete_course(id_course):
             "message": "Internal Server Error",
             "description": str(e)
         }
+    
+
+def get_assistants_by_course(id_curso):
+    try:
+        query = """
+            SELECT 
+                u.id_usuario,
+                u.nombre,
+                u.apellido,
+                u.correo
+            FROM curso_ayudantes ca
+            JOIN usuarios u ON u.id_usuario = ca.id_usuario
+            WHERE ca.id_curso = %s
+        """
+
+        assistants = query_db(query, (id_curso,))
+
+        return {
+            "ok": True,
+            "data": assistants
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
+    
+def assign_assistant_to_course(id_curso, id_ayudante, id_user, id_rol):
+    try:
+        course = query_db(
+            """
+            SELECT id_curso, id_profesor
+            FROM cursos
+            WHERE id_curso = %s
+            """,
+            (id_curso,)
+        )
+
+        if not course:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Not Found",
+                "description": "El curso no existe"
+            }
+
+        course = course[0]
+
+        id_rol = int(id_rol)
+        id_user = int(id_user)
+        id_profesor = int(course["id_profesor"])
+
+        es_superadmin = id_rol == 1
+        es_profesor_del_curso = id_rol == 2 and id_user == id_profesor
+
+        if not es_superadmin and not es_profesor_del_curso:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permiso para asignar ayudantes a este curso"
+            }
+
+        assistant = query_db(
+            """
+            SELECT id_usuario
+            FROM usuarios
+            WHERE id_usuario = %s
+            AND id_rol = 3
+            """,
+            (id_ayudante,)
+        )
+
+        if not assistant:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": "El usuario seleccionado no existe o no tiene rol de ayudante"
+            }
+
+        query = """
+            INSERT IGNORE INTO curso_ayudantes (id_curso, id_usuario)
+            VALUES (%s, %s)
+        """
+
+        modify_db(query, (id_curso, id_ayudante))
+
+        return {
+            "ok": True,
+            "message": "Ayudante asignado al curso correctamente"
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
+    
+def remove_assistant_from_course(id_curso, id_ayudante, user):
+    try:
+        id_user = int(user["id_usuario"])
+        id_rol = int(user["id_rol"])
+        course = query_db(
+            """
+            SELECT id_curso, id_profesor
+            FROM cursos
+            WHERE id_curso = %s
+            """,
+            (id_curso,)
+        )
+
+        if not course:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Not Found",
+                "description": "El curso no existe"
+            }
+
+        course = course[0]
+
+        id_user = int(id_user)
+        id_rol = int(id_rol)
+        id_profesor = int(course["id_profesor"])
+
+        es_superadmin = id_rol == 1
+        es_profesor_del_curso = id_rol == 2 and id_user == id_profesor
+
+        if not es_superadmin and not es_profesor_del_curso:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permiso para quitar ayudantes de este curso"
+            }
+
+        query = """
+            DELETE FROM curso_ayudantes
+            WHERE id_curso = %s
+            AND id_usuario = %s
+        """
+
+        modify_db(query, (id_curso, id_ayudante))
+
+        return {
+            "ok": True,
+            "message": "Ayudante quitado del curso correctamente"
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }

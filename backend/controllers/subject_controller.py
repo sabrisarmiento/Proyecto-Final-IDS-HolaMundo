@@ -1,4 +1,4 @@
-from database.db import query_db, modify_db
+from database.db import query_db, modify_db, insert_db
 
 def get_all_subjects(filters):
   try:
@@ -126,6 +126,10 @@ def create_subject(data):
       }
 
     codigo = data.get("codigo") or None
+    ids_profesores = data.get("ids_profesores", [])
+
+    if data.get("id_profesor"):
+      ids_profesores.append(data.get("id_profesor"))
 
     if codigo:
       exists = query_db("SELECT id_materia FROM materias WHERE codigo = %s", (codigo,))
@@ -136,9 +140,31 @@ def create_subject(data):
           "message": "Conflict",
           "description": f"Ya existe una materia con el código {codigo}"
         }
+      
+    for id_profesor in ids_profesores:
+      profesor = query_db(
+        "SELECT id_usuario FROM usuarios WHERE id_usuario = %s AND id_rol = 2",
+        (id_profesor,)
+      )
 
+      if not profesor:
+        return {
+          "ok": False,
+          "code": 400,
+          "message": "Bad Request",
+          "description": "El profesor con id {id_profesor} no existe o no tiene rol de profesor"
+        }
     sql = "INSERT INTO materias (nombre, codigo) VALUES (%s, %s)"
-    modify_db(sql, (data["nombre"], codigo))
+    id_materia = insert_db(sql, (data["nombre"], codigo))
+
+    for id_profesor in ids_profesores:
+      sql_asignacion = """
+        INSERT IGNORE INTO materia_profesores (id_materia, id_usuario)
+        VALUES (%s, %s)
+      """
+
+      modify_db(sql_asignacion, (id_materia, id_profesor))
+
     return {
       "ok": True,
       "message": "Materia creada exitosamente"
@@ -257,3 +283,133 @@ def delete_subject(id):
       "message": "Internal Server Error",
       "description": str(e)
     }
+  
+def get_professors_by_subject(id_materia):
+  try:
+    query = """
+      SELECT
+        u.id_usuario,
+        u.nombre,
+        u.apellido,
+        u.correo
+      FROM materia_profesores mp
+      JOIN usuarios u ON u.id_usuario = mp.id_usuario
+      WHERE mp.id_materia = %s
+    """
+
+    professors = query_db(query, (id_materia,))
+
+    return {
+      "ok": True,
+      "data": professors
+    }
+
+  except Exception as e:
+    return {
+      "ok": False,
+      "code": 500,
+      "message": "Internal Server Error",
+      "description": str(e)
+    }
+  
+
+def assign_professor_to_subject(id_materia, id_profesor):
+  try:
+    subject = query_db(
+      "SELECT id_materia FROM materias WHERE id_materia = %s",
+      (id_materia,)
+    )
+
+    if not subject:
+      return {
+        "ok": False,
+        "code": 404,
+        "message": "Not Found",
+        "description": "La materia no existe"
+      }
+
+    professor = query_db(
+      "SELECT id_usuario FROM usuarios WHERE id_usuario = %s AND id_rol = 2",
+      (id_profesor,)
+    )
+
+    if not professor:
+      return {
+        "ok": False,
+        "code": 400,
+        "message": "Bad Request",
+        "description": "El usuario seleccionado no existe o no tiene rol de profesor"
+      }
+
+    sql = """
+      INSERT IGNORE INTO materia_profesores (id_materia, id_usuario)
+      VALUES (%s, %s)
+    """
+
+    modify_db(sql, (id_materia, id_profesor))
+
+    return {
+      "ok": True,
+      "message": "Profesor asignado a la materia correctamente"
+    }
+
+  except Exception as e:
+    return {
+      "ok": False,
+      "code": 500,
+      "message": "Internal Server Error",
+      "description": str(e)
+    }
+  
+
+def remove_professor_from_subject(id_materia, id_profesor):
+  try:
+    sql = """
+      DELETE FROM materia_profesores
+      WHERE id_materia = %s
+      AND id_usuario = %s
+    """
+
+    modify_db(sql, (id_materia, id_profesor))
+
+    return {
+      "ok": True,
+      "message": "Profesor quitado de la materia correctamente"
+    }
+
+  except Exception as e:
+    return {
+      "ok": False,
+      "code": 500,
+      "message": "Internal Server Error",
+      "description": str(e)
+    }
+  
+
+def get_subjects_assigned_to_professor(id_profesor):
+    try:
+        query = """
+            SELECT 
+                m.id_materia,
+                m.nombre,
+                m.codigo,
+                m.descripcion
+            FROM materia_profesores mp
+            JOIN materias m ON m.id_materia = mp.id_materia
+            WHERE mp.id_usuario = %s
+        """
+
+        subjects = query_db(query, (id_profesor,))
+
+        return {
+            "ok": True,
+            "data": subjects
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }

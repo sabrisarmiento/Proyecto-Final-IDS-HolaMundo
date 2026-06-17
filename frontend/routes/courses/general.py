@@ -12,14 +12,27 @@ from config import get_headers
 def courses():
     subjects = get_my_subjects()
 
+    assigned_subjects = []
+
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/subjects/my-assigned',
+            headers=get_headers()
+        )
+        assigned_subjects = response.json().get('subjects', []) if response.ok else []
+    except Exception as e:
+        print(f"Error cargando materias asignadas: {e}")
+
     if request.method == 'POST':
         try:
+            user = session.get("user", {})
+            id_profesor = user.get("id_usuario")
             data = {
                 "catedra":      request.form.get('catedra'),
                 "cuatrimestre": request.form.get('cuatrimestre'),
                 "anio":         int(request.form.get('anio')),
                 "id_materia":   int(request.form.get('id_materia')),
-                "id_profesor":  int(request.form.get('id_profesor')),
+                "id_profesor":  int(id_profesor),
             }
             post_course(data)
             return redirect(url_for('courses.courses'))
@@ -61,6 +74,7 @@ def courses():
     return render_template(
         'courses.html',
         courses=data_courses,
+        assigned_subjects=assigned_subjects,
         subjects=subjects,
         active_page='courses',
         filtro_materia=filtro_materia,
@@ -121,6 +135,96 @@ def eliminar_materia(subject_id):
         print(f"Error eliminando materia: {e}")
 
     return redirect(url_for('courses.courses'))
+
+@courses_bp.route('/cursos/materias/<int:subject_id>/profesores', methods=['GET', 'POST'])
+def profesores_materia(subject_id):
+    token = get_token()
+
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debés iniciar sesión')
+
+    if request.method == 'POST':
+        id_profesor = request.form.get('id_profesor')
+
+        payload = {
+            'id_profesor': id_profesor
+        }
+
+        try:
+            requests.post(
+                f'{BACKEND_URL}/subjects/{subject_id}/professors',
+                json=payload,
+                headers=auth_headers()
+            )
+        except Exception as e:
+            print(f"Error asignando profesor a materia: {e}")
+
+        return redirect(url_for(
+            'courses.profesores_materia',
+            subject_id=subject_id
+        ))
+
+    try:
+        subject_res = requests.get(
+            f'{BACKEND_URL}/subjects/{subject_id}',
+            headers=auth_headers()
+        )
+        subject_data = subject_res.json() if subject_res.ok else {}
+        subject = subject_data.get('subject') or subject_data.get('data') or {}
+    except Exception as e:
+        print(f"Error obteniendo materia: {e}")
+        subject = {}
+
+    try:
+        assigned_res = requests.get(
+            f'{BACKEND_URL}/subjects/{subject_id}/professors',
+            headers=auth_headers()
+        )
+        assigned_data = assigned_res.json() if assigned_res.ok else {}
+        assigned_professors = assigned_data.get('professors') or assigned_data.get('data') or []
+    except Exception as e:
+        print(f"Error obteniendo profesores asignados: {e}")
+        assigned_professors = []
+
+    try:
+        professors_res = requests.get(
+            f'{BACKEND_URL}/users',
+            params={'id_rol': 2},
+            headers=auth_headers()
+        )
+        professors_data = professors_res.json() if professors_res.ok else {}
+        professors = professors_data.get('users') or professors_data.get('data') or []
+    except Exception as e:
+        print(f"Error obteniendo profesores: {e}")
+        professors = []
+
+    return render_template(
+        'subject_professors.html',
+        subject=subject,
+        assigned_professors=assigned_professors,
+        professors=professors
+    )
+
+@courses_bp.route('/cursos/materias/<int:subject_id>/profesores/<int:professor_id>/quitar', methods=['POST'])
+def quitar_profesor_materia(subject_id, professor_id):
+    token = get_token()
+
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debés iniciar sesión')
+
+    try:
+        requests.delete(
+            f'{BACKEND_URL}/subjects/{subject_id}/professors/{professor_id}',
+            headers=auth_headers()
+        )
+    except Exception as e:
+        print(f"Error quitando profesor de materia: {e}")
+
+    return redirect(url_for(
+        'courses.profesores_materia',
+        subject_id=subject_id
+    ))
+
 
 
 @courses_bp.route('/set-course/<int:course_id>')

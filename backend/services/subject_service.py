@@ -6,7 +6,11 @@ from controllers.subject_controller import (
     create_subject,
     patch_subject,
     delete_subject,
-    get_subjects_for_user
+    get_subjects_for_user,
+    get_professors_by_subject,
+    assign_professor_to_subject,
+    remove_professor_from_subject,
+    get_subjects_assigned_to_professor
 )
 
 def subjects_service(filters):
@@ -61,3 +65,36 @@ def delete_subject_service(subject_id):
   return success_response({
     "message": result["message"]
   })
+
+def get_professors_by_subject_service(id_materia):
+    result = get_professors_by_subject(id_materia)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({
+        "professors": result["data"]
+    })
+
+def assign_professor_to_subject_service(id_materia, data):
+    id_profesor = data.get("id_profesor")
+    result = assign_professor_to_subject(id_materia, id_profesor)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({
+        "message": result["message"]
+    })
+
+def remove_professor_from_subject_service(id_materia, id_profesor):
+    result = remove_professor_from_subject(id_materia, id_profesor)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({
+        "message": result["message"]
+    })
+
+def get_subjects_assigned_to_professor_service(id_profesor):
+    result = get_subjects_assigned_to_professor(id_profesor)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({
+        "subjects": result["data"]
+    })

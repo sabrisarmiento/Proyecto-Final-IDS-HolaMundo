@@ -14,7 +14,7 @@ from services.material_frontend_service import get_materials_by_course
 def course_detail(course_id):
     token = session.get("token")
     user = session.get("user", {})
-    
+
     if not token or not user:
         return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
     
@@ -22,6 +22,37 @@ def course_detail(course_id):
     nivel = user.get("nivel")
     id_rol = user.get("id_rol")
 
+
+    try:
+        assistants_res = requests.get(
+            f'{BACKEND_URL}/courses/{course_id}/assistants',
+            headers=headers
+        )
+
+        assistants_data = assistants_res.json() if assistants_res.ok else {}
+        assistants = assistants_data.get("assistants") or assistants_data.get("data") or []
+
+    except Exception as e:
+        print(f"Error cargando ayudantes del curso: {e}")
+        assistants = []
+
+
+    try:
+        available_assistants_res = requests.get(
+            f'{BACKEND_URL}/users',
+            params={"id_rol": 3},
+            headers=headers
+        )
+
+        available_assistants_data = available_assistants_res.json() if available_assistants_res.ok else {}
+        available_assistants = available_assistants_data.get("users") or available_assistants_data.get("data") or []
+        print("STATUS AVAILABLE ASSISTANTS:", available_assistants_res.status_code)
+        print("JSON AVAILABLE ASSISTANTS:", available_assistants_data)
+        print("AVAILABLE ASSISTANTS:", available_assistants)
+
+    except Exception as e:
+        print(f"Error cargando ayudantes disponibles: {e}")
+        available_assistants = []
 
     try:
         course = get_course_by_id(course_id)
@@ -111,6 +142,43 @@ def course_detail(course_id):
     #     course = get_course_by_id(course_id)
     # except Exception:
     #     course = {}
+    assistants = []
+    available_assistants = []
+
+    try:
+        assistants_res = requests.get(
+            f'{BACKEND_URL}/courses/{course_id}/assistants',
+            headers=headers
+        )
+
+        assistants_data = assistants_res.json() if assistants_res.ok else {}
+        assistants = assistants_data.get("assistants") or assistants_data.get("data") or []
+
+        print("STATUS ASSISTANTS:", assistants_res.status_code)
+        print("JSON ASSISTANTS:", assistants_data)
+        print("ASSISTANTS:", assistants)
+
+    except Exception as e:
+        print(f"Error cargando ayudantes del curso: {e}")
+        assistants = []
+
+    try:
+        available_assistants_res = requests.get(
+            f'{BACKEND_URL}/users',
+            params={"id_rol": 3},
+            headers=headers
+        )
+
+        available_assistants_data = available_assistants_res.json() if available_assistants_res.ok else {}
+        available_assistants = available_assistants_data.get("users") or available_assistants_data.get("data") or []
+
+        print("STATUS AVAILABLE ASSISTANTS:", available_assistants_res.status_code)
+        print("JSON AVAILABLE ASSISTANTS:", available_assistants_data)
+        print("AVAILABLE ASSISTANTS:", available_assistants)
+
+    except Exception as e:
+        print(f"Error cargando ayudantes disponibles: {e}")
+        available_assistants = []
 
     try:
         evaluaciones = get_exams_by_course_id(course_id)
@@ -307,5 +375,56 @@ def course_detail(course_id):
         config_msg=session.pop('config_msg', None),
         config_ok=session.pop('config_ok', False),
         dash_data=dash_data,
-        current_user_name=current_user_name
+        current_user_name=current_user_name,
+        assistants=assistants,
+        available_assistants=available_assistants,
     )
+
+@courses_bp.route("/cursos/<int:course_id>/ayudantes/agregar", methods=["POST"])
+def agregar_ayudante_curso(course_id):
+    token = session.get("token")
+
+    if not token:
+        return redirect(url_for("landing.landing") + "?error=Debés iniciar sesión")
+
+    id_ayudante = request.form.get("id_ayudante")
+
+    headers = {"Authorization": f"Bearer {token}"}
+
+    try:
+        requests.post(
+            f"{BACKEND_URL}/courses/{course_id}/assistants",
+            json={"id_ayudante": id_ayudante},
+            headers=headers
+        )
+    except Exception as e:
+        print(f"Error agregando ayudante al curso: {e}")
+
+    return redirect(url_for(
+        "courses.course_detail",
+        course_id=course_id,
+        tab="config"
+    ))
+
+@courses_bp.route("/cursos/<int:course_id>/ayudantes/<int:assistant_id>/quitar", methods=["POST"])
+def quitar_ayudante_curso(course_id, assistant_id):
+    token = session.get("token")
+
+    if not token:
+        return redirect(url_for("landing.landing") + "?error=Debés iniciar sesión")
+
+    headers = {"Authorization": f"Bearer {token}"}
+
+    try:
+        requests.delete(
+            f"{BACKEND_URL}/courses/{course_id}/assistants/{assistant_id}",
+            headers=headers
+        )
+    except Exception as e:
+        print(f"Error quitando ayudante del curso: {e}")
+
+    return redirect(url_for(
+        "courses.course_detail",
+        course_id=course_id,
+        tab="config"
+    ))
