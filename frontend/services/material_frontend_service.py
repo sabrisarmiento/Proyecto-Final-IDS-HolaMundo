@@ -29,3 +29,18 @@ def create_material(data):
         return response.json(), response.status_code
     except Exception as e:
         return {"errors": [{"description": str(e)}]}, 502
+
+def update_material(id_material, data):
+    try:
+        response = requests.patch(f"{BASE_URL}/materials/{id_material}", json=data, headers=get_headers())
+        return response.json(), response.status_code
+    except Exception as e:
+        return {"errors": [{"description": str(e)}]}, 502
+
+
+def delete_material(id_material):
+    try:
+        response = requests.delete(f"{BASE_URL}/materials/{id_material}", headers=get_headers())
+        return response.json(), response.status_code
+    except Exception as e:
+        return {"errors": [{"description": str(e)}]}, 502

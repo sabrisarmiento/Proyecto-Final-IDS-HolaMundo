@@ -119,7 +119,9 @@ CREATE TABLE materiales (
     descripcion TEXT,
     url_externo VARCHAR(500) NOT NULL,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
+    id_clase INT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) ON DELETE SET NULL
 );
 
 -- equipo_alumno --

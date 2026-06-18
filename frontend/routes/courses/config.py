@@ -4,8 +4,7 @@ import requests
 from . import courses_bp
 from .common import BACKEND_URL, get_token, auth_headers
 from services.students_services import patch_student
-from services.material_frontend_service import create_material
-
+from services.material_frontend_service import create_material, update_material, delete_material
 
 @courses_bp.route('/cursos/<int:course_id>/importar-alumnos', methods=['POST'])
 def importar_alumnos(course_id):
@@ -133,8 +132,30 @@ def create_material_view(course_id):
         "descripcion": request.form.get('descripcion'),
         "url_externo": request.form.get('url_externo'),
         "id_curso": course_id,
+        "id_clase": request.form.get('id_clase') or None,
     }
     result, status = create_material(data)
     if status >= 400:
         flash(result.get("errors", [{}])[0].get("description", "No se pudo crear el material."))
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='materials'))
+
+@courses_bp.route('/cursos/<int:course_id>/materiales/<int:id_material>/editar', methods=['POST'])
+def editar_material_view(course_id, id_material):
+    data = {
+        "titulo": request.form.get('titulo'),
+        "descripcion": request.form.get('descripcion'),
+        "url_externo": request.form.get('url_externo'),
+        "id_clase": request.form.get('id_clase') or None,
+    }
+    result, status = update_material(id_material, data)
+    if status >= 400:
+        flash(result.get("errors", [{}])[0].get("description", "No se pudo editar el material."))
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='materials'))
+
+
+@courses_bp.route('/cursos/<int:course_id>/materiales/<int:id_material>/eliminar', methods=['POST'])
+def eliminar_material_view(course_id, id_material):
+    result, status = delete_material(id_material)
+    if status >= 400:
+        flash(result.get("errors", [{}])[0].get("description", "No se pudo eliminar el material."))
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='materials'))

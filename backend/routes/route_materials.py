@@ -2,8 +2,10 @@ from flask import Blueprint, request
 from services.material_service import (
     materials_service,
     create_material_service,
-    delete_material_service
+    delete_material_service,
+    update_material_service
 )
+
 from middleware.auth_middleware import require_auth
 
 materials_bp = Blueprint('materials', __name__)
@@ -30,3 +32,9 @@ def create_material_route():
 @require_auth
 def delete_material_route(id_material):
     return delete_material_service(id_material)
+
+@materials_bp.route('/materials/<int:id_material>', methods=['PATCH'])
+@require_auth
+def update_material_route(id_material):
+    data = request.get_json()
+    return update_material_service(id_material, data)
