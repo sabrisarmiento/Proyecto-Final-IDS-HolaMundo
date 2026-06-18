@@ -109,8 +109,6 @@ def course_detail(course_id):
         if request.form.get("delete_team"):
             team_id = request.form.get("delete_team")
             try:
-                # token = session.get("token")
-                # headers = {"Authorization": f"Bearer {token}"}
                 requests.delete(f"http://127.0.0.1:5000/equipos/{team_id}", headers=headers)
             except Exception as e:
                 print(f"Error deleting team: {e}")
@@ -138,10 +136,6 @@ def course_detail(course_id):
     token   = session.get('token')
     headers = {'Authorization': f'Bearer {token}'}
 
-    # try:
-    #     course = get_course_by_id(course_id)
-    # except Exception:
-    #     course = {}
     assistants = []
     available_assistants = []
 
@@ -309,7 +303,9 @@ def course_detail(course_id):
     try:
         promo_res  = requests.get(f'http://127.0.0.1:5000/cursos/{course_id}/promocion', headers=headers)
         promo_data = promo_res.json().get('config', {})
-        curso_es_promocionable = promo_data.get('es_promocionable', False)
+        curso_es_promocionable  = promo_data.get('es_promocionable', False)
+        curso_cuenta_asistencia = promo_data.get('cuenta_asistencia', False)
+        curso_pct_asistencia    = float(promo_data.get('porcentaje_asistencia', 75.0))
         promo_evals  = promo_data.get('evaluaciones', [])
         promo_config = {}
         for p in promo_evals:
@@ -318,8 +314,10 @@ def course_detail(course_id):
                 'nota_minima': p.get('nota_minima')
             }
     except Exception:
-        curso_es_promocionable = False
-        promo_config           = {}
+        curso_es_promocionable  = False
+        curso_cuenta_asistencia = False
+        curso_pct_asistencia    = 75.0
+        promo_config            = {}
 
     pending_team_change = session.get("pending_team_change")
 
@@ -369,6 +367,8 @@ def course_detail(course_id):
         promedio_eval=promedio_eval,
         promedio_general=promedio_general,
         curso_es_promocionable=curso_es_promocionable,
+        curso_cuenta_asistencia=curso_cuenta_asistencia,
+        curso_pct_asistencia=curso_pct_asistencia,
         promo_config=promo_config,
         pending_team_change=pending_team_change,
         advertisements=advertisements,

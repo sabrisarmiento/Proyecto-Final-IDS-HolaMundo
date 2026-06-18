@@ -52,6 +52,15 @@ CREATE TABLE curso_ayudantes (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
+-- materia_profesores
+CREATE TABLE materia_profesores (
+    id_materia INT NOT NULL,
+    id_usuario INT NOT NULL,
+    PRIMARY KEY (id_materia, id_usuario),
+    FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
 -- tipos_evaluacion --
 CREATE TABLE tipos_evaluacion (
     id_tipo INT AUTO_INCREMENT PRIMARY KEY,
@@ -203,14 +212,6 @@ CREATE TABLE curso_slack_config (
     actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
     FOREIGN KEY (instalado_por) REFERENCES usuarios(id_usuario)
-);
-
-CREATE TABLE curso_ayudantes (
-    id_curso INT NOT NULL,
-    id_usuario INT NOT NULL,
-    PRIMARY KEY (id_curso, id_usuario),
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
 -- CREATE TABLE curso_slack_config (

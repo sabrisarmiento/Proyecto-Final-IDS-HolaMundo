@@ -31,12 +31,14 @@ def get_subjects_for_user(id_user, is_admin, filters):
         sql = "SELECT id_materia, nombre, codigo FROM materias"
         condition = """
             WHERE id_materia IN (
+                SELECT id_materia FROM materia_profesores WHERE id_usuario = %s
+                UNION
                 SELECT DISTINCT id_materia FROM cursos
                 WHERE id_profesor = %s
                 OR id_curso IN (SELECT id_curso FROM curso_ayudantes WHERE id_usuario = %s)
             )
         """
-        params = [id_user, id_user]
+        params = [id_user, id_user, id_user]
         if filters.get("name"):
             condition += " AND nombre = %s"; params.append(filters["name"])
 

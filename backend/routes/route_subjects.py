@@ -44,18 +44,21 @@ def get_subject_topics(subject_id):
 
 @subjects_bp.route('/subjects', methods=['POST'])
 @require_auth
+@require_min_admin_level(NIVEL_SUPERADMIN)
 def create_subject():
   data = request.get_json()
   return create_subject_service(data)
 
 @subjects_bp.route('/subjects/<int:subject_id>', methods=['PATCH'])
 @require_auth
+@require_min_admin_level(NIVEL_SUPERADMIN)
 def patch_subject(subject_id):
   data = request.get_json()
   return patch_subject_service(subject_id, data)
 
 @subjects_bp.route('/subjects/<int:subject_id>', methods=['DELETE'])
 @require_auth
+@require_min_admin_level(NIVEL_SUPERADMIN)
 def delete_subject(subject_id):
   return delete_subject_service(subject_id)
 

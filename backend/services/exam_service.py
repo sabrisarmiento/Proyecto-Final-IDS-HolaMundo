@@ -111,9 +111,15 @@ def save_promocion_config_service(id_curso, data):
             "ok": False, "code": 400,
             "message": "Bad Request", "description": "Datos requeridos"
         })
-    es_promocionable = data.get("es_promocionable", False)
-    evaluaciones     = data.get("evaluaciones", [])
-    result = save_promocion_config_db(id_curso, es_promocionable, evaluaciones)
+    es_promocionable      = data.get("es_promocionable", False)
+    evaluaciones          = data.get("evaluaciones", [])
+    cuenta_asistencia     = data.get("cuenta_asistencia", False)
+    porcentaje_asistencia = float(data.get("porcentaje_asistencia", 75.0))
+
+    result = save_promocion_config_db(
+        id_curso, es_promocionable, evaluaciones,
+        cuenta_asistencia, porcentaje_asistencia
+    )
     if not result["ok"]:
         return error_response(result)
     return success_response({"message": result["message"]})
