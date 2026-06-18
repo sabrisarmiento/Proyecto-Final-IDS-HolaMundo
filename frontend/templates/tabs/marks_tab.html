@@ -22,7 +22,6 @@
                   <input type="hidden" name="nota_minima_{{ eval.id_evaluacion }}" value="{{ cfg.get('nota_minima') }}">
                 {% endif %}
               {% endfor %}
-              <!-- Pasar también la config de asistencia cuando se hace toggle -->
               <input type="hidden" name="cuenta_asistencia" id="hidden-cuenta-asistencia"
                      value="{% if curso_cuenta_asistencia %}on{% endif %}">
               <input type="hidden" name="porcentaje_asistencia" id="hidden-pct-asistencia"
@@ -84,7 +83,6 @@
               <p class="tab-empty" style="margin-top:1rem;">Creá evaluaciones primero para configurar la promoción.</p>
             {% endif %}
 
-            <!-- Bloque de asistencia para promoción -->
             <div class="promo-asist-block">
               <label class="promo-asist-label">
                 <input type="checkbox"
@@ -168,7 +166,7 @@
 
           <div class="mgmt-box mgmt-box--right">
             <label class="mgmt-label">CREAR UN NUEVO TIPO DE EVALUACIÓN</label>
-            <p class="mgmt-hint">Se incorporará una nueva columna interactiva en la planilla inferior al instante.</p>
+            <p class="mgmt-hint">Se incorporará una nueva columna interactiva en la planilla inferior al instante</p>
             <form action="{{ url_for('courses.crear_evaluacion', course_id=course.id_curso) }}" method="POST" class="create-form">
               <input type="text" name="nombre_eval" placeholder="Ej: TP1, Defensa oral, Recuperatorio..." required>
               <select name="asociacion" class="eval-select-tipo" title="Tipo de evaluación">
@@ -194,7 +192,7 @@
               </h2>
               <p class="qg-subtitle">Escribe directamente los números (escala 0-10) del alumno correspondiente</p>
               <p class="qg-subtitle qg-corrector-aviso">
-                Las notas que guardes ahora quedarán registradas como corregidas por
+                Las notas que guardes ahora quedaran registradas como corregidas por
                 <strong>{{ current_user_name or 'tu usuario' }}</strong>
               </p>
             </div>
@@ -287,8 +285,8 @@
               </h2>
               <p class="qg-subtitle">Asigna una nota por equipo | Se aplica a todos sus integrantes</p>
               <p class="qg-subtitle qg-corrector-aviso">
-                Las notas que guardes ahora quedarán registradas como corregidas por
-                <strong>{{ current_user_name or 'tu usuario' }}</strong>.
+                Las notas que guardes ahora quedaran registradas como corregidas por
+                <strong>{{ current_user_name or 'tu usuario' }}</strong>
               </p>
             </div>
             <div class="qg-right-controls">
@@ -380,13 +378,13 @@
             </div>
           </form>
           {% else %}
-          <p class="tab-empty">No hay equipos con integrantes en este curso. Creá equipos desde la pestaña Equipos.</p>
+          <p class="tab-empty">No hay equipos con integrantes en este curso, crea equipos desde la pestaña Equipos</p>
           {% endif %}
         </div>
         {% endif %}
 
       {% else %}
-        <p class="tab-empty">Creá una evaluación para empezar a cargar notas.</p>
+        <p class="tab-empty">Creá una evaluación para empezar a cargar notas</p>
       {% endif %}
 
       <div class="planilla-section">
@@ -448,7 +446,9 @@
         <div class="table-scroll">
           <table class="planilla-table" id="planilla-table"
             data-es-promocionable="{{ '1' if curso_es_promocionable else '0' }}"
-            data-promo-config='{{ promo_config | tojson }}'>
+            data-promo-config='{{ promo_config | tojson }}'
+            data-cuenta-asistencia="{{ '1' if curso_cuenta_asistencia else '0' }}"
+            data-pct-asistencia="{{ curso_pct_asistencia | default(75) }}">
             <thead>
               <tr>
                 <th class="th-padron">PADRÓN ID</th>
@@ -484,7 +484,9 @@
                   data-equipo="{{ (s.equipo or '') | lower }}"
                   data-correctores="{{ correctores_csv }}"
                   data-notas='{{ s.notas_json | tojson }}'
-                  data-estado="">
+                  data-estado=""
+                  data-id-alumno="{{ s.id_alumno }}"
+                  data-pct-asistencia="{{ s.pct_asistencia | default('') }}">
                 <td class="td-padron">{{ s.padron }}</td>
                 <td class="td-nombre">{{ s.nombre }} {{ s.apellido }}</td>
                 <td class="td-comision"><span class="team-badge">{{ s.equipo or 'Sin Equipo' }}</span></td>

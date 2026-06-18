@@ -109,45 +109,13 @@ def get_course_dashboard(id_curso):
             for n in notas_full:
                 notas_por_alumno_eval.setdefault(n["id_alumno"], {})[n["id_evaluacion"]] = float(n["nota"])
 
-        promocionados = 0
-        van_a_final   = 0
-        recursantes   = 0
-
-        for alumno_id in ids_activos:
-            notas_alumno = notas_por_alumno_eval.get(alumno_id, {})
-            valores = list(notas_alumno.values())
-
-            if not valores:
-                van_a_final += 1
-                continue
-
-            recursa = any(v < 4 for v in valores)
-
-            if recursa:
-                recursantes += 1
-            elif es_promocionable and promo_evals:
-                puede_promo = all(
-                    notas_alumno.get(id_ev, 0) >= nota_min
-                    for id_ev, nota_min in promo_evals.items()
-                    if id_ev in notas_alumno
-                )
-                if puede_promo:
-                    promocionados += 1
-                else:
-                    van_a_final += 1
-            else:
-                promedio_alumno = sum(valores) / len(valores)
-                if promedio_alumno >= 4:
-                    van_a_final += 1
-                else:
-                    recursantes += 1
-
         clases = query_db(
             "SELECT id_clase FROM clases WHERE id_curso = %s",
             (id_curso,)
         )
         total_clases = len(clases)
 
+        pct_asistencia_por_alumno = {}
         asistencia_stats = {"regulares": 0, "en_riesgo": 0, "sin_datos": 0}
         attendance_by_student = []
 
@@ -168,10 +136,13 @@ def get_course_dashboard(id_curso):
             for aid in ids_activos:
                 presentes = presencias_map.get(aid, 0)
                 pct = (presentes / total_clases) * 100
+                pct_asistencia_por_alumno[aid] = pct
+
                 if pct >= umbral_asistencia:
                     asistencia_stats["regulares"] += 1
                 else:
                     asistencia_stats["en_riesgo"] += 1
+
                 alumno = names_map.get(aid, {})
                 attendance_by_student.append({
                     "id_alumno":    aid,
@@ -183,6 +154,51 @@ def get_course_dashboard(id_curso):
                 })
         else:
             asistencia_stats["sin_datos"] = len(ids_activos)
+            for aid in ids_activos:
+                pct_asistencia_por_alumno[aid] = None
+
+        promocionados = 0
+        van_a_final   = 0
+        recursantes   = 0
+
+        for alumno_id in ids_activos:
+            notas_alumno = notas_por_alumno_eval.get(alumno_id, {})
+            valores = list(notas_alumno.values())
+
+            if not valores:
+                van_a_final += 1
+                continue
+
+            recursa = any(v < 4 for v in valores)
+            if recursa:
+                recursantes += 1
+                continue
+
+            if es_promocionable:
+                if promo_evals:
+                    cumple_notas = all(
+                        notas_alumno.get(id_ev, 0) >= nota_min
+                        for id_ev, nota_min in promo_evals.items()
+                    )
+                else:
+                    cumple_notas = True
+
+                if cuenta_asistencia and total_clases > 0:
+                    pct_asist = pct_asistencia_por_alumno.get(alumno_id)
+                    cumple_asistencia = (pct_asist is not None and pct_asist >= porcentaje_asistencia)
+                else:
+                    cumple_asistencia = True
+
+                if cumple_notas and cumple_asistencia:
+                    promocionados += 1
+                else:
+                    van_a_final += 1
+            else:
+                promedio_alumno = sum(valores) / len(valores)
+                if promedio_alumno >= 4:
+                    van_a_final += 1
+                else:
+                    recursantes += 1
 
         return {
             "ok": True,
