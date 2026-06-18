@@ -76,3 +76,27 @@ def delete_material_by_id(id_material):
             "message": "Internal Server Error",
             "description": str(e)
         }
+    
+def update_material(id_material, data):
+    try:
+        exists = query_db("SELECT id_material FROM materiales WHERE id_material = %s", (id_material,))
+        if not exists:
+            return {"ok": False, "code": 404, "message": "Not Found",
+                    "description": f"No existe el material con el ID {id_material}."}
+
+        fields, params = [], []
+        for key in ["titulo", "descripcion", "url_externo"]:
+            if key in data and data[key] is not None:
+                fields.append(f"{key} = %s")
+                params.append(data[key])
+
+        if not fields:
+            return {"ok": False, "code": 400, "message": "Bad Request",
+                    "description": "No se enviaron campos para actualizar"}
+
+        params.append(id_material)
+        modify_db(f"UPDATE materiales SET {', '.join(fields)} WHERE id_material = %s", tuple(params))
+        return {"ok": True, "message": "Material actualizado correctamente"}
+    except Exception as e:
+        return {"ok": False, "code": 500, "message": "Internal Server Error",
+                "description": str(e)}

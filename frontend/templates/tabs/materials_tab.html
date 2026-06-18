@@ -19,7 +19,25 @@
         {% if m.descripcion %}<p>{{ m.descripcion }}</p>{% endif %}
         </div>
         <a href="{{ m.url_externo }}" target="_blank" class="btn-action">Ver recurso</a>
+        <button type="button" class="btn-action" onclick="openModal('edit-material-{{ m.id_material }}')">Editar</button>
+        <form method="POST"
+            action="{{ url_for('courses.eliminar_material_view', course_id=course_id, id_material=m.id_material) }}"
+            onsubmit="return confirm('¿Eliminar este material?')">
+            <button type="submit" class="btn-action">Eliminar</button>
+        </form>
+
+        {% call modal("edit-material-" ~ m.id_material, "Editar material") %}
+        <form method="POST"
+            action="{{ url_for('courses.editar_material_view', course_id=course_id, id_material=m.id_material) }}"
+            class="material-form">
+            <input type="text" name="titulo" value="{{ m.titulo }}" required>
+            <input type="text" name="descripcion" value="{{ m.descripcion or '' }}">
+            <input type="url" name="url_externo" value="{{ m.url_externo }}" required>
+            <button type="submit" class="btn-action">Guardar cambios</button>
+        </form>
+        {% endcall %}
     </li>
+
     {% endfor %}
     </ul>
 {% else %}
