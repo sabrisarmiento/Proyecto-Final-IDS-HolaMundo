@@ -332,6 +332,16 @@ def course_detail(course_id):
     except Exception:
         dash_data = {}
 
+    try:
+        asist_detalle = dash_data.get("asistencia_detalle", [])
+        pct_map = {row["id_alumno"]: row["porcentaje"] for row in asist_detalle}
+        for s in students_data:
+            s["pct_asistencia"] = pct_map.get(s["id_alumno"], "")
+    except Exception as e:
+        print(f"Error adjuntando asistencia a alumnos: {e}")
+        for s in students_data:
+            s["pct_asistencia"] = ""
+
     materiales = get_materials_by_course(course_id) if active_tab == 'materials' else []
 
     try:

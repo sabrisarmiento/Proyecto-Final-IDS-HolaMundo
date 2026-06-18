@@ -158,6 +158,16 @@ function toggleNotaMinima(checkbox) {
     }
 }
 
+function togglePctAsistencia(checked) {
+    var wrap = document.getElementById('pct-asistencia-wrap');
+    if (!wrap) return;
+    if (checked) {
+        wrap.classList.remove('hidden');
+    } else {
+        wrap.classList.add('hidden');
+    }
+}
+
 function filtrarPlanilla() {
     var equipoSel    = (document.getElementById('filtro-planilla-equipo')    || {}).value || '';
     var correctorSel = ((document.getElementById('filtro-planilla-corrector') || {}).value || '').trim().toLowerCase();
@@ -205,7 +215,9 @@ function recalcularEstadoPlanilla() {
     var tabla = document.getElementById('planilla-table');
     if (!tabla) return;
 
-    var esPromocionable = tabla.dataset.esPromocionable === '1';
+    var esPromocionable  = tabla.dataset.esPromocionable === '1';
+    var cuentaAsistencia = tabla.dataset.cuentaAsistencia === '1';
+    var pctAsistenciaMin = parseFloat(tabla.dataset.pctAsistencia || '75');
 
     var promoConfig = {};
     try {
@@ -237,8 +249,7 @@ function recalcularEstadoPlanilla() {
         } else if (!esPromocionable) {
             estado = vals.length > 0 ? 'final' : 'final';
         } else {
-            var puedePromo = true;
-
+            var cumpleNotas = true;
             Object.keys(promoConfig).forEach(function (idEvalStr) {
                 var cfg = promoConfig[idEvalStr];
                 if (!cfg || !cfg.cuenta) return;
@@ -251,11 +262,21 @@ function recalcularEstadoPlanilla() {
                     : 4;
 
                 if (parseFloat(notaAlumno) < minima) {
-                    puedePromo = false;
+                    cumpleNotas = false;
                 }
             });
 
-            estado = puedePromo ? 'promociona' : 'final';
+            var cumpleAsistencia = true;
+            if (cuentaAsistencia) {
+                var pctAlumno = row.dataset.pctAsistencia;
+                if (pctAlumno === '' || pctAlumno === null || pctAlumno === undefined) {
+                    cumpleAsistencia = false;
+                } else {
+                    cumpleAsistencia = parseFloat(pctAlumno) >= pctAsistenciaMin;
+                }
+            }
+
+            estado = (cumpleNotas && cumpleAsistencia) ? 'promociona' : 'final';
         }
 
         row.dataset.estado = estado;

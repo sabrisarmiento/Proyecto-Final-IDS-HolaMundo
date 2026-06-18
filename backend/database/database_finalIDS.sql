@@ -199,6 +199,8 @@ CREATE TABLE configuracion_promocion (
 CREATE TABLE curso_promocion_config (
     id_curso INT PRIMARY KEY,
     es_promocionable BOOLEAN NOT NULL DEFAULT FALSE,
+    porcentaje_asistencia DECIMAL(5,2) DEFAULT 75.00,
+    cuenta_asistencia BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
