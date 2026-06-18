@@ -7,6 +7,12 @@
     <input type="text" name="titulo" placeholder="Título" required>
     <input type="text" name="descripcion" placeholder="Descripción (opcional)">
     <input type="url" name="url_externo" placeholder="https://… (link al recurso)" required>
+    <select name="id_clase">
+        <option value="">Sin clase (general)</option>
+        {% for cl in clases %}
+        <option value="{{ cl.id_clase }}">Clase {{ cl.id_clase }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}</option>
+        {% endfor %}
+    </select>
     <button type="submit" class="btn-action">Subir material</button>
 </form>
 
@@ -17,6 +23,7 @@
         <div class="material-info">
         <strong>{{ m.titulo }}</strong>
         {% if m.descripcion %}<p>{{ m.descripcion }}</p>{% endif %}
+        {% if m.id_clase %}<p class="material-clase">Relacionado a: {{ m.clase_temas or ('Clase ' ~ m.id_clase) }}{% if m.clase_fecha %} ({{ m.clase_fecha }}){% endif %}</p>{% endif %}
         </div>
         <a href="{{ m.url_externo }}" target="_blank" class="btn-action">Ver recurso</a>
         <button type="button" class="btn-action" onclick="openModal('edit-material-{{ m.id_material }}')">Editar</button>
@@ -33,6 +40,12 @@
             <input type="text" name="titulo" value="{{ m.titulo }}" required>
             <input type="text" name="descripcion" value="{{ m.descripcion or '' }}">
             <input type="url" name="url_externo" value="{{ m.url_externo }}" required>
+            <select name="id_clase">
+                <option value="">Sin clase (general)</option>
+                {% for cl in clases %}
+                <option value="{{ cl.id_clase }}" {% if cl.id_clase == m.id_clase %}selected{% endif %}>Clase {{ cl.id_clase }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}</option>
+                {% endfor %}
+            </select>
             <button type="submit" class="btn-action">Guardar cambios</button>
         </form>
         {% endcall %}

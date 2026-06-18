@@ -132,6 +132,7 @@ def create_material_view(course_id):
         "descripcion": request.form.get('descripcion'),
         "url_externo": request.form.get('url_externo'),
         "id_curso": course_id,
+        "id_clase": request.form.get('id_clase') or None,
     }
     result, status = create_material(data)
     if status >= 400:
@@ -144,6 +145,7 @@ def editar_material_view(course_id, id_material):
         "titulo": request.form.get('titulo'),
         "descripcion": request.form.get('descripcion'),
         "url_externo": request.form.get('url_externo'),
+        "id_clase": request.form.get('id_clase') or None,
     }
     result, status = update_material(id_material, data)
     if status >= 400:
