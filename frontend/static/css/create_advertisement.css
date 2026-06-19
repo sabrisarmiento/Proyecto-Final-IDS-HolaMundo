@@ -1,5 +1,3 @@
-/* ===== CREATE ADVERTISEMENT ===== */
-
 .advertisement-title {
   text-align: center;
   color: var(--color-2);
@@ -23,6 +21,10 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--color-8);
+}
+
+.advertisement-form label[for] {
+  margin-top: 0.2rem;
 }
 
 .advertisement-form input,
@@ -57,7 +59,6 @@
   resize: vertical;
 }
 
-/* Button aligned to the right */
 .advertisement-form .btn-publicar {
   align-self: flex-end;
   margin-top: 0.6rem;
@@ -66,7 +67,6 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Error message */
 .advertisement-error {
   max-width: 600px;
   margin: 0 auto 1rem;
@@ -75,4 +75,56 @@
   background: rgba(200, 30, 30, 0.12);
   color: #b32424;
   font-size: 0.9rem;
+}
+
+
+.advertisement-form > label:not([for]) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    padding: 0.8rem 1rem;
+    background: var(--color-45);
+    border: 1.5px solid var(--color-6);
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-15);
+    text-transform: none;
+    letter-spacing: normal;
+    cursor: pointer;
+}
+
+.advertisement-form > label:not([for]) input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    width: 38px;
+    height: 21px;
+    flex-shrink: 0;
+    background: var(--color-6);
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.advertisement-form > label:not([for]) input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.15s;
+}
+
+.advertisement-form > label:not([for]) input[type="checkbox"]:checked {
+    background: var(--color-3);
+}
+
+.advertisement-form > label:not([for]) input[type="checkbox"]:checked::before {
+    transform: translateX(17px);
 }
