@@ -1,3 +1,4 @@
+from config import BASE_URL
 from flask import Blueprint, request, session
 import requests
 
@@ -17,7 +18,7 @@ def update_profile():
 
   try:
     response = requests.patch(
-      f"http://127.0.0.1:5000/users/{user['id_usuario']}",
+      f"{BASE_URL}/users/{user['id_usuario']}",
       json=payload,
       headers={'Authorization': f"Bearer {session['token']}"}
     )
@@ -49,7 +50,7 @@ def change_password():
 
   try:
     response = requests.put(
-      'http://127.0.0.1:5000/change-password',
+      f"{BASE_URL}/change-password",
       json=payload,
       headers={'Authorization': f"Bearer {session['token']}"}
     )

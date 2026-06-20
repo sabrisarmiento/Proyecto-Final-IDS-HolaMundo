@@ -1,3 +1,4 @@
+from config import BASE_URL
 from flask import render_template, request, redirect, url_for, session
 import requests
 
@@ -109,7 +110,7 @@ def course_detail(course_id):
         if request.form.get("delete_team"):
             team_id = request.form.get("delete_team")
             try:
-                requests.delete(f"http://127.0.0.1:5000/equipos/{team_id}", headers=headers)
+                requests.delete(f"{BASE_URL}/equipos/{team_id}", headers=headers)
             except Exception as e:
                 print(f"Error deleting team: {e}")
             return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
@@ -193,7 +194,7 @@ def course_detail(course_id):
         if order:
             params['order'] = order
 
-        students_res  = requests.get(f'http://127.0.0.1:5000/students_with_notes', params=params, headers=headers)
+        students_res  = requests.get(f'{BASE_URL}/students_with_notes', params=params, headers=headers)
         response_data = students_res.json()
         students_data = response_data.get('data') or response_data.get('students') or []
         total         = response_data.get('total', len(students_data))
@@ -205,7 +206,7 @@ def course_detail(course_id):
     filtro_tipo=request.args.get("tipo")
     id_clase_editar = request.args.get("editar", type=int)
     try:
-        clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
+        clases_res  = requests.get(f'{BASE_URL}/clases?id_curso={course_id}')
         clases_json = clases_res.json()
         clases      = clases_json.get("classes", [])
         if filtro_modalidad:
@@ -293,7 +294,7 @@ def course_detail(course_id):
     total_pages = max(1, (total + per_page - 1) // per_page)
 
     try:
-        teams_res = requests.get(f'http://127.0.0.1:5000/equipos?id_curso={course_id}', headers=headers)
+        teams_res = requests.get(f'{BASE_URL}/equipos?id_curso={course_id}', headers=headers)
         teams_json = teams_res.json()
         teams = teams_json.get("teams") or teams_json.get("data") or []
     except Exception as e:
@@ -301,7 +302,7 @@ def course_detail(course_id):
         teams = []
 
     try:
-        promo_res  = requests.get(f'http://127.0.0.1:5000/cursos/{course_id}/promocion', headers=headers)
+        promo_res  = requests.get(f'{BASE_URL}/cursos/{course_id}/promocion', headers=headers)
         promo_data = promo_res.json().get('config', {})
         curso_es_promocionable  = promo_data.get('es_promocionable', False)
         curso_cuenta_asistencia = promo_data.get('cuenta_asistencia', False)
@@ -341,7 +342,7 @@ def course_detail(course_id):
         advertisements = []
 
     try:
-        dash_res  = requests.get(f'http://127.0.0.1:5000/cursos/{course_id}/dashboard', headers=headers)
+        dash_res  = requests.get(f'{BASE_URL}/cursos/{course_id}/dashboard', headers=headers)
         dash_data = dash_res.json().get('dashboard', {}) if dash_res.ok else {}
     except Exception:
         dash_data = {}
