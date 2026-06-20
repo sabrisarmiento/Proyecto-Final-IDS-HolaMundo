@@ -85,6 +85,12 @@
         <span class="dash-stat-sub">escala 0 – 10</span>
       </div>
 
+      <div class="dash-stat-card dash-stat--accent">
+        <span class="dash-stat-label">Asistencia general</span>
+        <strong class="dash-stat-num">{{ dash_data.asistencia_general.porcentaje }}%</strong>
+        <span class="dash-stat-sub">{{ dash_data.asistencia_general.presentes }} de {{ dash_data.asistencia_general.posibles }} presencias</span>
+      </div>
+
       <div class="dash-stat-card">
         <span class="dash-stat-label">Promocionan</span>
         <strong class="dash-stat-num dash-stat-num--green" id="dash-promocionados">—</strong>
@@ -146,28 +152,18 @@
 
     <section class="dash-attendance">
 
-      <div class="dash-attendance-top">
-        <div class="dash-stat-card dash-stat--accent dash-attendance-general">
-          <span class="dash-stat-label">Asistencia general</span>
-          <strong class="dash-stat-num">{{ dash_data.asistencia_general.porcentaje }}%</strong>
-          <span class="dash-stat-sub">
-            {{ dash_data.asistencia_general.presentes }} de {{ dash_data.asistencia_general.posibles }} presencias · todas las clases
-          </span>
+      <div class="dash-chart-card dash-attendance-clase">
+        <h4 class="dash-chart-title">Presentes por clase</h4>
+        <div class="dash-attendance-controls">
+          <select id="dash-asist-clase" class="dash-select"></select>
+          <span id="dash-asist-clase-count" class="dash-attendance-count">—</span>
         </div>
-
-        <div class="dash-chart-card dash-attendance-clase">
-          <h4 class="dash-chart-title">Presentes por clase</h4>
-          <div class="dash-attendance-controls">
-            <select id="dash-asist-clase" class="dash-select"></select>
-            <span id="dash-asist-clase-count" class="dash-attendance-count">—</span>
-          </div>
-          <div class="dash-attendance-filtros">
-            <label><input type="radio" name="asist-clase-filtro" value="all" checked /> Todos</label>
-            <label><input type="radio" name="asist-clase-filtro" value="present" /> Presentes</label>
-            <label><input type="radio" name="asist-clase-filtro" value="absent" /> Ausentes</label>
-          </div>
-          <ul id="dash-asist-clase-lista" class="dash-attendance-lista"></ul>
+        <div class="dash-attendance-filtros">
+          <label><input type="radio" name="asist-clase-filtro" value="all" checked /> Todos</label>
+          <label><input type="radio" name="asist-clase-filtro" value="present" /> Presentes</label>
+          <label><input type="radio" name="asist-clase-filtro" value="absent" /> Ausentes</label>
         </div>
+        <ul id="dash-asist-clase-lista" class="dash-attendance-lista"></ul>
       </div>
 
       <div class="dash-chart-card dash-chart-card--wide">
