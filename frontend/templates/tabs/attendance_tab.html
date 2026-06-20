@@ -24,19 +24,21 @@
 {% if class_id %}
 <div class="attendance-table-wrap">
   <table class="attendance-table">
-    <thead><tr><th>Alumno</th><th>Clase</th><th>Presente</th></tr></thead>
+    <thead><tr><th>Alumno</th><th>Padrón</th><th>Correo</th><th>Estado</th></tr></thead>
     <tbody>
-      {% for record in attendance %}
+      {% for alumno in roster %}
         <tr>
-          <td>{{ record.id_alumno }}</td>
-          <td>{{ record.id_clase }}</td>
+          <td>{{ alumno.apellido }}, {{ alumno.nombre }}</td>
+          <td>{{ alumno.padron }}</td>
+          <td>{{ alumno.correo }}</td>
           <td>
-            {% if record.presente %}<span class="status status-present">Presente</span>
-            {% else %}<span class="status status-absent">Ausente</span>{% endif %}
+            {% if alumno.estado == 'present' %}<span class="status status-present">Presente</span>
+            {% elif alumno.estado == 'absent' %}<span class="status status-absent">Ausente</span>
+            {% else %}<span class="status status-pending">–</span>{% endif %}
           </td>
         </tr>
       {% else %}
-        <tr><td colspan="3">No hay registros todavía. Enviá los links de asistencia para que los alumnos den el presente.</td></tr>
+        <tr><td colspan="4">No hay alumnos activos en esta clase.</td></tr>
       {% endfor %}
     </tbody>
   </table>

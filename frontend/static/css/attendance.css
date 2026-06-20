@@ -144,6 +144,11 @@
     background-color: #6b7280;
 }
 
+.status-pending {
+    background-color: var(--color-6);
+    color: var(--color-85);
+}
+
 .empty-state {
     text-align: center;
     display: block;

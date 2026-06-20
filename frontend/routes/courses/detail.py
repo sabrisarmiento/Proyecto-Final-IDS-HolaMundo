@@ -217,14 +217,14 @@ def course_detail(course_id):
         clases = []
 
     class_id_sel = request.args.get('clase')
-    attendance_records = []
+    roster = []
     if class_id_sel:
         try:
-            att_res = requests.get(f'{BACKEND_URL}/asistencia',
-                                    params={'id_clase': class_id_sel}, headers=headers)
-            attendance_records = att_res.json().get('attendance', []) if att_res.ok else []
+            roster_res = requests.get(f'{BACKEND_URL}/asistencia/planilla',
+                                      params={'id_clase': class_id_sel}, headers=headers)
+            roster = roster_res.json().get('roster', []) if roster_res.ok else []
         except Exception:
-            attendance_records = []
+            roster = []
 
     for s in students_data:
         notas_dict = {}
@@ -368,7 +368,7 @@ def course_detail(course_id):
         total_pages=total_pages,
         course_id=course_id,
         active_tab=active_tab,
-        attendance=attendance_records,
+        roster=roster,
         class_id=class_id_sel,
         materiales=materiales,
         evaluaciones=evaluaciones,
