@@ -62,7 +62,7 @@
                 <option value="" disabled {% if not class_id %}selected{% endif %}>Elegí una clase…</option>
                 {% for cl in classes %}
                     <option value="{{ cl.id_clase }}" {% if cl.id_clase|string == class_id %}selected{% endif %}>
-                        Clase {{ cl.id_clase }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}
+                        {{ cl.temas or ("Semana " ~ cl.semana) }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}
                     </option>
                 {% endfor %}
             </select>

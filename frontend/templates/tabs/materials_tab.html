@@ -10,7 +10,7 @@
     <select name="id_clase">
         <option value="">Sin clase (general)</option>
         {% for cl in clases %}
-        <option value="{{ cl.id_clase }}">Clase {{ cl.id_clase }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}</option>
+        <option value="{{ cl.id_clase }}">{{ cl.temas or ("Semana " ~ cl.semana) }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}</option>
         {% endfor %}
     </select>
     <button type="submit" class="btn-action">Subir material</button>
@@ -43,7 +43,7 @@
             <select name="id_clase">
                 <option value="">Sin clase (general)</option>
                 {% for cl in clases %}
-                <option value="{{ cl.id_clase }}" {% if cl.id_clase == m.id_clase %}selected{% endif %}>Clase {{ cl.id_clase }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}</option>
+                <option value="{{ cl.id_clase }}" {% if cl.id_clase == m.id_clase %}selected{% endif %}>{{ cl.temas or ("Semana " ~ cl.semana) }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}</option>
                 {% endfor %}
             </select>
             <button type="submit" class="btn-action">Guardar cambios</button>
