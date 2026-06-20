@@ -68,7 +68,7 @@
                     <h2 class="advertisement-card-title">{{ aviso.titulo }}</h2>
                     <p class="advertisement-card-message">{{ aviso.mensaje }}</p>
                     <p>ORIGEN: {{ aviso.origen }}</p>
-                    {% if session.get("token") and aviso.id_aviso %}
+                    {% if session.get("token") and aviso.id_aviso and aviso.puede_editar %}
                         <div class="advertisement-actions">
                             <a 
                                 href="{{ url_for('advertisements.edit_advertisement_front', id_aviso=aviso.id_aviso) }}?id_curso={{ aviso.id_curso }}"
