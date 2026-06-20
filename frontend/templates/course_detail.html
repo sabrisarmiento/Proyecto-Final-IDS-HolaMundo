@@ -101,7 +101,7 @@
       {% if advertisements %}
         <div class="advertisements-list">
           {% for aviso in advertisements %}
-            <article class="advertisement-card">
+            <article class="advertisement-card {% if aviso.origen == 'panel_confirmado' %}panel-confirmado{% endif %}">
               <div class="advertisement-card-header">
                 <span>{{ aviso.fecha }}</span>
                 <span>Publicado por: {{ aviso.emisor }}</span>
