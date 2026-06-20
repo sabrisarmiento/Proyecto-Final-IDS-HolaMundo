@@ -108,8 +108,12 @@ def generate_qr_service(id_clase, horas=None, minutos=None):
             print(f"Enviando QR a {alumno['correo']}: {qr_url}")
 
         return jsonify({
-            "ok": True,
-            "message": f"QRs generados y enviados a {len(alumnos)} alumnos correctamente"
+            "ok": enviados > 0,
+            "message": (
+                f"QRs generados. Correos enviados: {enviados}/{len(alumnos)}."
+                if enviados else
+                f"QRs generados, pero no se pudo enviar ningún correo a los {len(alumnos)} alumnos. Revisá EMAIL_USER/EMAIL_PASS en el .env."
+            )
         }), 200
 
     except Exception as e:
