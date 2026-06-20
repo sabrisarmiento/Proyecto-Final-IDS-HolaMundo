@@ -139,14 +139,25 @@ def _add_marks_section(pdf, id_curso, evaluaciones=None, mostrar_corrector=False
     filtro = ", ".join(evaluaciones) if evaluaciones else "todas las evaluaciones"
     _section_title(pdf, "Reporte de Notas", f"Curso ID {id_curso} - {filtro}")
 
+    PAGE_W = 190  # A4 portrait - márgenes por defecto (10mm c/u)
+    W_PADRON, W_NOTA, W_CORRECTOR, W_ESTADO = 22, 15, 30, 22
+    fixed = W_PADRON + W_NOTA
+    if mostrar_corrector:
+        fixed += W_CORRECTOR
+    if incluir_estado_final:
+        fixed += W_ESTADO
+    flexible = PAGE_W - fixed
+    W_ALUMNO = round(flexible * 0.55)
+    W_EVAL   = flexible - W_ALUMNO
+
     headers = ["Padrón", "Alumno", "Evaluación", "Nota"]
-    widths  = [25, 65, 45, 20]
+    widths  = [W_PADRON, W_ALUMNO, W_EVAL, W_NOTA]
     if mostrar_corrector:
         headers.append("Corrector")
-        widths.append(35)
+        widths.append(W_CORRECTOR)
     if incluir_estado_final:
         headers.append("Estado")
-        widths.append(25)
+        widths.append(W_ESTADO)
 
     rows = []
     for n in notas:
