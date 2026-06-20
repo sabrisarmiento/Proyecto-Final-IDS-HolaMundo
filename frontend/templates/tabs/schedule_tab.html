@@ -9,6 +9,7 @@
     <label for="semana-clase"> Semana: </label>
     <input
       type="number"
+      min="1"
       id="semana-clase"
       name="semana"
       placeholder="Indicar semana..."
@@ -19,7 +20,6 @@
     <label for="temas-clase"> Temas: </label>
     <input
       type="text"
-      min="0"
       id="temas-clase"
       name="temas"
       placeholder="Escribir temas..."
@@ -90,7 +90,7 @@
     <tr class="calendar-columns">
       {% if id_clase_editar==clase.id_clase %}
       <form action="{{ url_for('courses.editar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}" method="POST">
-          <td><input class="semana-edit-input" type="number" min="0" name="semana" value="{{ clase.semana }}"></td>
+          <td><input class="semana-edit-input" type="number" min="1" name="semana" value="{{ clase.semana }}"></td>
           <td><input class="calendar-edit-form" type="date" name="fecha_clase" value="{{ clase.fecha }}"></td>
           <td><input class="temas-edit-input" type="text" name="temas" value="{{ clase.temas }}"></td>
 
