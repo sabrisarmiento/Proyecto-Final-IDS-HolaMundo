@@ -19,18 +19,6 @@
       {% endfor %}
     </select>
   </form>
-
-  {% if class_id %}
-  <form method="POST" action="{{ url_for('attendance.generate_qr_view') }}">
-    <input type="hidden" name="id_clase" value="{{ class_id }}">
-    <input type="hidden" name="course_id" value="{{ course_id }}">
-    <label>Validez del QR:
-      <input type="number" name="horas" min="0" max="24" value="3"> h
-      <input type="number" name="minutos" min="0" max="59" value="0"> min
-    </label>
-    <button type="submit" class="btn-qr"><span class="btn-qr-icon">▦</span> Generar QR</button>
-  </form>
-  {% endif %}
 </div>
 
 {% if class_id %}

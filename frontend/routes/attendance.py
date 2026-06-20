@@ -49,10 +49,6 @@ def generate_qr_view():
     result = generate_qr(class_id, horas, minutos)
     flash(result.get("message", "No se pudieron generar los QR."))
 
-    course_id = request.form.get('course_id')
-    if course_id:
-        return redirect(url_for('courses.course_detail', course_id=course_id, tab='attendance', clase=class_id))
-
     subject_id = request.form.get('subject')
     curso_id = request.form.get('curso')
     return redirect(url_for('attendance.attendance', subject=subject_id, curso=curso_id, clase=class_id))

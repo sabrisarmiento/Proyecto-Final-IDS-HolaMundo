@@ -144,10 +144,52 @@
 
     </section>
 
+    <section class="dash-attendance">
+
+      <div class="dash-attendance-top">
+        <div class="dash-stat-card dash-stat--accent dash-attendance-general">
+          <span class="dash-stat-label">Asistencia general</span>
+          <strong class="dash-stat-num">{{ dash_data.asistencia_general.porcentaje }}%</strong>
+          <span class="dash-stat-sub">
+            {{ dash_data.asistencia_general.presentes }} de {{ dash_data.asistencia_general.posibles }} presencias · todas las clases
+          </span>
+        </div>
+
+        <div class="dash-chart-card dash-attendance-clase">
+          <h4 class="dash-chart-title">Presentes por clase</h4>
+          <div class="dash-attendance-controls">
+            <select id="dash-asist-clase" class="dash-select"></select>
+            <span id="dash-asist-clase-count" class="dash-attendance-count">—</span>
+          </div>
+          <div class="dash-attendance-filtros">
+            <label><input type="radio" name="asist-clase-filtro" value="all" checked /> Todos</label>
+            <label><input type="radio" name="asist-clase-filtro" value="present" /> Presentes</label>
+            <label><input type="radio" name="asist-clase-filtro" value="absent" /> Ausentes</label>
+          </div>
+          <ul id="dash-asist-clase-lista" class="dash-attendance-lista"></ul>
+        </div>
+      </div>
+
+      <div class="dash-chart-card dash-chart-card--wide">
+        <h4 class="dash-chart-title">Asistencia por alumno</h4>
+        <div class="dash-attendance-controls">
+          <select id="dash-asist-alumno" class="dash-select"></select>
+          <span class="dash-attendance-count">
+            <strong id="dash-asist-alumno-presentes">—</strong> presentes ·
+            <strong id="dash-asist-alumno-pct">—</strong>
+          </span>
+        </div>
+        <div class="dash-chart-wrap" style="height:220px;">
+          <canvas id="chart-asist-alumno"></canvas>
+        </div>
+      </div>
+
+    </section>
+
     {% if dash_data.asistencia_detalle %}
     <section class="dash-chart-card dash-chart-card--wide">
-      <h4 class="dash-chart-title">Asistencia por alumno</h4>
-      <p class="dash-chart-subtitle">Presentes sobre el total de clases</p>
+      <h4 class="dash-chart-title">Detalle de asistencia</h4>
+      <p class="dash-chart-subtitle">Todos los alumnos del curso</p>
       <div class="dash-table-wrap">
         <table class="dash-table">
           <thead>
