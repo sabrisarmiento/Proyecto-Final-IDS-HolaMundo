@@ -245,4 +245,4 @@ CREATE TABLE curso_slack_config (
 --    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  --   FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
  --   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
---);
+-- );
