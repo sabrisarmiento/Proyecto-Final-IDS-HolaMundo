@@ -216,6 +216,7 @@ def course_detail(course_id):
     except Exception as e:
         print(e)
         clases = []
+    
 
     class_id_sel = request.args.get('clase')
     attendance_records = []
