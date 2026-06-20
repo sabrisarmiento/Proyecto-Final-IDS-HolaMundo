@@ -11,6 +11,10 @@
 {% call modal("export-reports-modal", "Exportar informes") %}
 <form id="export-reports-form"
       data-base="{{ url_for('courses.exportar_informes', course_id=course['id_curso']) }}">
+  <input type="hidden" name="materia" value="{{ course.materia }}">
+  <input type="hidden" name="catedra" value="{{ course.catedra }}">
+  <input type="hidden" name="cuatrimestre" value="{{ course.cuatrimestre }}">
+  <input type="hidden" name="anio" value="{{ course.anio }}">
   <label class="export-check">
     <input type="checkbox" name="alumnos" value="1" /> Listado de alumnos (sin notas)
   </label>
@@ -27,7 +31,17 @@
     {% else %}
       <p class="csv-hint">No hay tipos de evaluación cargados.</p>
     {% endif %}
+    <label class="export-check export-subcheck">
+      <input type="checkbox" name="mostrar_corrector" value="1" /> Mostrar nombre del corrector
+    </label>
+    <label class="export-check export-subcheck">
+      <input type="checkbox" name="incluir_estado_final" value="1" />
+      Incluir estado final del alumno
+    </label>
   </div>
+  <label class="export-check">
+    <input type="checkbox" name="asistencia" value="1" /> Asistencia PDF
+  </label>
   <label class="export-check">
     <input type="checkbox" name="equipos" value="1" /> Reporte de equipos con integrantes
   </label>

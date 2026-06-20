@@ -23,7 +23,9 @@ def login():
       session['user'] = data['user']
       return redirect(url_for('dashboard.dashboard'))
     else:
-      return redirect(url_for('landing.landing') + '?error=Error de conexión')
+      errors = data.get('errors') or [{}]
+      msg = errors[0].get('description', 'Credenciales inválidas')
+      return redirect(url_for('landing.landing') + f'?error={msg}')
 
   except Exception:
     return redirect(url_for('landing.landing') + '?error=Error de conexión')

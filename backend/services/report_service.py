@@ -1,9 +1,6 @@
 from flask import Response
 from helpers.responses import error_response
 from controllers.reports_controller import (
-    report_students_pdf,
-    report_teams_pdf,
-    report_marks_pdf,
     report_combined_pdf,
 )
 
@@ -19,20 +16,12 @@ def _pdf_response(result):
         },
     )
 
-
-def report_students_service(id_curso):
-    return _pdf_response(report_students_pdf(id_curso))
-
-
-def report_teams_service(id_curso):
-    return _pdf_response(report_teams_pdf(id_curso))
-
-
-def report_marks_service(id_curso, evaluaciones):
-    return _pdf_response(report_marks_pdf(id_curso, evaluaciones))
-
-
 def report_combined_service(id_curso, incluir_alumnos, incluir_equipos,
-                            incluir_notas, evaluaciones):
+                            incluir_notas, evaluaciones,
+                            incluir_asistencia=False, mostrar_corrector=False,
+                            incluir_estado_final=False,
+                            materia=None, catedra=None, cuatrimestre=None, anio=None):
     return _pdf_response(report_combined_pdf(
-        id_curso, incluir_alumnos, incluir_equipos, incluir_notas, evaluaciones))
+        id_curso, incluir_alumnos, incluir_equipos, incluir_notas, evaluaciones,
+        incluir_asistencia, mostrar_corrector, incluir_estado_final,
+        materia, catedra, cuatrimestre, anio))
