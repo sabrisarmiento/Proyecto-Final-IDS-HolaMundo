@@ -9,7 +9,7 @@ from services.advertisements_service import (
     create_advertisement, get_slack_advertisements_by_course, get_advertisement_by_id, 
     update_advertisement, delete_advertisement
     )
-from services.courses_service import get_courses
+from services.courses_service import get_courses, get_course_by_id
 
 advertisements_bp = Blueprint('advertisements', __name__)
 
@@ -23,6 +23,33 @@ def public_advertisements():
   courses = []
   subjects = get_subjects()
 
+  # if view is not None:
+  #   try:
+  #     all_courses = get_courses()
+
+  #     subject = next((s for s in subjects if s["id_materia"] == int(view)), None)
+  #     subject_name = subject.get("nombre") if subject else None
+
+  #     courses = [c for c in all_courses if c.get("materia") == subject_name]
+  #     print("COURSES EN /AVISOS:", courses)
+
+  #     if selected_course:
+  #       id_course = int(selected_course)
+
+  #       if source == "panel":
+  #         avisos = get_advertisements_by_course(id_course)
+  #       elif source == "slack":
+  #         avisos = get_slack_advertisements_by_course(id_course)
+  #       else:
+  #         avisos = get_all_combined_advertisements(id_course)
+
+  #     else:
+  #       avisos = get_advertisements_by_subject(int(view))
+
+  #   except Exception as e:
+  #     print(f"Error al obtener avisos para la materia {view}: {e}")
+  course_detail = None
+
   if view is not None:
     try:
       all_courses = get_courses()
@@ -34,6 +61,7 @@ def public_advertisements():
 
       if selected_course:
         id_course = int(selected_course)
+        course_detail = get_course_by_id(id_course)
 
         if source == "panel":
           avisos = get_advertisements_by_course(id_course)
@@ -47,6 +75,29 @@ def public_advertisements():
 
     except Exception as e:
       print(f"Error al obtener avisos para la materia {view}: {e}")
+
+  user = session.get("user", {})
+  id_user = str(user.get("id_usuario"))
+  id_rol = str(user.get("id_rol"))
+
+  for aviso in avisos:
+    aviso["puede_editar"] = False
+
+    if id_rol == "1":
+      aviso["puede_editar"] = True
+
+    elif course_detail:
+      es_profesor = str(course_detail.get("profesor_id")) == id_user
+
+      ayudantes = course_detail.get("ayudantes", [])
+
+      es_ayudante = any(
+        str(ayudante.get("id_usuario")) == id_user
+        for ayudante in ayudantes
+      )
+
+      if es_profesor or es_ayudante:
+        aviso["puede_editar"] = True
 
   return render_template(
     "advertisements.html",

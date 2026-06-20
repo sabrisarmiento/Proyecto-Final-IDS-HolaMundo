@@ -60,7 +60,12 @@
         <div class="advertisements-list" id="advertisements-container">
             {% if avisos %}
                 {% for aviso in avisos %}
-                <article class="advertisement-card {% if aviso.origen == 'panel_confirmado' %}panel-confirmado{% endif %}" data-course="{{ aviso.id_curso }}">
+                <article class="
+                    advertisement-card
+                    {% if aviso.origen == 'slack' %}origen-slack{% endif %}
+                    {% if aviso.origen == 'panel_confirmado' %}origen-panel-confirmado{% endif %}
+                    {% if aviso.origen == 'panel' or not aviso.origen %}origen-panel{% endif %}
+                " data-course="{{ aviso.id_curso }}">
                     <div class="advertisement-card-header">
                         <span class="advertisement-date">{{ aviso.fecha }}</span>
                         <span class="advertisement-issuer">Publicado por: {{ aviso.emisor }}</span>
@@ -68,7 +73,7 @@
                     <h2 class="advertisement-card-title">{{ aviso.titulo }}</h2>
                     <p class="advertisement-card-message">{{ aviso.mensaje }}</p>
                     <p>ORIGEN: {{ aviso.origen }}</p>
-                    {% if session.get("token") and aviso.id_aviso %}
+                    {% if session.get("token") and aviso.id_aviso and aviso.puede_editar %}
                         <div class="advertisement-actions">
                             <a 
                                 href="{{ url_for('advertisements.edit_advertisement_front', id_aviso=aviso.id_aviso) }}?id_curso={{ aviso.id_curso }}"
