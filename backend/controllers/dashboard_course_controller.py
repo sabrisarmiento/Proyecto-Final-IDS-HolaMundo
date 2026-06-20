@@ -109,47 +109,16 @@ def get_course_dashboard(id_curso):
             for n in notas_full:
                 notas_por_alumno_eval.setdefault(n["id_alumno"], {})[n["id_evaluacion"]] = float(n["nota"])
 
-        promocionados = 0
-        van_a_final   = 0
-        recursantes   = 0
-
-        for alumno_id in ids_activos:
-            notas_alumno = notas_por_alumno_eval.get(alumno_id, {})
-            valores = list(notas_alumno.values())
-
-            if not valores:
-                van_a_final += 1
-                continue
-
-            recursa = any(v < 4 for v in valores)
-
-            if recursa:
-                recursantes += 1
-            elif es_promocionable and promo_evals:
-                puede_promo = all(
-                    notas_alumno.get(id_ev, 0) >= nota_min
-                    for id_ev, nota_min in promo_evals.items()
-                    if id_ev in notas_alumno
-                )
-                if puede_promo:
-                    promocionados += 1
-                else:
-                    van_a_final += 1
-            else:
-                promedio_alumno = sum(valores) / len(valores)
-                if promedio_alumno >= 4:
-                    van_a_final += 1
-                else:
-                    recursantes += 1
-
         clases = query_db(
-            "SELECT id_clase FROM clases WHERE id_curso = %s",
+            "SELECT id_clase, fecha, temas FROM clases WHERE id_curso = %s ORDER BY fecha ASC, id_clase ASC",
             (id_curso,)
         )
         total_clases = len(clases)
 
+        pct_asistencia_por_alumno = {}
         asistencia_stats = {"regulares": 0, "en_riesgo": 0, "sin_datos": 0}
         attendance_by_student = []
+        presentes_pares = []
 
         if total_clases > 0 and ids_activos:
             fmt = ",".join(["%s"] * len(ids_activos))
@@ -165,13 +134,26 @@ def get_course_dashboard(id_curso):
             presencias_map = {r["id_alumno"]: r["presentes"] for r in presencias}
             names_map = {a["id_alumno"]: a for a in activos}
 
+            presentes_raw = query_db(
+                f"""
+                SELECT id_alumno, id_clase
+                FROM asistencia
+                WHERE id_alumno IN ({fmt}) AND presente != 0
+                """,
+                ids_activos
+            )
+            presentes_pares = [[r["id_alumno"], r["id_clase"]] for r in presentes_raw]
+
             for aid in ids_activos:
                 presentes = presencias_map.get(aid, 0)
                 pct = (presentes / total_clases) * 100
+                pct_asistencia_por_alumno[aid] = pct
+
                 if pct >= umbral_asistencia:
                     asistencia_stats["regulares"] += 1
                 else:
                     asistencia_stats["en_riesgo"] += 1
+
                 alumno = names_map.get(aid, {})
                 attendance_by_student.append({
                     "id_alumno":    aid,
@@ -183,6 +165,55 @@ def get_course_dashboard(id_curso):
                 })
         else:
             asistencia_stats["sin_datos"] = len(ids_activos)
+            for aid in ids_activos:
+                pct_asistencia_por_alumno[aid] = None
+
+        promocionados = 0
+        van_a_final   = 0
+        recursantes   = 0
+
+        for alumno_id in ids_activos:
+            notas_alumno = notas_por_alumno_eval.get(alumno_id, {})
+            valores = list(notas_alumno.values())
+
+            if not valores:
+                van_a_final += 1
+                continue
+
+            recursa = any(v < 4 for v in valores)
+            if recursa:
+                recursantes += 1
+                continue
+
+            if es_promocionable:
+                if promo_evals:
+                    cumple_notas = all(
+                        notas_alumno.get(id_ev, 0) >= nota_min
+                        for id_ev, nota_min in promo_evals.items()
+                    )
+                else:
+                    cumple_notas = True
+
+                if cuenta_asistencia and total_clases > 0:
+                    pct_asist = pct_asistencia_por_alumno.get(alumno_id)
+                    cumple_asistencia = (pct_asist is not None and pct_asist >= porcentaje_asistencia)
+                else:
+                    cumple_asistencia = True
+
+                if cumple_notas and cumple_asistencia:
+                    promocionados += 1
+                else:
+                    van_a_final += 1
+            else:
+                promedio_alumno = sum(valores) / len(valores)
+                if promedio_alumno >= 4:
+                    van_a_final += 1
+                else:
+                    recursantes += 1
+
+        presentes_totales = len(presentes_pares)
+        posibles_totales = total_clases * len(ids_activos)
+        asistencia_general_pct = round(presentes_totales / posibles_totales * 100, 1) if posibles_totales else 0
 
         return {
             "ok": True,
@@ -213,6 +244,20 @@ def get_course_dashboard(id_curso):
                     "umbral": umbral_asistencia,
                 },
                 "asistencia_detalle": attendance_by_student,
+                "asistencia_general": {
+                    "porcentaje": asistencia_general_pct,
+                    "presentes":  presentes_totales,
+                    "posibles":   posibles_totales,
+                },
+                "clases_list": [
+                    {"id_clase": c["id_clase"], "fecha": c["fecha"], "temas": c["temas"]}
+                    for c in clases
+                ],
+                "alumnos_list": [
+                    {"id_alumno": a["id_alumno"], "nombre": a["nombre"], "apellido": a["apellido"]}
+                    for a in activos
+                ],
+                "presentes": presentes_pares,
                 "es_promocionable":   es_promocionable,
             }
         }

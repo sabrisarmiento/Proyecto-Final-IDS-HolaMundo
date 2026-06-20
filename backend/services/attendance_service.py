@@ -8,8 +8,8 @@ from controllers.attendance_controller import (
     create_attendance,
     update_attendance,
     delete_attendance,
-    students_active_qr,
-    mark_qr_generated,
+    active_students_for_class,
+    open_attendance_window,
 )
 from controllers.classes_controller import get_class_id
 
@@ -47,29 +47,7 @@ def attendance_delete_handler(id):
         "message": result["message"]
     })
 
-def generate_class_qr_service(id_clase):
-    try:
-        students = students_active_qr(id_clase)
-
-        sent = 0
-        for student in students:
-            raw_data = f"{student['id_alumno']}-{id_clase}-2026-secret"
-            qr_hash = hashlib.sha256(raw_data.encode()).hexdigest()
-
-            qr_url = f"https://introds-web.vercel.app/presente?id={student['id_alumno']}&clase={id_clase}&code={qr_hash}"
-
-            if send_attendance_email(student['correo'], student['nombre'], qr_url):
-                sent += 1
-
-        return jsonify({
-            "ok": True,
-            "message": f"Se enviaron {sent} correos con QRs dinámicos."
-        }), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-def generate_qr_service(id_clase, horas=None, minutos=None):
+def send_attendance_link_service(id_clase, horas=None, minutos=None):
     try:
         if not id_clase:
             return jsonify({"error": "ID de clase no proporcionado"}), 400
@@ -84,12 +62,12 @@ def generate_qr_service(id_clase, horas=None, minutos=None):
         if total_minutos <= 0 or total_minutos > 24 * 60:
             return jsonify({"error": "La duración debe estar entre 1 minuto y 24 horas"}), 400
 
-        alumnos = students_active_qr(id_clase)
+        alumnos = active_students_for_class(id_clase)
 
         if not alumnos:
             return jsonify({"message": "No se encontraron alumnos activos para esta clase"}), 404
 
-        valido_hasta = mark_qr_generated(id_clase, total_minutos)
+        valido_hasta = open_attendance_window(id_clase, total_minutos)
         hora_str = valido_hasta.strftime("%H:%M") if valido_hasta else ""
 
         context = get_class_id(id_clase)
@@ -98,18 +76,22 @@ def generate_qr_service(id_clase, horas=None, minutos=None):
         enviados = 0
         for alumno in alumnos:
             raw_data = f"{alumno['id_alumno']}-{id_clase}-{os.getenv('ATTENDANCE_SECRET')}"
-            qr_hash = hashlib.sha256(raw_data.encode()).hexdigest()
+            link_code = hashlib.sha256(raw_data.encode()).hexdigest()
 
-            qr_url = f"{FRONTEND_URL}/presente?id_alumno={alumno['id_alumno']}&id_clase={id_clase}&code={qr_hash}"
+            attendance_link = f"{FRONTEND_URL}/presente?id_alumno={alumno['id_alumno']}&id_clase={id_clase}&code={link_code}"
 
-            if send_attendance_email(alumno['correo'], alumno['nombre'], qr_url, hora_str, clase):
+            if send_attendance_email(alumno['correo'], alumno['nombre'], attendance_link, hora_str, clase):
                 enviados += 1
 
-            print(f"Enviando QR a {alumno['correo']}: {qr_url}")
+            print(f"Enviando link a {alumno['correo']}: {attendance_link}")
 
         return jsonify({
-            "ok": True,
-            "message": f"QRs generados y enviados a {len(alumnos)} alumnos correctamente"
+            "ok": enviados > 0,
+            "message": (
+                f"Links de asistencia enviados: {enviados}/{len(alumnos)}."
+                if enviados else
+                f"No se pudo enviar el link de asistencia a ninguno de los {len(alumnos)} alumnos. Revisá EMAIL_USER/EMAIL_PASS en el .env."
+            )
         }), 200
 
     except Exception as e:
