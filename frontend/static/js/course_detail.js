@@ -357,3 +357,18 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => msg.remove(), 5000);
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const selectSourceDashboard = document.getElementById("select-source-dashboard");
+
+    if (!selectSourceDashboard) return;
+
+    selectSourceDashboard.addEventListener("change", function () {
+        const params = new URLSearchParams(window.location.search);
+
+        params.set("tab", "ads");
+        params.set("source", this.value);
+
+        window.location.search = params.toString();
+    });
+});

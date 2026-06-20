@@ -3,7 +3,7 @@ import requests
 
 from . import courses_bp
 from .common import BACKEND_URL, get_token
-from services.advertisements_service import get_advertisements_by_course
+from services.advertisements_service import get_advertisements_by_course, get_all_combined_advertisements, get_slack_advertisements_by_course
 from services.courses_service import get_course_by_id
 from services.students_services import post_student
 from services.exams_service import get_exams_by_course_id
@@ -321,8 +321,22 @@ def course_detail(course_id):
 
     pending_team_change = session.get("pending_team_change")
 
+    # try:
+    #     advertisements = get_advertisements_by_course(course_id)
+    # except Exception:
+    #     advertisements = []
+    source = request.args.get("source", "all")
+
     try:
-        advertisements = get_advertisements_by_course(course_id)
+        if source == "panel":
+            advertisements = get_advertisements_by_course(course_id)
+
+        elif source == "slack":
+            advertisements = get_slack_advertisements_by_course(course_id)
+
+        else:
+            advertisements = get_all_combined_advertisements(course_id)
+
     except Exception:
         advertisements = []
 
@@ -372,6 +386,7 @@ def course_detail(course_id):
         promo_config=promo_config,
         pending_team_change=pending_team_change,
         advertisements=advertisements,
+        source=source,
         config_msg=session.pop('config_msg', None),
         config_ok=session.pop('config_ok', False),
         dash_data=dash_data,

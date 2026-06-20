@@ -81,6 +81,23 @@
           </button>
         </form>
       </div>
+      <div class="ads-filter">
+        <label for="select-source-dashboard">Ver avisos:</label>
+
+        <select id="select-source-dashboard">
+          <option value="all" {% if source == "all" %}selected{% endif %}>
+            Panel FIUBA + Slack
+          </option>
+
+          <option value="panel" {% if source == "panel" %}selected{% endif %}>
+            Solo Panel FIUBA
+          </option>
+
+          <option value="slack" {% if source == "slack" %}selected{% endif %}>
+            Solo Slack
+          </option>
+        </select>
+      </div>
       {% if advertisements %}
         <div class="advertisements-list">
           {% for aviso in advertisements %}
