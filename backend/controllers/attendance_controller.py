@@ -43,6 +43,46 @@ def active_students_for_class(id_clase):
     except Exception:
         return []
     
+def roster_for_class(id_clase):
+    try:
+        alumnos = query_db(
+            """
+            SELECT a.id_alumno, a.nombre, a.apellido, a.padron, a.correo, asi.presente
+            FROM alumnos a
+            LEFT JOIN asistencia asi
+              ON asi.id_alumno = a.id_alumno AND asi.id_clase = %s
+            WHERE a.id_curso = (SELECT id_curso FROM clases WHERE id_clase = %s)
+              AND a.estado_alumno = 1
+            ORDER BY a.apellido, a.nombre
+            """,
+            (id_clase, id_clase),
+        )
+
+        ventana = query_db(
+            "SELECT (asistencia_valida_hasta IS NOT NULL AND NOW() > asistencia_valida_hasta) AS cerrada FROM clases WHERE id_clase = %s",
+            (id_clase,),
+        )
+        ventana_cerrada = bool(ventana[0]["cerrada"]) if ventana else False
+
+        roster = []
+        for a in alumnos:
+            presente = a["presente"]
+            if presente is None:
+                estado = "absent" if ventana_cerrada else "pending"
+            else:
+                estado = "present" if presente else "absent"
+            roster.append({
+                "id_alumno": a["id_alumno"],
+                "nombre": a["nombre"],
+                "apellido": a["apellido"],
+                "padron": a["padron"],
+                "correo": a["correo"],
+                "estado": estado,
+            })
+        return {"ok": True, "data": roster}
+    except Exception as e:
+        return {"ok": False, "code": 500, "message": "Internal Server Error", "description": str(e)}
+
 def open_attendance_window(id_clase, total_minutos):
     modify_db(
         "UPDATE clases SET asistencia_abierta_en = NOW(), asistencia_valida_hasta = NOW() + INTERVAL %s MINUTE WHERE id_clase = %s",

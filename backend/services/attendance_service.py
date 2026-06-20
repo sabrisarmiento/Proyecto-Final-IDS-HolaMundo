@@ -8,6 +8,7 @@ from controllers.attendance_controller import (
     create_attendance,
     update_attendance,
     delete_attendance,
+    roster_for_class,
     active_students_for_class,
     open_attendance_window,
 )
@@ -21,6 +22,14 @@ def attendance_get_handler(id_clase, id_alumno):
         return error_response(result)
     return success_response({
         "attendance": result["data"]
+    })
+
+def attendance_roster_handler(id_clase):
+    result = roster_for_class(id_clase)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({
+        "roster": result["data"]
     })
 
 def attendance_post_handler(data):

@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from services.attendance_service import (
     attendance_get_handler,
+    attendance_roster_handler,
     attendance_post_handler,
     attendance_patch_handler,
     attendance_delete_handler,
@@ -15,6 +16,11 @@ def get_attendance():
     id_clase = request.args.get("id_clase")
     id_alumno = request.args.get("id_alumno")
     return attendance_get_handler(id_clase, id_alumno)
+
+@attendance_bp.route("/asistencia/planilla", methods=["GET"])
+def get_attendance_roster():
+    id_clase = request.args.get("id_clase")
+    return attendance_roster_handler(id_clase)
 
 @attendance_bp.route("/asistencia", methods=["POST"])
 def post_attendance():
