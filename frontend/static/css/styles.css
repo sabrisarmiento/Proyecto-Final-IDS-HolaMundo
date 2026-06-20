@@ -22,6 +22,8 @@
   --color-16:#92140c1f;
   --color-17:#2dd200;
   --color-18:#e60b0b;
+  --color-19:black;
+  --color-20:#92140C;
 }
 
 [data-theme="dark"] {
@@ -31,6 +33,7 @@
   --color-65: #3f384c;
   --color-6: #2c2734;
   --color-2: #a59dec;
+  --color-7:#a59dec;
   --color-8: #e3e4e8;
   --color-9: #b4adf9;
   --color-10: #ffffff;
@@ -40,6 +43,8 @@
   --color-14:#837dbc;
   --color-15:#ffffff;
   --color-16:#18151d;
+  --color-19:white;
+  --color-20:#a59dec;
   border-color: #262628;
 }
 
