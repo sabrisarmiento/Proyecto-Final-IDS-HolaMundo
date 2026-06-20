@@ -53,13 +53,19 @@
           Iniciar Sesion
         </button>
   
-        {% call modal("login-modal", "iniciar Sesion") %}
+        {% call modal("login-modal", "Iniciar Sesion") %}
           <form action="{{ url_for("login.login") }}" method="POST">
             <input type="email" name="correo" placeholder="Ingresar correo ..." required>
             <input type="password" name="contraseña" placeholder="Ingresar contraseña ...">
+            {% if request.args.get('error') %}
+              <p class="form-message form-message-error">{{ request.args.get('error') }}</p>
+            {% endif %}
             <button type="submit">Iniciar Sesion</button>
           </form>
         {% endcall %}
+        {% if request.args.get('error') %}
+          <script>document.addEventListener('DOMContentLoaded', () => openModal('login-modal'));</script>
+        {% endif %}
       {% endif %}
     </div>
 
