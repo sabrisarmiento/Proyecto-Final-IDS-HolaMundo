@@ -1,3 +1,4 @@
+from config import BASE_URL
 from flask import Blueprint, render_template, request, session, redirect, url_for
 import requests
 #from services.advertisement_frontend_service import AdvertisementFrontendService
@@ -63,7 +64,7 @@ def create_advertisement_front(id_curso):
 #         return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
     
 #     response = requests.get(
-#         f"http://127.0.0.1:5000/slack/install/{id_curso}",
+#         f"{BASE_URL}/slack/install/{id_curso}",
 #         headers={
 #             "Authorization": f"Bearer {token}"
 #         },
@@ -139,7 +140,7 @@ def configure_slack_front(id_curso):
         permite_lectura = request.form.get("permite_lectura") == "on"
 
         response = requests.post(
-            f"http://127.0.0.1:5000/courses/{id_curso}/slack/config",
+            f"{BASE_URL}/courses/{id_curso}/slack/config",
             headers={
                 "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json"
@@ -175,7 +176,7 @@ def disconnect_slack_front(id_curso):
         return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
 
     requests.delete(
-        f"http://127.0.0.1:5000/courses/{id_curso}/slack/disconnect",
+        f"{BASE_URL}/courses/{id_curso}/slack/disconnect",
         headers={
             "Authorization": f"Bearer {token}"
         }

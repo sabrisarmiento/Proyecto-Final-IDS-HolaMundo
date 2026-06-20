@@ -1,6 +1,7 @@
+import os
 import requests
 from config import BASE_URL
-BASE = "http://127.0.0.1:5000"
+BASE = os.getenv("BACKEND_URL", "http://127.0.0.1:5000")
 
 def attendance_get_all(id_clase=None):
     try:

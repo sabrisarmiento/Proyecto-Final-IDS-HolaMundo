@@ -1,10 +1,11 @@
+from config import BASE_URL
 #borrar
 
 import requests
 
 def get_advertisements():
     try:
-        response = requests.get("http://127.0.0.1:5000/advertisements")
+        response = requests.get(f"{BASE_URL}/advertisements")
         response.raise_for_status()
         return response.json().get("advertisements", [])
     except Exception as e:
@@ -14,7 +15,7 @@ def get_advertisements():
 def get_advertisements_by_course(id_course):
     try:
         res = requests.get(
-            "http://127.0.0.1:5000/advertisements",
+            f"{BASE_URL}/advertisements",
             params={"id_curso": id_course}
         )
         res.raise_for_status()
@@ -25,7 +26,7 @@ def get_advertisements_by_course(id_course):
     
 def get_advertisements_by_subject(id_subject):
     try:
-        response = requests.get(f"http://127.0.0.1:5000/advertisements/subject/{id_subject}")
+        response = requests.get(f"{BASE_URL}/advertisements/subject/{id_subject}")
         response.raise_for_status()
         return response.json().get("advertisements", [])
     except Exception as e:

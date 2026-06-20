@@ -8,10 +8,12 @@ db_password = os.getenv("DB_PASSWORD")
 db_user = os.getenv("DB_USER")
 
 db_config = {
-    "host": "localhost",
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", 3306)),
     "user": db_user,
     "password": db_password,
-    "database": "DB_ProyectoFinal_IDS"
+    "database": os.getenv("DB_NAME", "DB_ProyectoFinal_IDS"),
+    "charset": "utf8mb4",
 }
 
 def connect_db():

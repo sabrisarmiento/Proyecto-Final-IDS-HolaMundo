@@ -1,3 +1,4 @@
+from config import BASE_URL
 from flask import Blueprint, request, redirect, url_for, session
 import requests
 
@@ -9,7 +10,7 @@ def login():
   contraseña = request.form.get('contraseña')
 
   try:
-    response = requests.post('http://127.0.0.1:5000/login', json={  # requests (librería)
+    response = requests.post(f"{BASE_URL}/login", json={  # requests (librería)
       "correo": correo,
       "contraseña": contraseña
     })
