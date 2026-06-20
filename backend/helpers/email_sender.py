@@ -6,14 +6,14 @@ from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
 
-def send_attendance_email(destinatario, nombre_alumno, qr_link, valido_hasta=None, clase=None):
+def send_attendance_email(destinatario, nombre_alumno, attendance_link, valido_hasta=None, clase=None):
     remitente = os.getenv("EMAIL_USER")
     password = os.getenv("EMAIL_PASS")
     
     mensaje = MIMEMultipart()
     mensaje['From'] = remitente
     mensaje['To'] = destinatario
-    mensaje['Subject'] = f"Asistencia - Clase {clase.get('numero')} de {clase.get('materia')}" if clase else "Asistencia - Código QR Dinámico"
+    mensaje['Subject'] = f"Asistencia - Clase {clase.get('numero')} de {clase.get('materia')}" if clase else "Asistencia - Link para marcar presente"
 
     validez = f"<p>El código es válido hasta las <b>{valido_hasta}</b>.</p>" if valido_hasta else ""
     detail = (
@@ -26,8 +26,8 @@ def send_attendance_email(destinatario, nombre_alumno, qr_link, valido_hasta=Non
         <body>
             <h3>Hola {nombre_alumno},</h3>
             {detail}
-            <p>Para marcar la asistencia, escaneá el código QR o hacé clic en el enlace:</p>
-            <a href="{qr_link}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+            <p>Para marcar tu asistencia, hacé clic en el siguiente enlace:</p>
+            <a href="{attendance_link}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
                 Dar el Presente
             </a>
             <p>Recordá que el sistema validará tu <b>geolocalización</b> al momento de escanear</p>

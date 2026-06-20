@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from services.attendance_frontend_service import attendance_get_all, generate_qr, mark_attendance, get_class
+from services.attendance_frontend_service import attendance_get_all, send_attendance_link, mark_attendance, get_class
 from services.subjects_service import get_my_subjects
 from services.courses_service import get_my_courses
 from services.calendar_service import calendar_get_all
@@ -41,13 +41,13 @@ def attendance():
     )
 
 
-@attendance_bp.route('/asistencia/generar-qr', methods=['POST'])
-def generate_qr_view():
+@attendance_bp.route('/asistencia/enviar-link', methods=['POST'])
+def send_attendance_link_view():
     class_id = request.form.get('id_clase')
     horas = request.form.get('horas')
     minutos = request.form.get('minutos')
-    result = generate_qr(class_id, horas, minutos)
-    flash(result.get("message", "No se pudieron generar los QR."))
+    result = send_attendance_link(class_id, horas, minutos)
+    flash(result.get("message", "No se pudo enviar el link de asistencia."))
 
     subject_id = request.form.get('subject')
     curso_id = request.form.get('curso')

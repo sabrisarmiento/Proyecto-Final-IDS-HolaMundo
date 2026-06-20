@@ -11,9 +11,9 @@ def attendance_get_all(id_clase=None):
         print(f"Error: {e}")
         return []
 
-def generate_qr(id_clase, horas=None, minutos=None):
+def send_attendance_link(id_clase, horas=None, minutos=None):
     try:
-        r = requests.post(f"{BASE}/asistencia/generar-qr", json={"id_clase": id_clase, "horas": horas, "minutos": minutos})
+        r = requests.post(f"{BASE}/asistencia/enviar-link", json={"id_clase": id_clase, "horas": horas, "minutos": minutos})
         return r.json()
     except Exception as e:
         print(f"Error: {e}")
