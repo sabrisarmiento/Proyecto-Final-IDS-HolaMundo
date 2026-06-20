@@ -13,12 +13,12 @@ def send_attendance_email(destinatario, nombre_alumno, qr_link, valido_hasta=Non
     mensaje = MIMEMultipart()
     mensaje['From'] = remitente
     mensaje['To'] = destinatario
-    mensaje['Subject'] = f"Asistencia - Clase {clase['numero']} de {clase['materia']}" if clase else "Asistencia - Código QR Dinámico"
+    mensaje['Subject'] = f"Asistencia - Clase {clase.get('numero')} de {clase.get('materia')}" if clase else "Asistencia - Código QR Dinámico"
 
     validez = f"<p>El código es válido hasta las <b>{valido_hasta}</b>.</p>" if valido_hasta else ""
     detail = (
-        f"<p><b>Clase N.º {clase['numero']}</b> — {clase['materia']} (Cátedra {clase['catedra']})</p>"
-        f"<p>Fecha: {clase['fecha']} · Tema: {clase['temas'] or '—'}</p>"
+        f"<p><b>Clase N.º {clase.get('numero')}</b> — {clase.get('materia')} (Cátedra {clase.get('catedra')})</p>"
+        f"<p>Fecha: {clase.get('fecha')} · Tema: {clase.get('temas') or '—'}</p>"
     ) if clase else ""
 
     cuerpo = f"""
