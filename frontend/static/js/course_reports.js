@@ -126,6 +126,11 @@ function setupExportReports() {
         params.append("incluir_estado_final", "1");
     }
 
+    for (const field of ['materia', 'catedra', 'cuatrimestre', 'anio']) {
+      const val = form.querySelector(`input[name="${field}"]`)?.value;
+      if (val) params.append(field, val);
+    }
+
     hideMessage(message);
     window.open(`${form.dataset.base}?${params.toString()}`, "_blank");
   });

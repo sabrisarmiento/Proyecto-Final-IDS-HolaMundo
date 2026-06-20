@@ -40,6 +40,10 @@ def exportar_informes(course_id):
             params.append((seccion, '1'))
     for ev in request.args.getlist('evaluaciones[]'):
         params.append(('evaluaciones[]', ev))
+    for field in ('materia', 'catedra', 'cuatrimestre', 'anio'):
+        val = request.args.get(field)
+        if val:
+            params.append((field, val))
 
     try:
         backend_res = requests.get(

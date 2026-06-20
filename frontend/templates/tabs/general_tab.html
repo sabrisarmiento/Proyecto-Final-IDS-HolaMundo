@@ -11,6 +11,10 @@
 {% call modal("export-reports-modal", "Exportar informes") %}
 <form id="export-reports-form"
       data-base="{{ url_for('courses.exportar_informes', course_id=course['id_curso']) }}">
+  <input type="hidden" name="materia" value="{{ course.materia }}">
+  <input type="hidden" name="catedra" value="{{ course.catedra }}">
+  <input type="hidden" name="cuatrimestre" value="{{ course.cuatrimestre }}">
+  <input type="hidden" name="anio" value="{{ course.anio }}">
   <label class="export-check">
     <input type="checkbox" name="alumnos" value="1" /> Listado de alumnos (sin notas)
   </label>

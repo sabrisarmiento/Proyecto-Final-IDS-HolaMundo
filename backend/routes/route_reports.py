@@ -23,4 +23,8 @@ def reporte_exportar():
         request.args.get("asistencia") in _TRUTHY,
         request.args.get("mostrar_corrector") in _TRUTHY,
         request.args.get("incluir_estado_final") in _TRUTHY,
+        request.args.get("materia"),
+        request.args.get("catedra"),
+        request.args.get("cuatrimestre"),
+        request.args.get("anio"),
     )

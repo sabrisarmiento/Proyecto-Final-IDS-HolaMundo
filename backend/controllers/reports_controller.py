@@ -47,11 +47,11 @@ def _pdf_bytes(pdf):
 
 # --- Section builders: agregan una sección al pdf, devuelven dict de error o None ---
 
-def _add_students_section(pdf, id_curso):
+def _add_students_section(pdf, id_curso, subtitulo=None):
     result = get_all_students({"id_curso": id_curso})
     if not result["ok"]:
         return result
-    _section_title(pdf, "Listado de Alumnos", f"Curso ID {id_curso}")
+    _section_title(pdf, "Listado de Alumnos", subtitulo)
     rows = [
         (a["padron"], a["apellido"], a["nombre"], a["correo"],
          "Activo" if a.get("estado_alumno") else "Baja")
@@ -62,11 +62,11 @@ def _add_students_section(pdf, id_curso):
     return None
 
 
-def _add_teams_section(pdf, id_curso):
+def _add_teams_section(pdf, id_curso, subtitulo=None):
     result = get_all_teams({"id_curso": id_curso})
     if not result["ok"]:
         return result
-    _section_title(pdf, "Reporte de Equipos", f"Curso ID {id_curso}")
+    _section_title(pdf, "Reporte de Equipos", subtitulo)
     equipos = result["data"]
     if not equipos:
         pdf.set_font("Helvetica", "", 11)
@@ -83,7 +83,7 @@ def _add_teams_section(pdf, id_curso):
     return None
 
 
-def _add_marks_section(pdf, id_curso, evaluaciones=None, mostrar_corrector=False, incluir_estado_final=False):
+def _add_marks_section(pdf, id_curso, evaluaciones=None, mostrar_corrector=False, incluir_estado_final=False, subtitulo=None):
     sql = """
         SELECT a.id_alumno, a.padron, a.apellido, a.nombre, t.nombre AS evaluacion, n.nota,
                n.corrector_nombre
@@ -137,7 +137,7 @@ def _add_marks_section(pdf, id_curso, evaluaciones=None, mostrar_corrector=False
             estado_por_alumno[row["id_alumno"]] = estado
 
     filtro = ", ".join(evaluaciones) if evaluaciones else "todas las evaluaciones"
-    _section_title(pdf, "Reporte de Notas", f"Curso ID {id_curso} - {filtro}")
+    _section_title(pdf, "Reporte de Notas", subtitulo)
 
     PAGE_W = 190  # A4 portrait - márgenes por defecto (10mm c/u)
     W_PADRON, W_NOTA, W_CORRECTOR, W_ESTADO = 22, 15, 30, 22
@@ -172,7 +172,7 @@ def _add_marks_section(pdf, id_curso, evaluaciones=None, mostrar_corrector=False
     return None
 
 
-def _add_attendance_section(pdf, id_curso):
+def _add_attendance_section(pdf, id_curso, subtitulo=None):
     alumnos = query_db(
         "SELECT id_alumno, padron, apellido, nombre FROM alumnos WHERE id_curso = %s AND estado_alumno = 1 ORDER BY apellido, nombre",
         (int(id_curso),)
@@ -194,7 +194,7 @@ def _add_attendance_section(pdf, id_curso):
     )
     presencias_map = {r["id_alumno"]: r["presentes"] for r in presencias}
 
-    _section_title(pdf, "Asistencia por Alumno", f"Curso ID {id_curso}")
+    _section_title(pdf, "Asistencia por Alumno", subtitulo)
     rows = []
     for a in alumnos:
         presentes = presencias_map.get(a["id_alumno"], 0)
@@ -210,7 +210,8 @@ def _add_attendance_section(pdf, id_curso):
 def report_combined_pdf(id_curso, incluir_alumnos, incluir_equipos,
                         incluir_notas, evaluaciones=None,
                         incluir_asistencia=False, mostrar_corrector=False,
-                        incluir_estado_final=False):
+                        incluir_estado_final=False,
+                        materia=None, catedra=None, cuatrimestre=None, anio=None):
     if not id_curso:
         return {"ok": False, "code": 400, "message": "Bad Request",
                 "description": "Falta el parámetro curso_id"}
@@ -218,21 +219,24 @@ def report_combined_pdf(id_curso, incluir_alumnos, incluir_equipos,
         return {"ok": False, "code": 400, "message": "Bad Request",
                 "description": "Seleccioná al menos una sección para exportar"}
     try:
+        partes = [p for p in [materia, catedra, f"{cuatrimestre} {anio}".strip() if cuatrimestre or anio else None] if p]
+        subtitulo = " · ".join(partes) if partes else None
+
         pdf = _new_pdf()
         if incluir_alumnos:
-            err = _add_students_section(pdf, id_curso)
+            err = _add_students_section(pdf, id_curso, subtitulo)
             if err:
                 return err
         if incluir_notas:
-            err = _add_marks_section(pdf, id_curso, evaluaciones, mostrar_corrector, incluir_estado_final)
+            err = _add_marks_section(pdf, id_curso, evaluaciones, mostrar_corrector, incluir_estado_final, subtitulo)
             if err:
                 return err
         if incluir_asistencia:
-            err = _add_attendance_section(pdf, id_curso)
+            err = _add_attendance_section(pdf, id_curso, subtitulo)
             if err:
                 return err
         if incluir_equipos:
-            err = _add_teams_section(pdf, id_curso)
+            err = _add_teams_section(pdf, id_curso, subtitulo)
             if err:
                 return err
         return {"ok": True, "data": _pdf_bytes(pdf),
