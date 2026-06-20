@@ -337,9 +337,6 @@ button.btn-crear:hover {
   line-height: 1.5;
 }
 
-.panel-confirmado {
-    border-left: 5px solid #8e44ad;
-}
 .advertisement-form .btn-crear:not(.btn-publicar) {
     background: var(--color-45);
     color: var(--color-9);
@@ -348,4 +345,37 @@ button.btn-crear:hover {
     font-size: 0.9rem;
     font-weight: 600;
     border-radius: 8px;
+}
+.advertisement-card.origen-panel {
+    border-left: 6px solid var(--color-3);
+}
+
+.advertisement-card.origen-panel-confirmado {
+    border-left: 6px solid var(--color-15);
+}
+
+.advertisement-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.advertisement-card.origen-slack::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    border-radius: 16px 0 0 16px;
+    background: linear-gradient(
+        to bottom,
+        #36c5f0 0%,
+        #36c5f0 25%,
+        #2eb67d 25%,
+        #2eb67d 50%,
+        #ecb22e 50%,
+        #ecb22e 75%,
+        #e01e5a 75%,
+        #e01e5a 100%
+    );
 }
