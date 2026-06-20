@@ -96,8 +96,8 @@ CREATE TABLE clases (
     semana INT NOT NULL,
     tipo VARCHAR(50),
     modalidad VARCHAR(50),
-    qr_generado_en DATETIME NULL,
-    qr_valido_hasta DATETIME NULL,
+    asistencia_abierta_en DATETIME NULL,
+    asistencia_valida_hasta DATETIME NULL,
     id_curso INT NOT NULL,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );

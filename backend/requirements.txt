@@ -11,7 +11,6 @@ python-dotenv==1.2.2
 Werkzeug==3.1.8
 Flask-Cors==4.0.0
 PyJWT==2.8.0
-qrcode==7.4.2
 pdfkit==1.0.0
 fpdf2==2.8.7
 google-api-python-client==2.118.0

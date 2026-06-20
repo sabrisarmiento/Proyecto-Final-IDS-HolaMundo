@@ -68,7 +68,7 @@
     box-shadow: 0 0 0 3px var(--color-16);
 }
 
-.btn-qr {
+.btn-send-link {
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 600;
@@ -84,11 +84,11 @@
     transition: background-color 0.15s ease, transform 0.05s ease;
 }
 
-.btn-qr:hover {
+.btn-send-link:hover {
     background-color: var(--color-2);
 }
 
-.btn-qr:active {
+.btn-send-link:active {
     transform: translateY(1px);
 }
 
@@ -193,7 +193,7 @@
         align-items: stretch;
     }
 
-    .btn-qr {
+    .btn-send-link {
         justify-content: center;
     }
 }
