@@ -22,9 +22,28 @@
                     <select title="select-course" id="select-courses">
                         <option value="" selected>Seleccione una cátedra</option>
                         {% for course in courses %}
-                            <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
-                        {% endfor %}
+                        <option 
+                            value="{{ course.id_curso }}"
+                            {% if selected_course == course.id_curso %}selected{% endif %}
+                        >
+                            {{ course.catedra }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                {% if selected_course %}
+                    <select title="select-source" id="select-source">
+                        <option value="all" {% if source == "all" %}selected{% endif %}>
+                            Todos los avisos
+                        </option>
+                        <option value="panel" {% if source == "panel" %}selected{% endif %}>
+                            Solo Panel FIUBA
+                        </option>
+                        <option value="slack" {% if source == "slack" %}selected{% endif %}>
+                            Solo Slack
+                        </option>
                     </select>
+                {% endif %}
             
                     <p id="msg-select-course">
                         Por favor, seleccione una cátedra para ver sus avisos.

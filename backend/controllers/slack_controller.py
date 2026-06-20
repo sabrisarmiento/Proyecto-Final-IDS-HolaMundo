@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 from database.db import modify_db, query_db
 
 
@@ -342,16 +343,22 @@ def get_slack_messages(id_curso):
         slack_messages = []
 
         for message in data.get("messages", []):
+            ts = message.get("ts")
+            fecha = ""
+
+            if ts:
+                fecha = datetime.fromtimestamp(float(ts)).strftime("%d/%m/%Y %H:%M")
+
             if message.get("subtype") == "bot_message":
                 emisor = "Slack Bot"
             else:
-                emisor = message.get("user", "Usuario Slack")
+                emisor = "Usuario Slack"
 
             slack_messages.append({
                 "titulo": "Mensaje de Slack",
                 "mensaje": message.get("text", ""),
                 "emisor": emisor,
-                "fecha": message.get("ts"),
+                "fecha": fecha,
                 "origen": "slack"
             })
 
