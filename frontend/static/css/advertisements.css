@@ -156,3 +156,7 @@
   color: var(--color-15);
   line-height: 1.5;
 }
+
+.panel-confirmado {
+    border-left: 5px solid #8e44ad;
+}

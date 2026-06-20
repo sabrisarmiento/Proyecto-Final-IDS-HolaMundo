@@ -349,17 +349,19 @@ def get_slack_messages(id_curso):
             if ts:
                 fecha = datetime.fromtimestamp(float(ts)).strftime("%d/%m/%Y %H:%M")
 
-            if message.get("subtype") == "bot_message":
+            if message.get("subtype") == "bot_message" or message.get("bot_id") or message.get("app_id"):
                 emisor = "Slack Bot"
+                origen = "panel_confirmado"
             else:
                 emisor = "Usuario Slack"
+                origen = "slack"
 
             slack_messages.append({
                 "titulo": "Mensaje de Slack",
                 "mensaje": message.get("text", ""),
                 "emisor": emisor,
                 "fecha": fecha,
-                "origen": "slack"
+                "origen": origen
             })
 
         return {

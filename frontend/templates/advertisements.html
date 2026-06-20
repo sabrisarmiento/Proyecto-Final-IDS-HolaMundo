@@ -60,13 +60,14 @@
         <div class="advertisements-list" id="advertisements-container">
             {% if avisos %}
                 {% for aviso in avisos %}
-                <article class="advertisement-card" data-course="{{ aviso.id_curso }}">
+                <article class="advertisement-card {% if aviso.origen == 'panel_confirmado' %}panel-confirmado{% endif %}" data-course="{{ aviso.id_curso }}">
                     <div class="advertisement-card-header">
                         <span class="advertisement-date">{{ aviso.fecha }}</span>
                         <span class="advertisement-issuer">Publicado por: {{ aviso.emisor }}</span>
                     </div>
                     <h2 class="advertisement-card-title">{{ aviso.titulo }}</h2>
                     <p class="advertisement-card-message">{{ aviso.mensaje }}</p>
+                    <p>ORIGEN: {{ aviso.origen }}</p>
                     {% if session.get("token") and aviso.id_aviso %}
                         <div class="advertisement-actions">
                             <a 
