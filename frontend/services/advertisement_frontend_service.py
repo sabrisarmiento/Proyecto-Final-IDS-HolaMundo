@@ -22,23 +22,23 @@ def get_slack_advertisements():
     try:
         response = requests.get(f"{BASE_URL}/advertisements/slack")
 
-        #print(response.status_code)
-        #print(response.text)
+#         print(response.status_code)
+#         print(response.text)
    
-        if response.status_code == 200:
-            datos_api = response.json()
-            return datos_api.get("advertisements", [])
+#         if response.status_code == 200:
+#             datos_api = response.json()
+#             return datos_api.get("advertisements", [])
 
-        return []
+#         return []
 
-    except Exception as e:
-        print(f"Error: {e}")
-        return []
+#     except Exception as e:
+#         print(f"Error: {e}")
+#         return []
     
-def get_all_combined_advertisements(id_curso=None):
-    normal_advertisements = get_all_advertisements(id_curso)
-    slack_advertisements = get_slack_advertisements()
+# def get_all_combined_advertisements(id_curso=None):
+#     normal_advertisements = get_all_advertisements(id_curso)
+#     slack_advertisements = get_slack_advertisements(id_curso)
 
-    advertisements = normal_advertisements + slack_advertisements
+#     advertisements = normal_advertisements + slack_advertisements
 
-    return advertisements
+#     return advertisements

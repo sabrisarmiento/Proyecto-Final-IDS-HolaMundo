@@ -1,7 +1,7 @@
 from config import BASE_URL
 #borrar
 
-import requests
+# import requests
 
 def get_advertisements():
     try:

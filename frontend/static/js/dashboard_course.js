@@ -113,7 +113,7 @@
           {
             data: [regulares, en_riesgo, sin_datos],
             backgroundColor: [
-              CSS("--color-3") || "#92140C",
+              CSS("--color-9") || "#111D4A",
               CSS("--color-4") || "#C9867E",
               CSS("--color-6") || "#FFE4C5",
             ],
@@ -287,8 +287,8 @@
             {
               label: "Asistencia acumulada",
               data,
-              borderColor: CSS("--color-3") || "#92140C",
-              backgroundColor: "rgba(146,20,12,0.12)",
+              borderColor: CSS("--color-9") || "#111D4A",
+              backgroundColor: "rgba(17,29,74,0.12)",
               fill: true,
               tension: 0.3,
               pointRadius: 4,

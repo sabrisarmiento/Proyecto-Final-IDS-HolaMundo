@@ -250,22 +250,6 @@
   margin-top: 1.75rem;
 }
 
-.dash-attendance-top {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 1rem;
-}
-
-@media (max-width: 900px) {
-  .dash-attendance-top {
-    grid-template-columns: 1fr;
-  }
-}
-
-.dash-attendance-general {
-  justify-content: center;
-}
-
 .dash-attendance-controls {
   display: flex;
   align-items: center;

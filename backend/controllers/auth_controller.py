@@ -48,7 +48,7 @@ def login_user(data):
             "correo": user["correo"],
             "id_rol": user["id_rol"],
             "nivel":user["nivel_administracion"],
-            "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+            "exp": datetime.now(timezone.utc) + timedelta(hours=12)
         }, os.getenv("SECRET_KEY"), algorithm="HS256")
 
         return {
