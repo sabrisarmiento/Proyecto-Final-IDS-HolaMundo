@@ -104,20 +104,26 @@ function setupExportReports() {
     const alumnos = form.querySelector('input[name="alumnos"]').checked;
     const equipos = form.querySelector('input[name="equipos"]').checked;
     const notas = notasCheck && notasCheck.checked;
+    const asistencia = form.querySelector('input[name="asistencia"]')?.checked;
 
-    if (!alumnos && !equipos && !notas) {
+    if (!alumnos && !equipos && !notas && !asistencia) {
       showMessage(message, "Seleccioná al menos una sección.", true);
       return;
     }
 
     const params = new URLSearchParams();
     if (alumnos) params.append("alumnos", "1");
+    if (asistencia) params.append("asistencia", "1");
     if (equipos) params.append("equipos", "1");
     if (notas) {
       params.append("notas", "1");
       form
         .querySelectorAll('input[name="evaluaciones[]"]:checked')
         .forEach((cb) => params.append("evaluaciones[]", cb.value));
+      if (form.querySelector('input[name="mostrar_corrector"]')?.checked)
+        params.append("mostrar_corrector", "1");
+      if (form.querySelector('input[name="incluir_estado_final"]')?.checked)
+        params.append("incluir_estado_final", "1");
     }
 
     hideMessage(message);

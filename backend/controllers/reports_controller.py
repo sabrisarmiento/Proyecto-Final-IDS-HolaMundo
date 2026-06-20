@@ -83,9 +83,10 @@ def _add_teams_section(pdf, id_curso):
     return None
 
 
-def _add_marks_section(pdf, id_curso, evaluaciones=None):
+def _add_marks_section(pdf, id_curso, evaluaciones=None, mostrar_corrector=False, incluir_estado_final=False):
     sql = """
-        SELECT a.padron, a.apellido, a.nombre, t.nombre AS evaluacion, n.nota
+        SELECT a.id_alumno, a.padron, a.apellido, a.nombre, t.nombre AS evaluacion, n.nota,
+               n.corrector_nombre
         FROM notas n
         JOIN evaluaciones e ON n.id_evaluacion = e.id_evaluacion
         JOIN tipos_evaluacion t ON e.id_tipo = t.id_tipo
@@ -103,72 +104,106 @@ def _add_marks_section(pdf, id_curso, evaluaciones=None):
     sql += " ORDER BY a.apellido, a.nombre, t.nombre"
     notas = query_db(sql, params)
 
+    estado_por_alumno = {}
+    if incluir_estado_final:
+        cfg = query_db(
+            "SELECT es_promocionable FROM curso_promocion_config WHERE id_curso = %s",
+            (int(id_curso),)
+        )
+        es_promocionable = bool(cfg[0]["es_promocionable"]) if cfg else False
+
+        promedios = query_db(
+            """
+            SELECT a.id_alumno, AVG(n.nota) AS promedio
+            FROM notas n
+            JOIN evaluaciones e ON n.id_evaluacion = e.id_evaluacion
+            JOIN alumnos a ON n.id_alumno = a.id_alumno
+            WHERE e.id_curso = %s
+            GROUP BY a.id_alumno
+            """,
+            (int(id_curso),)
+        )
+        for row in promedios:
+            prom = float(row["promedio"]) if row["promedio"] is not None else 0
+            if es_promocionable:
+                if prom >= 7:
+                    estado = "Promociona"
+                elif prom >= 4:
+                    estado = "Final"
+                else:
+                    estado = "Recursa"
+            else:
+                estado = "Aprobado" if prom >= 4 else "Desaprobado"
+            estado_por_alumno[row["id_alumno"]] = estado
+
     filtro = ", ".join(evaluaciones) if evaluaciones else "todas las evaluaciones"
     _section_title(pdf, "Reporte de Notas", f"Curso ID {id_curso} - {filtro}")
-    rows = [
-        (n["padron"], f"{n['apellido']}, {n['nombre']}", n["evaluacion"], n["nota"])
-        for n in notas
-    ]
-    _table(pdf, ["Padrón", "Alumno", "Evaluación", "Nota"], [25, 75, 50, 25], rows)
+
+    headers = ["Padrón", "Alumno", "Evaluación", "Nota"]
+    widths  = [25, 65, 45, 20]
+    if mostrar_corrector:
+        headers.append("Corrector")
+        widths.append(35)
+    if incluir_estado_final:
+        headers.append("Estado")
+        widths.append(25)
+
+    rows = []
+    for n in notas:
+        row = [n["padron"], f"{n['apellido']}, {n['nombre']}", n["evaluacion"], n["nota"]]
+        if mostrar_corrector:
+            row.append(n.get("corrector_nombre") or "—")
+        if incluir_estado_final:
+            row.append(estado_por_alumno.get(n.get("id_alumno"), "—"))
+        rows.append(row)
+
+    _table(pdf, headers, widths, rows)
     return None
 
 
-# --- Endpoints individuales (Parte 3) ---
+def _add_attendance_section(pdf, id_curso):
+    alumnos = query_db(
+        "SELECT id_alumno, padron, apellido, nombre FROM alumnos WHERE id_curso = %s AND estado_alumno = 1 ORDER BY apellido, nombre",
+        (int(id_curso),)
+    )
+    if not alumnos:
+        return None
 
-def report_students_pdf(id_curso):
-    if not id_curso:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "Falta el parámetro curso_id"}
-    try:
-        pdf = _new_pdf()
-        err = _add_students_section(pdf, id_curso)
-        if err:
-            return err
-        return {"ok": True, "data": _pdf_bytes(pdf),
-                "filename": f"alumnos_curso_{id_curso}.pdf"}
-    except Exception as e:
-        return {"ok": False, "code": 500, "message": "Internal Server Error",
-                "description": str(e)}
+    ids = [a["id_alumno"] for a in alumnos]
+    clases = query_db(
+        "SELECT COUNT(*) AS total FROM clases WHERE id_curso = %s",
+        (int(id_curso),)
+    )
+    total_clases = clases[0]["total"] if clases else 0
 
+    fmt = ",".join(["%s"] * len(ids))
+    presencias = query_db(
+        f"SELECT id_alumno, COUNT(*) AS presentes FROM asistencia WHERE id_alumno IN ({fmt}) AND presente != 0 GROUP BY id_alumno",
+        ids
+    )
+    presencias_map = {r["id_alumno"]: r["presentes"] for r in presencias}
 
-def report_teams_pdf(id_curso):
-    if not id_curso:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "Falta el parámetro curso_id"}
-    try:
-        pdf = _new_pdf()
-        err = _add_teams_section(pdf, id_curso)
-        if err:
-            return err
-        return {"ok": True, "data": _pdf_bytes(pdf),
-                "filename": f"equipos_curso_{id_curso}.pdf"}
-    except Exception as e:
-        return {"ok": False, "code": 500, "message": "Internal Server Error",
-                "description": str(e)}
-
-
-def report_marks_pdf(id_curso, evaluaciones=None):
-    if not id_curso:
-        return {"ok": False, "code": 400, "message": "Bad Request",
-                "description": "Falta el parámetro curso_id"}
-    try:
-        pdf = _new_pdf()
-        _add_marks_section(pdf, id_curso, evaluaciones)
-        return {"ok": True, "data": _pdf_bytes(pdf),
-                "filename": f"notas_curso_{id_curso}.pdf"}
-    except Exception as e:
-        return {"ok": False, "code": 500, "message": "Internal Server Error",
-                "description": str(e)}
+    _section_title(pdf, "Asistencia por Alumno", f"Curso ID {id_curso}")
+    rows = []
+    for a in alumnos:
+        presentes = presencias_map.get(a["id_alumno"], 0)
+        pct = round(presentes / total_clases * 100, 1) if total_clases else 0
+        rows.append((a["padron"], f"{a['apellido']}, {a['nombre']}",
+                     f"{presentes}/{total_clases}", f"{pct}%"))
+    _table(pdf, ["Padrón", "Alumno", "Presencias", "%"], [25, 80, 30, 20], rows)
+    return None
 
 
-# --- Endpoint combinado (Parte 4): un solo PDF según lo seleccionado ---
+# --- Endpoint combinado: un solo PDF según lo seleccionado ---
 
 def report_combined_pdf(id_curso, incluir_alumnos, incluir_equipos,
-                        incluir_notas, evaluaciones=None):
+                        incluir_notas, evaluaciones=None,
+                        incluir_asistencia=False, mostrar_corrector=False,
+                        incluir_estado_final=False):
     if not id_curso:
         return {"ok": False, "code": 400, "message": "Bad Request",
                 "description": "Falta el parámetro curso_id"}
-    if not any([incluir_alumnos, incluir_equipos, incluir_notas]):
+    if not any([incluir_alumnos, incluir_equipos, incluir_notas, incluir_asistencia]):
         return {"ok": False, "code": 400, "message": "Bad Request",
                 "description": "Seleccioná al menos una sección para exportar"}
     try:
@@ -178,7 +213,11 @@ def report_combined_pdf(id_curso, incluir_alumnos, incluir_equipos,
             if err:
                 return err
         if incluir_notas:
-            err = _add_marks_section(pdf, id_curso, evaluaciones)
+            err = _add_marks_section(pdf, id_curso, evaluaciones, mostrar_corrector, incluir_estado_final)
+            if err:
+                return err
+        if incluir_asistencia:
+            err = _add_attendance_section(pdf, id_curso)
             if err:
                 return err
         if incluir_equipos:

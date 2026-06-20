@@ -35,7 +35,7 @@ def exportar_informes(course_id):
         return redirect(url_for('auth.login'))
 
     params = [('curso_id', course_id)]
-    for seccion in ('alumnos', 'equipos', 'notas'):
+    for seccion in ('alumnos', 'equipos', 'notas', 'asistencia', 'mostrar_corrector', 'incluir_estado_final'):
         if request.args.get(seccion) in ('1', 'true', 'on'):
             params.append((seccion, '1'))
     for ev in request.args.getlist('evaluaciones[]'):
