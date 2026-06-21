@@ -1,3 +1,15 @@
+{% macro dropdown_profile_welcome(user) %}
+<div class="dropdown">
+  <button type="button" class="dropdown-btn" onclick="toggleDropdown('dropdown-menu')">
+    Bienvenido, {{ user["nombre"] }}
+  </button>
+  <div class="dropdown-menu" id="dropdown-menu">
+    <a href="#" onclick="toggleDropdown('dropdown-menu'); openModal('profile-modal'); return false;">Perfil</a>
+    <a href="{{ url_for('login.logout') }}">Cerrar sesion</a>
+  </div>
+</div>
+{% endmacro %}
+
 {% macro dropdown_profile(user) %}
 <div class="dropdown">
   <button type="button" class="dropdown-btn" onclick="toggleDropdown('dropdown-menu')">
