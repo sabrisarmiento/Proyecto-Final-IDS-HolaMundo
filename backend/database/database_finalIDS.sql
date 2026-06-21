@@ -39,6 +39,7 @@ CREATE TABLE cursos (
     slack_url VARCHAR(500),
     youtube_url VARCHAR (500),
     regimen_aprobacion TEXT,
+    estado VARCHAR(50),
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 );

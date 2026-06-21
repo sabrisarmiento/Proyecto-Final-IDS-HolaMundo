@@ -259,13 +259,24 @@
   color: var(--color-9);
 }
 
-.course-status-badge {
+.course-status-badge-active {
   display: inline-block;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   background: #dcfce7;
   color: #166534;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+}
+
+.course-status-badge-inactive {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: #ffd8d8;
+  color: #651616;
   padding: 0.15rem 0.6rem;
   border-radius: 999px;
 }
