@@ -129,6 +129,32 @@ def update_course_config(course_id):
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
 
 
+@courses_bp.route('/cursos/<int:course_id>/temas', methods=['POST'])
+def update_temas(course_id):
+    token = get_token()
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+
+    id_materia = request.form.get('id_materia')
+    nombres = request.form.getlist('temas_nombre[]')
+    iconos = request.form.getlist('temas_icono[]')
+    temas = [{"nombre": n, "icono": i} for n, i in zip(nombres, iconos) if n.strip()]
+
+    try:
+        requests.put(
+            f'{BACKEND_URL}/subjects/{id_materia}/temas',
+            json={"temas": temas},
+            headers=auth_headers()
+        )
+        session['config_msg'] = 'Temas actualizados correctamente'
+        session['config_ok'] = True
+    except Exception as e:
+        session['config_msg'] = f'Error al actualizar temas: {e}'
+        session['config_ok'] = False
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
+
+
 @courses_bp.route('/cursos/<int:course_id>/materiales', methods=['POST'])
 def create_material_view(course_id):
     data = {
