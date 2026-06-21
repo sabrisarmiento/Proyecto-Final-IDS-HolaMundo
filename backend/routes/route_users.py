@@ -42,10 +42,15 @@ def create_user():
 
 @users_bp.route("/users/<int:id_user>",methods=["PATCH"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
 def patch_user(id_user):
     data = request.get_json()
     logged_user = request.user
+    
+    if logged_user.get("id_usuario") != id_user:
+        nivel = logged_user.get("nivel")
+        if nivel is None or nivel < NIVEL_PROFESOR:
+            from helpers.responses import error_response
+            return error_response({"code": 403, "message": "Forbidden", "description": "No tienes permisos"})
     return patch_user_service(id_user, data, logged_user)
 
 
