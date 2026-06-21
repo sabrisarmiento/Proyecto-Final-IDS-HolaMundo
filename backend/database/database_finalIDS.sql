@@ -141,7 +141,7 @@ CREATE TABLE asistencia (
     presente BOOLEAN DEFAULT FALSE,
     UNIQUE (id_alumno, id_clase),
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_clase) REFERENCES clases(id_clase)
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) ON DELETE CASCADE
 );
 
 -- avisos --
