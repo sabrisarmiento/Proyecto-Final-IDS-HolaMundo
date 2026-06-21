@@ -38,6 +38,7 @@ def calendar():
     'calendar.html',
     active_page='calendar',
     selected_subject=int(view) if view else None,
+    selected_curso=int(request.args.get('curso')) if request.args.get('curso') else None,
     subjects=subjects,
     schedule=schedule,
     courses=courses
