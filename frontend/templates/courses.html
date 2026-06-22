@@ -171,7 +171,7 @@
     <article class="course" onclick="window.location.href='/cursos/{{ course.id_curso }}'">
       <div class="course-header">
         <span class="course-id">#{{ course.id_curso }}</span>
-        {% if course.estado == "Activo" %}
+        {% if course.estado %}
           <span class="course-status-badge-active">Activo</span>
         {% else %}
           <span class="course-status-badge-inactive">Inactivo</span>

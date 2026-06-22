@@ -130,6 +130,7 @@ def update_course_config(course_id):
         'slack_url': request.form.get('slack_url', '').strip(),
         'youtube_url': request.form.get('youtube_url', '').strip(),
         'regimen_aprobacion': request.form.get('regimen_aprobacion', '').strip(),
+        'estado': request.form.get('estado') == 'on',
     }   
 
     try:
