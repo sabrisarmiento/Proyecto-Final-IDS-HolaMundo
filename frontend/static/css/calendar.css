@@ -4,6 +4,10 @@
     display: none;
 }
 
+.hidden {
+    display: none;
+}
+
 #msg-select-course {
     display: block;
     color: var(--color-8);
@@ -135,6 +139,7 @@
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
 }
 
 .class article:last-of-type {
@@ -172,4 +177,15 @@
     font-weight: 600;
     text-transform: capitalize;
     width: fit-content;
+}
+
+.class article small {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 0.75rem;
+    color: var(--color-8);
+    opacity: 0.8;
+    background: transparent;
+    padding: 0;
 }
