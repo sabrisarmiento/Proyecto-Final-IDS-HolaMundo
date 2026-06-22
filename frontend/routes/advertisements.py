@@ -1,8 +1,6 @@
 from config import BASE_URL
 from flask import Blueprint, render_template, request, session, redirect, url_for
 import requests
-#from services.advertisement_frontend_service import AdvertisementFrontendService
-#from services.slack_advertisement_frontend_service import SlackAdvertisementFrontendService
 from services.subjects_service import get_subjects
 from services.advertisements_service import (
     get_all_combined_advertisements, get_advertisements_by_subject, get_advertisements_by_course,
@@ -23,31 +21,6 @@ def public_advertisements():
   courses = []
   subjects = get_subjects()
 
-  # if view is not None:
-  #   try:
-  #     all_courses = get_courses()
-
-  #     subject = next((s for s in subjects if s["id_materia"] == int(view)), None)
-  #     subject_name = subject.get("nombre") if subject else None
-
-  #     courses = [c for c in all_courses if c.get("materia") == subject_name]
-  #     print("COURSES EN /AVISOS:", courses)
-
-  #     if selected_course:
-  #       id_course = int(selected_course)
-
-  #       if source == "panel":
-  #         avisos = get_advertisements_by_course(id_course)
-  #       elif source == "slack":
-  #         avisos = get_slack_advertisements_by_course(id_course)
-  #       else:
-  #         avisos = get_all_combined_advertisements(id_course)
-
-  #     else:
-  #       avisos = get_advertisements_by_subject(int(view))
-
-  #   except Exception as e:
-  #     print(f"Error al obtener avisos para la materia {view}: {e}")
   course_detail = None
 
   if view is not None:
@@ -136,75 +109,6 @@ def create_advertisement_front(id_curso):
     "create_advertisement.html",
     id_curso=id_curso
   )
-
-# @advertisements_bp.route("/cursos/<int:id_curso>/slack/conectar")
-# def connect_slack_front(id_curso):
-#     token = session.get("token")
-
-#     if not token:
-#         return redirect(url_for("landing.landing") + "?error=Debes iniciar sesión")
-    
-#     response = requests.get(
-#         f"{BASE_URL}/slack/install/{id_curso}",
-#         headers={
-#             "Authorization": f"Bearer {token}"
-#         },
-#         allow_redirects=False
-#     )
-
-#     if response.status_code in [301, 302]:
-#         return redirect(response.headers["Location"])
-
-#     return redirect(url_for("courses.course_detail", course_id=id_curso) + "?tab=ads")
-
-# @advertisements_bp.route('/avisos/slack')
-# def slack_advertisements():
-
-#     id_curso = session.get("selected_course", 1)
-
-#     avisos = SlackAdvertisementFrontendService.get_all()
-
-#     cursos = course_get_all()
-
-#     return render_template(
-#         "advertisements.html",
-#         avisos=avisos,
-#         cursos=cursos,
-#         selected_course=id_curso,
-#         active_page="advertisements"
-#     )
-
-# aca hay uno importante
-# @advertisements_bp.route('/avisos')
-# def public_advertisements():
-#   view = request.args.get("subject")
-#   avisos = []
-#   courses = []
-#   subjects = get_subjects()
-
-#   if view is not None:
-#     try:
-#       avisos = get_advertisements_by_subject(int(view))
-#       all_courses = get_courses()
-
-#       subject = next((s for s in subjects if s["id_materia"] == int(view)), None)
-#       subject_name = subject.get("nombre") if subject else None
-
-#       courses = [c for c in all_courses if c.get("materia") == subject_name]
-
-#     except Exception as e:
-#       print(f"Error al obtener avisos para la materia {view}: {e}")
-
-#   print("courses", courses)
-
-#   return render_template(
-#     "advertisements.html",
-#     active_page="advertisements",
-#     selected_subject=int(view) if view else None,
-#     subjects=subjects,
-#     avisos=avisos,
-#     courses=courses
-#   )
 
 @advertisements_bp.route("/cursos/<int:id_curso>/slack/configurar", methods=["GET", "POST"])
 def configure_slack_front(id_curso):

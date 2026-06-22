@@ -313,10 +313,6 @@ def course_detail(course_id):
 
     pending_team_change = session.get("pending_team_change")
 
-    # try:
-    #     advertisements = get_advertisements_by_course(course_id)
-    # except Exception:
-    #     advertisements = []
     source = request.args.get("source", "all")
 
     try:

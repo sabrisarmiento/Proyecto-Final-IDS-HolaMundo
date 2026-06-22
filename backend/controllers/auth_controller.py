@@ -103,7 +103,6 @@ def change_password(data, id_usuario):
             }
 
         user = result[0]
-        #para cambiar la contraseña el usuario debe saber la contraseña anterior.
         if not check_password_hash(user["contraseña"], current_password):
             return {
                 "ok": False,
@@ -143,56 +142,3 @@ def change_password(data, id_usuario):
             "message": "Internal Server Error",
             "description": str(e)
         }
-
-
-#def register_user(data):
-#    try:
-#        nombre = data.get("nombre")
-#        apellido = data.get("apellido")
-#        correo = data.get("correo")
-#        contrasenia = data.get("contraseña")
-#        id_rol = data.get("id_rol")
-
-#        if not nombre or not apellido or not correo or not contrasenia or not id_rol:
-#            return {
-#                "ok": False,
-#                "code": 400,
-#                "message": "Bad Request",
-#                "description": "Nombre, apellido, correo, contraseña e id_rol son obligatorios"
-#            }
-
-#        existing_user = query_db(
-#            "SELECT id_usuario FROM usuarios WHERE correo = %s",
-#            (correo,)
-#        )
-
-#        if existing_user:
-#            return {
-#                "ok": False,
-#                "code": 409,
-#                "message": "Conflict",
-#                "description": "Ya existe un usuario con ese correo"
-#            }
-
-#        contrasenia_hash = generate_password_hash(contrasenia)
-
-#        sql = """
-#            INSERT INTO usuarios (nombre, apellido, correo, contraseña, id_rol)
-#            VALUES (%s, %s, %s, %s, %s)
-#        """
-
-#       modify_db(sql, (nombre, apellido, correo, contrasenia_hash, id_rol))
-
-#        return {
-#            "ok": True,
-#            "message": "Usuario registrado con éxito"
-#        }
-
-#    except Exception as e:
-#        return {
-#            "ok": False,
-#            "code": 500,
-#            "message": "Internal Server Error",
-#            "description": str(e)
-#        }
-    
