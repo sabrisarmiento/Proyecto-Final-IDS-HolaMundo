@@ -3,6 +3,7 @@ from services.subject_service import (
   subjects_service,
   subject_service,
   get_topics_service,
+  replace_temas_service,
   create_subject_service,
   patch_subject_service,
   delete_subject_service,
@@ -11,7 +12,6 @@ from services.subject_service import (
   assign_professor_to_subject_service,
   remove_professor_from_subject_service,
   get_subjects_assigned_to_professor_service
-  
 )
 from middleware.auth_middleware import require_auth, require_min_admin_level
 from helpers.constants import NIVEL_SUPERADMIN, NIVEL_PROFESOR
@@ -41,6 +41,14 @@ def get_subject(subject_id):
 @subjects_bp.route('/subjects/<int:subject_id>/temas', methods=['GET'])
 def get_subject_topics(subject_id):
     return get_topics_service(subject_id)
+
+@subjects_bp.route('/subjects/<int:subject_id>/temas', methods=['PUT'])
+@require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
+def replace_subject_topics(subject_id):
+    data = request.get_json()
+    temas = data.get("temas", []) if data else []
+    return replace_temas_service(subject_id, temas)
 
 @subjects_bp.route('/subjects', methods=['POST'])
 @require_auth

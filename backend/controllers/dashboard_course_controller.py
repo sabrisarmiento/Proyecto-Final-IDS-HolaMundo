@@ -110,7 +110,7 @@ def get_course_dashboard(id_curso):
                 notas_por_alumno_eval.setdefault(n["id_alumno"], {})[n["id_evaluacion"]] = float(n["nota"])
 
         clases = query_db(
-            "SELECT id_clase FROM clases WHERE id_curso = %s",
+            "SELECT id_clase, fecha, temas FROM clases WHERE id_curso = %s ORDER BY fecha ASC, id_clase ASC",
             (id_curso,)
         )
         total_clases = len(clases)
@@ -118,6 +118,7 @@ def get_course_dashboard(id_curso):
         pct_asistencia_por_alumno = {}
         asistencia_stats = {"regulares": 0, "en_riesgo": 0, "sin_datos": 0}
         attendance_by_student = []
+        presentes_pares = []
 
         if total_clases > 0 and ids_activos:
             fmt = ",".join(["%s"] * len(ids_activos))
@@ -132,6 +133,16 @@ def get_course_dashboard(id_curso):
             )
             presencias_map = {r["id_alumno"]: r["presentes"] for r in presencias}
             names_map = {a["id_alumno"]: a for a in activos}
+
+            presentes_raw = query_db(
+                f"""
+                SELECT id_alumno, id_clase
+                FROM asistencia
+                WHERE id_alumno IN ({fmt}) AND presente != 0
+                """,
+                ids_activos
+            )
+            presentes_pares = [[r["id_alumno"], r["id_clase"]] for r in presentes_raw]
 
             for aid in ids_activos:
                 presentes = presencias_map.get(aid, 0)
@@ -200,6 +211,10 @@ def get_course_dashboard(id_curso):
                 else:
                     recursantes += 1
 
+        presentes_totales = len(presentes_pares)
+        posibles_totales = total_clases * len(ids_activos)
+        asistencia_general_pct = round(presentes_totales / posibles_totales * 100, 1) if posibles_totales else 0
+
         return {
             "ok": True,
             "data": {
@@ -229,6 +244,20 @@ def get_course_dashboard(id_curso):
                     "umbral": umbral_asistencia,
                 },
                 "asistencia_detalle": attendance_by_student,
+                "asistencia_general": {
+                    "porcentaje": asistencia_general_pct,
+                    "presentes":  presentes_totales,
+                    "posibles":   posibles_totales,
+                },
+                "clases_list": [
+                    {"id_clase": c["id_clase"], "fecha": c["fecha"], "temas": c["temas"]}
+                    for c in clases
+                ],
+                "alumnos_list": [
+                    {"id_alumno": a["id_alumno"], "nombre": a["nombre"], "apellido": a["apellido"]}
+                    for a in activos
+                ],
+                "presentes": presentes_pares,
                 "es_promocionable":   es_promocionable,
             }
         }

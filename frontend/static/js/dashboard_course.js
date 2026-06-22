@@ -113,7 +113,7 @@
           {
             data: [regulares, en_riesgo, sin_datos],
             backgroundColor: [
-              CSS("--color-3") || "#92140C",
+              CSS("--color-9") || "#111D4A",
               CSS("--color-4") || "#C9867E",
               CSS("--color-6") || "#FFE4C5",
             ],
@@ -192,6 +192,134 @@
     });
   }
 
+  function renderAsistenciaClase(d) {
+    const select = document.getElementById("dash-asist-clase");
+    const countEl = document.getElementById("dash-asist-clase-count");
+    const listEl = document.getElementById("dash-asist-clase-lista");
+    if (!select || !listEl) return;
+
+    const clases = d.clases_list || [];
+    const alumnos = d.alumnos_list || [];
+    const presentes = d.presentes || [];
+
+    select.innerHTML = clases
+      .map((c) => `<option value="${c.id_clase}">${c.fecha} — ${c.temas || "Clase " + c.id_clase}</option>`)
+      .join("");
+
+    function render() {
+      const idClase = parseInt(select.value, 10);
+      const checked = document.querySelector("input[name='asist-clase-filtro']:checked");
+      const filtro = checked ? checked.value : "all";
+      const presentSet = new Set(presentes.filter((p) => p[1] === idClase).map((p) => p[0]));
+
+      let presentCount = 0;
+      const rows = alumnos.map((a) => {
+        const presente = presentSet.has(a.id_alumno);
+        if (presente) presentCount += 1;
+        return { a, presente };
+      });
+
+      countEl.textContent = `${presentCount} / ${alumnos.length} presentes`;
+
+      const visibles = rows.filter((r) =>
+        filtro === "all" ? true : filtro === "present" ? r.presente : !r.presente
+      );
+
+      listEl.innerHTML = visibles.length
+        ? visibles
+            .map((r) => {
+              const cls = r.presente ? "dash-asist-badge--ok" : "dash-asist-badge--risk";
+              const txt = r.presente ? "Presente" : "Ausente";
+              return `<li class="dash-attendance-item"><span>${r.a.apellido}, ${r.a.nombre}</span><span class="dash-asist-badge ${cls}">${txt}</span></li>`;
+            })
+            .join("")
+        : `<li class="dash-attendance-empty">Sin alumnos para este filtro</li>`;
+    }
+
+    if (clases.length) select.value = clases[clases.length - 1].id_clase;
+    select.addEventListener("change", render);
+    document
+      .querySelectorAll("input[name='asist-clase-filtro']")
+      .forEach((el) => el.addEventListener("change", render));
+    render();
+  }
+
+  function renderAsistenciaAlumno(d) {
+    const select = document.getElementById("dash-asist-alumno");
+    const canvas = document.getElementById("chart-asist-alumno");
+    const pctEl = document.getElementById("dash-asist-alumno-pct");
+    const presEl = document.getElementById("dash-asist-alumno-presentes");
+    if (!select || !canvas) return;
+
+    const clases = d.clases_list || [];
+    const alumnos = d.alumnos_list || [];
+    const detalle = d.asistencia_detalle || [];
+    const presentSet = new Set((d.presentes || []).map((p) => p[0] + "-" + p[1]));
+
+    select.innerHTML = alumnos
+      .map((a) => `<option value="${a.id_alumno}">${a.apellido}, ${a.nombre}</option>`)
+      .join("");
+
+    let chart = null;
+
+    function render() {
+      const idAlumno = parseInt(select.value, 10);
+      const info = detalle.find((x) => x.id_alumno === idAlumno);
+      if (pctEl) pctEl.textContent = info ? info.porcentaje + "%" : "—";
+      if (presEl) presEl.textContent = info ? `${info.presentes} / ${info.total_clases}` : "—";
+
+      let acumulado = 0;
+      const labels = clases.map((c) => c.fecha);
+      const data = clases.map((c, i) => {
+        if (presentSet.has(idAlumno + "-" + c.id_clase)) acumulado += 1;
+        return Math.round((acumulado / (i + 1)) * 100);
+      });
+      const puntos = clases.map((c) =>
+        presentSet.has(idAlumno + "-" + c.id_clase) ? "#16a34a" : CSS("--color-4") || "#C9867E"
+      );
+
+      if (chart) chart.destroy();
+      chart = new Chart(canvas, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Asistencia acumulada",
+              data,
+              borderColor: CSS("--color-9") || "#111D4A",
+              backgroundColor: "rgba(17,29,74,0.12)",
+              fill: true,
+              tension: 0.3,
+              pointRadius: 4,
+              pointBackgroundColor: puntos,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.y}% acumulado` } },
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: 100,
+              ticks: { stepSize: 25, callback: (v) => v + "%" },
+              grid: { color: "rgba(0,0,0,0.06)" },
+            },
+            x: { grid: { display: false } },
+          },
+        },
+      });
+    }
+
+    select.addEventListener("change", render);
+    if (alumnos.length) render();
+  }
+
   window.addEventListener("DOMContentLoaded", function () {
     const dataEl = document.getElementById("dash-curso-data");
     if (!dataEl) return;
@@ -208,6 +336,8 @@
     renderBarChart(d.evaluaciones);
     renderAsistenciaChart(d.asistencia);
     renderEstadoChart(d.clasificacion, d.es_promocionable);
+    renderAsistenciaClase(d);
+    renderAsistenciaAlumno(d);
 
     const loading = document.getElementById("dash-curso-loading");
     const content = document.getElementById("dash-curso-content");

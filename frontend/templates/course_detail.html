@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/course_marks_table.css') }}"/>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/materials.css') }}"/>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/advertisements.css') }}"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 
@@ -81,10 +82,32 @@
           </button>
         </form>
       </div>
+      <div class="ads-filter">
+        <label for="select-source-dashboard">Ver avisos:</label>
+
+        <select id="select-source-dashboard">
+          <option value="all" {% if source == "all" %}selected{% endif %}>
+            Panel FIUBA + Slack
+          </option>
+
+          <option value="panel" {% if source == "panel" %}selected{% endif %}>
+            Solo Panel FIUBA
+          </option>
+
+          <option value="slack" {% if source == "slack" %}selected{% endif %}>
+            Solo Slack
+          </option>
+        </select>
+      </div>
       {% if advertisements %}
         <div class="advertisements-list">
           {% for aviso in advertisements %}
-            <article class="advertisement-card">
+            <article class="
+              advertisement-card
+              {% if aviso.origen == 'slack' %}origen-slack{% endif %}
+              {% if aviso.origen == 'panel_confirmado' %}origen-panel-confirmado{% endif %}
+              {% if aviso.origen == 'panel' or not aviso.origen %}origen-panel{% endif %}
+            ">
               <div class="advertisement-card-header">
                 <span>{{ aviso.fecha }}</span>
                 <span>Publicado por: {{ aviso.emisor }}</span>
@@ -161,4 +184,5 @@
 <script src="{{ url_for('static', filename='js/course_detail.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dashboard_course.js') }}"></script>
 <script src="{{ url_for('static', filename='js/course_reports.js') }}"></script>
+<script src="{{ url_for('static', filename='js/config_tab.js') }}"></script>
 {% endblock %}

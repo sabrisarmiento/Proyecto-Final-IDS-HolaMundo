@@ -1,3 +1,4 @@
+from config import BASE_URL
 from flask import Blueprint, request, redirect, url_for, session
 import requests
 
@@ -9,7 +10,7 @@ def login():
   contraseña = request.form.get('contraseña')
 
   try:
-    response = requests.post('http://127.0.0.1:5000/login', json={  # requests (librería)
+    response = requests.post(f"{BASE_URL}/login", json={  # requests (librería)
       "correo": correo,
       "contraseña": contraseña
     })
@@ -22,7 +23,9 @@ def login():
       session['user'] = data['user']
       return redirect(url_for('dashboard.dashboard'))
     else:
-      return redirect(url_for('landing.landing') + '?error=Error de conexión')
+      errors = data.get('errors') or [{}]
+      msg = errors[0].get('description', 'Credenciales inválidas')
+      return redirect(url_for('landing.landing') + f'?error={msg}')
 
   except Exception:
     return redirect(url_for('landing.landing') + '?error=Error de conexión')

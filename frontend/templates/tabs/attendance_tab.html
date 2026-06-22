@@ -6,51 +6,34 @@
   {% endif %}
 {% endwith %}
 
-<div class="attendance-actions">
-  <form method="GET" class="field">
-    <input type="hidden" name="tab" value="attendance">
-    <span class="field-label">Clase</span>
-    <select name="clase" class="field-select" onchange="this.form.submit()">
-      <option value="" disabled {% if not class_id %}selected{% endif %}>Elegí una clase…</option>
-      {% for cl in clases %}
-        <option value="{{ cl.id_clase }}" {% if cl.id_clase|string == class_id %}selected{% endif %}>
-          Clase {{ cl.id_clase }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}
-        </option>
-      {% endfor %}
-    </select>
-  </form>
+<section class="dash-attendance">
 
-  {% if class_id %}
-  <form method="POST" action="{{ url_for('attendance.generate_qr_view') }}">
-    <input type="hidden" name="id_clase" value="{{ class_id }}">
-    <input type="hidden" name="course_id" value="{{ course_id }}">
-    <label>Validez del QR:
-      <input type="number" name="horas" min="0" max="24" value="3"> h
-      <input type="number" name="minutos" min="0" max="59" value="0"> min
-    </label>
-    <button type="submit" class="btn-qr"><span class="btn-qr-icon">▦</span> Generar QR</button>
-  </form>
-  {% endif %}
-</div>
+  <div class="dash-chart-card dash-attendance-clase">
+    <h4 class="dash-chart-title">Presentes por clase</h4>
+    <div class="dash-attendance-controls">
+      <select id="dash-asist-clase" class="dash-select"></select>
+      <span id="dash-asist-clase-count" class="dash-attendance-count">—</span>
+    </div>
+    <div class="dash-attendance-filtros">
+      <label><input type="radio" name="asist-clase-filtro" value="all" checked /> Todos</label>
+      <label><input type="radio" name="asist-clase-filtro" value="present" /> Presentes</label>
+      <label><input type="radio" name="asist-clase-filtro" value="absent" /> Ausentes</label>
+    </div>
+    <ul id="dash-asist-clase-lista" class="dash-attendance-lista"></ul>
+  </div>
 
-{% if class_id %}
-<div class="attendance-table-wrap">
-  <table class="attendance-table">
-    <thead><tr><th>Alumno</th><th>Clase</th><th>Presente</th></tr></thead>
-    <tbody>
-      {% for record in attendance %}
-        <tr>
-          <td>{{ record.id_alumno }}</td>
-          <td>{{ record.id_clase }}</td>
-          <td>
-            {% if record.presente %}<span class="status status-present">Presente</span>
-            {% else %}<span class="status status-absent">Ausente</span>{% endif %}
-          </td>
-        </tr>
-      {% else %}
-        <tr><td colspan="3">No hay registros todavía. Generá los QR para que los alumnos den el presente.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% endif %}
+  <div class="dash-chart-card dash-chart-card--wide">
+    <h4 class="dash-chart-title">Asistencia por alumno</h4>
+    <div class="dash-attendance-controls">
+      <select id="dash-asist-alumno" class="dash-select"></select>
+      <span class="dash-attendance-count">
+        <strong id="dash-asist-alumno-presentes">—</strong> presentes ·
+        <strong id="dash-asist-alumno-pct">—</strong>
+      </span>
+    </div>
+    <div class="dash-chart-wrap" style="height:220px;">
+      <canvas id="chart-asist-alumno"></canvas>
+    </div>
+  </div>
+
+</section>

@@ -47,7 +47,7 @@ def get_class_id(id_clase):
         query = """
             SELECT
                 c.id_clase, c.fecha, c.temas, c.tipo, c.modalidad, c.semana, c.id_curso,
-                DATE_FORMAT(c.qr_valido_hasta, '%H:%i') AS qr_vence,
+                DATE_FORMAT(c.asistencia_valida_hasta, '%H:%i') AS asistencia_vence,
                 cur.catedra,
                 m.nombre AS materia,
                 (SELECT COUNT(*) FROM clases c2

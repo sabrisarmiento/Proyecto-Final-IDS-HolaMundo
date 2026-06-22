@@ -7,7 +7,13 @@
 
         <!-- Form de datos de usuario -->
         <div id="perfil-view" class="profile-pane">
-          <form id="perfil-form">
+          {% with msgs = get_flashed_messages(with_categories=true, category_filter=['perfil_ok', 'perfil_error']) %}
+            {% for cat, msg in msgs %}
+              <p class="form-message {% if cat == 'perfil_ok' %}form-message-ok{% else %}form-message-error{% endif %}">{{ msg }}</p>
+            {% endfor %}
+          {% endwith %}
+          <form id="perfil-form" action="{{ url_for('profile.update_profile') }}" method="POST">
+            <input type="hidden" name="next" value="{{ request.path }}">
             <label for="perfil-nombre">Nombre</label>
             <input type="text" id="perfil-nombre" name="nombre" value="{{ perfil['nombre'] }}" required>
 
@@ -15,7 +21,6 @@
             <input type="email" id="perfil-correo" name="correo" value="{{ perfil['correo'] }}" required>
 
             <button type="submit" id="perfil-submit" disabled>Guardar cambios</button>
-            <p id="perfil-message" class="form-message" hidden></p>
           </form>
           <button type="button" class="link-button link-change" onclick="showPasswordView()">Cambiar mi contraseña</button>
         </div>
@@ -23,7 +28,13 @@
         <!-- Form de cambio de contraseña -->
         <div id="password-view" class="profile-pane">
           <button type="button" class="link-button link-back" onclick="showProfileView()">← Volver</button>
-          <form id="password-form">
+          {% with msgs = get_flashed_messages(with_categories=true, category_filter=['password_ok', 'password_error']) %}
+            {% for cat, msg in msgs %}
+              <p class="form-message {% if cat == 'password_ok' %}form-message-ok{% else %}form-message-error{% endif %}">{{ msg }}</p>
+            {% endfor %}
+          {% endwith %}
+          <form id="password-form" action="{{ url_for('profile.change_password') }}" method="POST">
+            <input type="hidden" name="next" value="{{ request.path }}">
             <label for="pw-current">Contraseña actual</label>
             <div class="input-eye">
               <input type="password" id="pw-current" name="current_password" required>
@@ -50,7 +61,6 @@
             </ul>
 
             <button type="submit" id="pw-submit" disabled>Cambiar contraseña</button>
-            <p id="pw-message" class="form-message" hidden></p>
           </form>
         </div>
 

@@ -1,9 +1,10 @@
+from config import BASE_URL
 from flask import render_template, request, redirect, url_for, session
 import requests
 
 from . import courses_bp
 from .common import BACKEND_URL, get_token
-from services.advertisements_service import get_advertisements_by_course
+from services.advertisements_service import get_advertisements_by_course, get_all_combined_advertisements, get_slack_advertisements_by_course
 from services.courses_service import get_course_by_id
 from services.students_services import post_student
 from services.exams_service import get_exams_by_course_id
@@ -109,7 +110,7 @@ def course_detail(course_id):
         if request.form.get("delete_team"):
             team_id = request.form.get("delete_team")
             try:
-                requests.delete(f"http://127.0.0.1:5000/equipos/{team_id}", headers=headers)
+                requests.delete(f"{BASE_URL}/equipos/{team_id}", headers=headers)
             except Exception as e:
                 print(f"Error deleting team: {e}")
             return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
@@ -193,7 +194,7 @@ def course_detail(course_id):
         if order:
             params['order'] = order
 
-        students_res  = requests.get(f'http://127.0.0.1:5000/students_with_notes', params=params, headers=headers)
+        students_res  = requests.get(f'{BASE_URL}/students_with_notes', params=params, headers=headers)
         response_data = students_res.json()
         students_data = response_data.get('data') or response_data.get('students') or []
         total         = response_data.get('total', len(students_data))
@@ -205,7 +206,7 @@ def course_detail(course_id):
     filtro_tipo=request.args.get("tipo")
     id_clase_editar = request.args.get("editar", type=int)
     try:
-        clases_res  = requests.get(f'http://127.0.0.1:5000/clases?id_curso={course_id}')
+        clases_res  = requests.get(f'{BASE_URL}/clases?id_curso={course_id}')
         clases_json = clases_res.json()
         clases      = clases_json.get("classes", [])
         if filtro_modalidad:
@@ -215,6 +216,7 @@ def course_detail(course_id):
     except Exception as e:
         print(e)
         clases = []
+    
 
     class_id_sel = request.args.get('clase')
     attendance_records = []
@@ -293,7 +295,7 @@ def course_detail(course_id):
     total_pages = max(1, (total + per_page - 1) // per_page)
 
     try:
-        teams_res = requests.get(f'http://127.0.0.1:5000/equipos?id_curso={course_id}', headers=headers)
+        teams_res = requests.get(f'{BASE_URL}/equipos?id_curso={course_id}', headers=headers)
         teams_json = teams_res.json()
         teams = teams_json.get("teams") or teams_json.get("data") or []
     except Exception as e:
@@ -301,7 +303,7 @@ def course_detail(course_id):
         teams = []
 
     try:
-        promo_res  = requests.get(f'http://127.0.0.1:5000/cursos/{course_id}/promocion', headers=headers)
+        promo_res  = requests.get(f'{BASE_URL}/cursos/{course_id}/promocion', headers=headers)
         promo_data = promo_res.json().get('config', {})
         curso_es_promocionable  = promo_data.get('es_promocionable', False)
         curso_cuenta_asistencia = promo_data.get('cuenta_asistencia', False)
@@ -321,13 +323,27 @@ def course_detail(course_id):
 
     pending_team_change = session.get("pending_team_change")
 
+    # try:
+    #     advertisements = get_advertisements_by_course(course_id)
+    # except Exception:
+    #     advertisements = []
+    source = request.args.get("source", "all")
+
     try:
-        advertisements = get_advertisements_by_course(course_id)
+        if source == "panel":
+            advertisements = get_advertisements_by_course(course_id)
+
+        elif source == "slack":
+            advertisements = get_slack_advertisements_by_course(course_id)
+
+        else:
+            advertisements = get_all_combined_advertisements(course_id)
+
     except Exception:
         advertisements = []
 
     try:
-        dash_res  = requests.get(f'http://127.0.0.1:5000/cursos/{course_id}/dashboard', headers=headers)
+        dash_res  = requests.get(f'{BASE_URL}/cursos/{course_id}/dashboard', headers=headers)
         dash_data = dash_res.json().get('dashboard', {}) if dash_res.ok else {}
     except Exception:
         dash_data = {}
@@ -343,6 +359,14 @@ def course_detail(course_id):
             s["pct_asistencia"] = ""
 
     materiales = get_materials_by_course(course_id) if active_tab == 'materials' else []
+
+    temas = []
+    if active_tab == 'config' and course.get('id_materia'):
+        try:
+            temas_res = requests.get(f'{BACKEND_URL}/subjects/{course["id_materia"]}/temas')
+            temas = temas_res.json().get("topics", []) if temas_res.ok else []
+        except Exception:
+            pass
 
     try:
         me_res = requests.get(f'{BACKEND_URL}/me', headers=headers)
@@ -382,12 +406,14 @@ def course_detail(course_id):
         promo_config=promo_config,
         pending_team_change=pending_team_change,
         advertisements=advertisements,
+        source=source,
         config_msg=session.pop('config_msg', None),
         config_ok=session.pop('config_ok', False),
         dash_data=dash_data,
         current_user_name=current_user_name,
         assistants=assistants,
         available_assistants=available_assistants,
+        temas=temas,
     )
 
 @courses_bp.route("/cursos/<int:course_id>/ayudantes/agregar", methods=["POST"])

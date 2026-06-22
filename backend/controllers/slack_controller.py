@@ -1,6 +1,7 @@
 import requests
+from datetime import datetime
 from database.db import modify_db, query_db
-
+from helpers.crypto import encrypt_value, decrypt_value
 
 def get_slack_user_name(token, user_id):
     url = "https://slack.com/api/users.info"
@@ -151,7 +152,7 @@ def send_advertisement_to_slack(id_curso, title, message, user_mail):
                 "ok": True,
                 "message": "El curso no tiene habilitado poder mandar avisos de la web a slack"
             }
-        slack_bot_token = config.get("slack_bot_token")
+        slack_bot_token = decrypt_value(config.get("slack_bot_token"))
         slack_channel_id = config.get("slack_channel_id")
 
         if not slack_bot_token or not slack_channel_id:
@@ -234,7 +235,7 @@ def configure_slack_course(id_curso, data, id_usuario):
                 "message": "Bad Request",
                 "description": "Faltan slack_bot_token o slack_channel_id"
             }
-
+        encrypted_slack_bot_token = encrypt_value(slack_bot_token)
         sql = """
             INSERT INTO curso_slack_config (
                 id_curso,
@@ -259,7 +260,7 @@ def configure_slack_course(id_curso, data, id_usuario):
             id_curso,
             slack_channel_id,
             slack_channel_name,
-            slack_bot_token,
+            encrypted_slack_bot_token,
             permite_escritura,
             permite_lectura,
             id_usuario
@@ -307,7 +308,7 @@ def get_slack_messages(id_curso):
                 "message": "El curso no tiene habilitada la lectura de Slack"
             }
 
-        slack_bot_token = config.get("slack_bot_token")
+        slack_bot_token = decrypt_value(config.get("slack_bot_token"))
         slack_channel_id = config.get("slack_channel_id")
 
         if not slack_bot_token or not slack_channel_id:
@@ -342,17 +343,25 @@ def get_slack_messages(id_curso):
         slack_messages = []
 
         for message in data.get("messages", []):
-            if message.get("subtype") == "bot_message":
+            ts = message.get("ts")
+            fecha = ""
+
+            if ts:
+                fecha = datetime.fromtimestamp(float(ts)).strftime("%d/%m/%Y %H:%M")
+
+            if message.get("subtype") == "bot_message" or message.get("bot_id") or message.get("app_id"):
                 emisor = "Slack Bot"
+                origen = "panel_confirmado"
             else:
-                emisor = message.get("user", "Usuario Slack")
+                emisor = "Usuario Slack"
+                origen = "slack"
 
             slack_messages.append({
                 "titulo": "Mensaje de Slack",
                 "mensaje": message.get("text", ""),
                 "emisor": emisor,
-                "fecha": message.get("ts"),
-                "origen": "slack"
+                "fecha": fecha,
+                "origen": origen
             })
 
         return {

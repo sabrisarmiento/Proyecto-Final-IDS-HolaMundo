@@ -27,6 +27,7 @@ def configure_slack(id_curso):
 
 @slack_bp.route("/courses/<int:id_curso>/slack/messages", methods=["GET"])
 def get_slack_messages(id_curso):
+    print("ENTRÓ A LA RUTA SLACK MESSAGES", id_curso)
     return get_slack_messages_service(id_curso)
 
 

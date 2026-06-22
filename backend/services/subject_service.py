@@ -3,6 +3,7 @@ from controllers.subject_controller import (
     get_all_subjects,
     get_subject_by_id,
     get_topics_by_subject_id,
+    replace_temas,
     create_subject,
     patch_subject,
     delete_subject,
@@ -90,6 +91,12 @@ def remove_professor_from_subject_service(id_materia, id_profesor):
     return success_response({
         "message": result["message"]
     })
+
+def replace_temas_service(id_materia, temas):
+    result = replace_temas(id_materia, temas)
+    if not result["ok"]:
+        return error_response(result)
+    return success_response({"message": result["message"]})
 
 def get_subjects_assigned_to_professor_service(id_profesor):
     result = get_subjects_assigned_to_professor(id_profesor)

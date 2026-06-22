@@ -31,7 +31,7 @@ def student_active(id_alumno):
     result = query_db(sql, (id_alumno,))
     return result[0]['estado_alumno'] if result else False
 
-def students_active_qr(id_clase):
+def active_students_for_class(id_clase):
     try:
         sql = """
             SELECT a.id_alumno, a.correo, a.nombre, a.apellido
@@ -43,13 +43,13 @@ def students_active_qr(id_clase):
     except Exception:
         return []
     
-def mark_qr_generated(id_clase, total_minutos):
+def open_attendance_window(id_clase, total_minutos):
     modify_db(
-        "UPDATE clases SET qr_generado_en = NOW(), qr_valido_hasta = NOW() + INTERVAL %s MINUTE WHERE id_clase = %s",
+        "UPDATE clases SET asistencia_abierta_en = NOW(), asistencia_valida_hasta = NOW() + INTERVAL %s MINUTE WHERE id_clase = %s",
         (total_minutos, id_clase),
     )
-    result = query_db("SELECT qr_valido_hasta FROM clases WHERE id_clase = %s", (id_clase,))
-    return result[0]["qr_valido_hasta"] if result else None
+    result = query_db("SELECT asistencia_valida_hasta FROM clases WHERE id_clase = %s", (id_clase,))
+    return result[0]["asistencia_valida_hasta"] if result else None
 
 def proximity_fiuba(user_lat, user_lon):
     FACULTAD_LAT = -34.61771131976023
@@ -87,7 +87,7 @@ def create_attendance(data):
                 "ok": False,
                 "code": 403,
                 "message": "Forbidden",
-                "description": "Código QR inválido o ausente"
+                "description": "Link inválido o ausente"
             }
 
         if not student_active(id_alumno):
@@ -132,7 +132,7 @@ def create_attendance(data):
             }
 
         window_open = query_db(
-            "SELECT 1 FROM clases WHERE id_clase = %s AND qr_valido_hasta IS NOT NULL AND NOW() <= qr_valido_hasta",
+            "SELECT 1 FROM clases WHERE id_clase = %s AND asistencia_valida_hasta IS NOT NULL AND NOW() <= asistencia_valida_hasta",
             (id_clase,),
         )
         if not window_open:
@@ -140,7 +140,7 @@ def create_attendance(data):
                 "ok": False,
                 "code": 403,
                 "message": "Forbidden",
-                "description": "El código QR expiró o no fue generado para esta clase"
+                "description": "El link expiró o no fue generado para esta clase"
             }
 
         already = query_db(

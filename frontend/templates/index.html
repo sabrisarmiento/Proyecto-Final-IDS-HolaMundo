@@ -14,7 +14,25 @@ block extra_styles %}
 <section class="hero">
   <h2>{{ subject.subject.nombre }}</h2>
   <p>FIUBA</p>
+
+  {% if not selected_curso %}
+  {% if cursos_catedra %}
+  <h3 class="catedra-title">Seleccioná tu cátedra</h3>
+  <div class="catedra-grid">
+    {% for curso in cursos_catedra %}
+    <a href="?subject={{ selected_subject }}&curso={{ curso.id_curso }}" class="catedra-card">
+      <span class="catedra-nombre">{{ curso.catedra }}</span>
+      <span class="catedra-meta">{{ curso.anio }} · {{ curso.cuatrimestre }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="catedra-empty">No hay cátedras disponibles para esta materia.</p>
+  {% endif %}
+  {% endif %}
 </section>
+
+{% if selected_curso %}
 
 {% if cursos and cursos[0].slack_url %}
 <a href="{{ cursos[0].slack_url }}" target="_blank" class="slack-banner">
@@ -134,6 +152,8 @@ block extra_styles %}
   <h4>{{ aviso.titulo }}</h4>
 </article>
 {% endfor %} {% endcall %}
+
+{% endif %}
 
 {% else %}
 

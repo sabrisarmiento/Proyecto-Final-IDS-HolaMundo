@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from routes import (
     advertisements_bp, attendance_bp, exam_bp, classes_bp, exam_types_bp,
@@ -31,4 +32,4 @@ app.register_blueprint(dashboard_general_bp)
 app.register_blueprint(reports_bp)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)), debug=True)
