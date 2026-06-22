@@ -46,17 +46,6 @@ def get_advertisements_by_subject(id_subject):
         print(f"Error al obtener avisos de la materia {id_subject}: {e}")
         return []
 
-
-# def get_slack_advertisements():
-#     try:
-#         response = requests.get(f"{API_URL}/advertisements/slack")
-#         response.raise_for_status()
-
-#         return response.json().get("advertisements", [])
-
-#     except Exception as e:
-#         print(f"Error al obtener avisos de Slack: {e}")
-#         return []
 def get_slack_advertisements_by_course(id_course):
     try:
         response = requests.get(
@@ -91,16 +80,6 @@ def create_advertisement(id_course, title, message, token):
             "titulo": title,
             "mensaje": message
         }
-
-#        response = requests.post(
- #           f"{API_URL}/advertisements",
-  #          json=body,
-   #         headers=headers
-    #    )
-
-        print("TOKEN QUE MANDA FRONT:", token)
-        print("HEADERS:", headers)
-        print("DATA CREATE AD:", data)
 
         response = requests.post(
             f"{API_URL}/advertisements",
