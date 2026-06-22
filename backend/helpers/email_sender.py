@@ -21,6 +21,9 @@ def send_attendance_email(destinatario, nombre_alumno, attendance_link, valido_h
         f"<p>Fecha: {clase.get('fecha')} · Tema: {clase.get('temas') or '—'}</p>"
     ) if clase else ""
 
+    is_virtual = bool(clase) and clase.get("modalidad") == "Virtual"
+    geo_aviso = "" if is_virtual else "<p>Recordá que el sistema validará tu <b>geolocalización</b> al dar el presente.</p>"
+
     cuerpo = f"""
     <html>
         <body>
@@ -30,7 +33,7 @@ def send_attendance_email(destinatario, nombre_alumno, attendance_link, valido_h
             <a href="{attendance_link}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
                 Dar el Presente
             </a>
-            <p>Recordá que el sistema validará tu <b>geolocalización</b> al momento de escanear</p>
+            {geo_aviso}
             {validez}
         </body>
     </html>
