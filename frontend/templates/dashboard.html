@@ -100,9 +100,9 @@
                 data-apellido="{{ u.apellido }}"
                 data-correo="{{ u.correo }}"
                 data-id-rol="{{ u.id_rol or '' }}">
-              <td>{{ u.nombre }}</td>
-              <td>{{ u.apellido }}</td>
-              <td class="dg-correo">{{ u.correo }}</td>
+              <td class="dg-datatxt">{{ u.nombre }}</td>
+              <td class="dg-datatxt">{{ u.apellido }}</td>
+              <td class="dg-datatxt-correo">{{ u.correo }}</td>
               <td>
                 {% set nivel = u.nivel_administracion or 1 %}
                 <span class="dg-rol-badge dg-rol-badge--nivel{{ nivel }}">

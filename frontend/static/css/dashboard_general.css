@@ -151,10 +151,15 @@
   vertical-align: middle;
 }
 
-.dg-correo {
-  color: var(--color-8);
-  font-size: 0.85rem;
+
+td.dg-datatxt {
+  color: var(--color-19);
 }
+
+td.dg-datatxt-correo {
+  color: var(--color-19);
+  font-size: 0.85rem;
+}  
 
 .dg-rol-badge {
   display: inline-block;
