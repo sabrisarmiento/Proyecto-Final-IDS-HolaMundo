@@ -59,6 +59,12 @@
         />
       </div>
     </div>
+
+    <div class="check-estado">
+      <label for="estado">Activo</label>
+      <input type="checkbox" id="estado" name="estado" {% if course.estado %}
+      checked{% endif %} onchange="this.form.submit()">
+    </div>
   </div>
 
   <div class="config-section">
