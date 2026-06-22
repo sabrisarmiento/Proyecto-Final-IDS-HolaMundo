@@ -103,6 +103,7 @@ def public_advertisements():
     "advertisements.html",
     active_page="advertisements",
     selected_subject=int(view) if view else None,
+    selected_curso=int(selected_course) if selected_course else None,
     selected_course=int(selected_course) if selected_course else None,
     source=source,
     subjects=subjects,

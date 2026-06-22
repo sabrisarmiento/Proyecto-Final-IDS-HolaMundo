@@ -43,4 +43,6 @@ def public_materials():
         sections=sections,
         subject_id=subject_id,
         course_id=course_id,
+        selected_subject=int(subject_id) if subject_id else None,
+        selected_curso=int(course_id) if course_id else None,
     )

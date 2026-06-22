@@ -79,7 +79,7 @@ def get_courses_for_user(id_user, is_admin, filters):
 def get_course_id(id_course):
     try:
         sql = """
-            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url, c.regimen_aprobacion, c.estado,
+            SELECT c.id_curso, c.id_materia, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url, c.regimen_aprobacion, c.estado,
                    u.id_usuario AS profesor_id, u.nombre AS profesor_nombre, u.apellido AS profesor_apellido
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia

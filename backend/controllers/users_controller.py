@@ -206,8 +206,9 @@ def update_user_by_id(id_user, data, logged_user):
 
     nivel_logged_user = logged_user.get("nivel")
     nivel_target = user_to_update.get("nivel_administracion")
+    is_self_edit = logged_user.get("id_usuario") == id_user
 
-    if not can_manage_admin_level(nivel_logged_user, nivel_target):
+    if not is_self_edit and not can_manage_admin_level(nivel_logged_user, nivel_target):
       return {
         "ok": False,
         "code": 403,
@@ -219,7 +220,7 @@ def update_user_by_id(id_user, data, logged_user):
     apellido = data.get("apellido")
     correo = data.get("correo")
     contraseña = data.get("contraseña")
-    id_rol = data.get("id_rol") 
+    id_rol = data.get("id_rol")
 
     update = []
     params = []
@@ -241,6 +242,13 @@ def update_user_by_id(id_user, data, logged_user):
       params.append(generate_password_hash(contraseña))
 
     if id_rol is not None:
+      if is_self_edit:
+        return {
+          "ok": False,
+          "code": 403,
+          "message": "Forbidden",
+          "description": "No podés cambiar tu propio rol"
+        }
       new_role = get_role_by_id(id_rol)
 
       if not new_role:

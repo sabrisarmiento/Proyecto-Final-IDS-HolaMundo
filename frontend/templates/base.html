@@ -13,26 +13,26 @@
   
 </head>
 <body>
-  {% from "components/dropdown.html" import dropdown_settings %}
+  {% from "components/dropdown.html" import dropdown_settings, dropdown_profile_welcome %}
   {% from "components/modal.html" import modal %}
 
   <header class="header-private">
-    <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+    <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="header-private-logo">
     Panel FIUBA
 </a>
 
     <nav class="header-private-nav">
-  <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+  <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="{% if active_page == 'landing' %}is-active{% endif %}">Inicio</a>
 
-  <a href="{{ url_for('materials.public_materials') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+  <a href="{{ url_for('materials.public_materials') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="{% if active_page == 'materials' %}is-active{% endif %}">Materiales</a>
 
-  <a href="{{ url_for('advertisements.public_advertisements') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+  <a href="{{ url_for('advertisements.public_advertisements') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
 
-  <a href="{{ url_for('calendar.calendar') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+  <a href="{{ url_for('calendar.calendar') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="{% if active_page == 'calendar' %}is-active{% endif %}">Cronograma</a>
 
   {% if session.get('user') %}
@@ -47,7 +47,7 @@
         {{ dropdown_settings() }}
       </div>
       {% if session.get('user') %}
-        <p>Bienvenido, {{ session['user']['nombre'] }}</p>
+        {{ dropdown_profile_welcome(session.get('user')) }}
       {% else %}
         <button type="button" class="btn-primary" onclick="openModal('login-modal')">
           Iniciar Sesion
@@ -70,6 +70,9 @@
     </div>
 
   </header>
+  {% if session.get('user') %}
+    {% include "profile.html" %}
+  {% endif %}
   <main class="main-private">
     {% block content %}{% endblock %}
   </main>

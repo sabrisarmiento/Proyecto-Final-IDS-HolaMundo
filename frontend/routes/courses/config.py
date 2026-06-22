@@ -10,11 +10,12 @@ from services.material_frontend_service import create_material, update_material,
 def importar_alumnos(course_id):
     token = get_token()
     if not token:
-        return jsonify({"error": "No autenticado"}), 401
+        return redirect(url_for('login.login'))
 
     file = request.files.get('file')
     if not file:
-        return jsonify({"error": "No se seleccionó ningún archivo"}), 400
+        flash("No se seleccionó ningún archivo.", "error")
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='students'))
 
     try:
         backend_res = requests.post(
@@ -23,9 +24,29 @@ def importar_alumnos(course_id):
             files={'file': (file.filename, file.stream, 'text/csv')},
             data={'id_curso': course_id},
         )
-        return jsonify(backend_res.json()), backend_res.status_code
+        data = backend_res.json()
+        if data.get('creados') is not None:
+            creados = data['creados']
+            errores = data.get('errores', 0)
+            if creados > 0:
+                msg = f"Se importaron {creados} alumno(s)."
+                if errores:
+                    msg += f" {errores} fila(s) con error."
+                flash(msg, "success")
+            else:
+                detalle = data.get('detalle_errores') or []
+                if detalle:
+                    primer = detalle[0]
+                    flash(f"Fila {primer.get('fila', '?')}: {primer.get('error', 'Error desconocido')}", "error")
+                else:
+                    flash("No se pudo importar ningún alumno.", "error")
+        else:
+            error = (data.get('errors') or [{}])[0].get('description') or data.get('error') or "No se pudo importar el archivo."
+            flash(error, "error")
     except Exception as e:
-        return jsonify({"error": f"No se pudo importar: {e}"}), 500
+        flash(f"No se pudo importar: {e}", "error")
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='students'))
 
 
 @courses_bp.route('/cursos/<int:course_id>/exportar-informes', methods=['GET'])
@@ -129,6 +150,32 @@ def update_course_config(course_id):
     except Exception as e:
         session['config_msg'] = f'Error de conexión: {e}'
         session['config_ok']  = False
+
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
+
+
+@courses_bp.route('/cursos/<int:course_id>/temas', methods=['POST'])
+def update_temas(course_id):
+    token = get_token()
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+
+    id_materia = request.form.get('id_materia')
+    nombres = request.form.getlist('temas_nombre[]')
+    iconos = request.form.getlist('temas_icono[]')
+    temas = [{"nombre": n, "icono": i} for n, i in zip(nombres, iconos) if n.strip()]
+
+    try:
+        requests.put(
+            f'{BACKEND_URL}/subjects/{id_materia}/temas',
+            json={"temas": temas},
+            headers=auth_headers()
+        )
+        session['config_msg'] = 'Temas actualizados correctamente'
+        session['config_ok'] = True
+    except Exception as e:
+        session['config_msg'] = f'Error al actualizar temas: {e}'
+        session['config_ok'] = False
 
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
 

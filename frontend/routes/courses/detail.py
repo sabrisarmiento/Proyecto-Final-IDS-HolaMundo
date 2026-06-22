@@ -360,6 +360,14 @@ def course_detail(course_id):
 
     materiales = get_materials_by_course(course_id) if active_tab == 'materials' else []
 
+    temas = []
+    if active_tab == 'config' and course.get('id_materia'):
+        try:
+            temas_res = requests.get(f'{BACKEND_URL}/subjects/{course["id_materia"]}/temas')
+            temas = temas_res.json().get("topics", []) if temas_res.ok else []
+        except Exception:
+            pass
+
     try:
         me_res = requests.get(f'{BACKEND_URL}/me', headers=headers)
         me_data = me_res.json() if me_res.ok else {}
@@ -405,6 +413,7 @@ def course_detail(course_id):
         current_user_name=current_user_name,
         assistants=assistants,
         available_assistants=available_assistants,
+        temas=temas,
     )
 
 @courses_bp.route("/cursos/<int:course_id>/ayudantes/agregar", methods=["POST"])

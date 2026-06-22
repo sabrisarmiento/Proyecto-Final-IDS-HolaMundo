@@ -1,0 +1,160 @@
+/* ---- Temas de la materia ---- */
+.temas-form-section {
+    margin-top: 1.5rem;
+}
+
+.temas-columns-header {
+    display: grid;
+    grid-template-columns: 52px 44px 1fr 36px;
+    gap: 0.6rem;
+    padding: 0 0 0.25rem;
+}
+
+.temas-columns-header span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-8);
+    text-align: center;
+}
+
+.temas-columns-header span:nth-child(3) {
+    text-align: left;
+}
+
+.temas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.tema-row {
+    display: grid;
+    grid-template-columns: 52px 44px 1fr 36px;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.tema-orden {
+    text-align: center;
+    padding: 0.6rem 0.4rem;
+}
+
+.tema-icon-wrap {
+    position: relative;
+}
+
+.tema-icon-btn {
+    width: 44px;
+    height: 100%;
+    min-height: 38px;
+    border: 1.5px solid var(--color-6);
+    border-radius: 8px;
+    background: var(--color-45);
+    color: var(--color-8);
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.tema-icon-btn:hover {
+    border-color: var(--color-3);
+    color: var(--color-3);
+}
+
+.tema-delete-btn {
+    width: 36px;
+    height: 100%;
+    min-height: 38px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-6);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background 0.15s;
+}
+
+.tema-delete-btn:hover {
+    color: var(--color-3);
+    background: var(--color-16);
+}
+
+.temas-btn-add {
+    align-self: flex-start;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-3);
+    background: transparent;
+    border: 1.5px dashed var(--color-3);
+    border-radius: 8px;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.temas-btn-add:hover {
+    background: var(--color-16);
+}
+
+/* ---- Icon picker popup ---- */
+.icon-picker-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+}
+
+.icon-picker-popup {
+    position: absolute;
+    z-index: 1000;
+    background: var(--color-5);
+    border: 1.5px solid var(--color-6);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    width: 270px;
+}
+
+.icon-picker-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-8);
+    margin: 0 0 0.75rem;
+}
+
+.icon-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.4rem;
+}
+
+.icon-option {
+    width: 44px;
+    height: 44px;
+    border: 1.5px solid var(--color-6);
+    border-radius: 8px;
+    background: var(--color-45);
+    color: var(--color-9);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+
+.icon-option:hover {
+    border-color: var(--color-3);
+    background: var(--color-16);
+    color: var(--color-3);
+}

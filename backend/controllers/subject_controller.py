@@ -97,10 +97,41 @@ def get_topics_by_subject_id(id):
             }
 
         result = query_db(
-            "SELECT id_tema, nombre, icono, orden FROM materia_temas WHERE id_materia = %s ORDER BY orden ASC",
+            "SELECT id_tema, nombre, icono FROM materia_temas WHERE id_materia = %s",
             (id,)
         )
         return {"ok": True, "data": result}
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
+
+def replace_temas(id_materia, temas):
+    try:
+        exists = query_db("SELECT id_materia FROM materias WHERE id_materia = %s", (id_materia,))
+        if not exists:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Not Found",
+                "description": f"No existe una materia con ID {id_materia}"
+            }
+
+        modify_db("DELETE FROM materia_temas WHERE id_materia = %s", (id_materia,))
+
+        for tema in temas:
+            nombre = tema.get("nombre", "").strip()
+            icono = tema.get("icono", "").strip()
+            if nombre:
+                modify_db(
+                    "INSERT INTO materia_temas (id_materia, nombre, icono) VALUES (%s, %s, %s)",
+                    (id_materia, nombre, icono)
+                )
+
+        return {"ok": True, "message": "Temas actualizados correctamente"}
     except Exception as e:
         return {
             "ok": False,
