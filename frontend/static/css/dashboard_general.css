@@ -51,6 +51,7 @@
 .dg-kpi-icon {
   font-size: 1.5rem;
   margin-bottom: 0.3rem;
+  color:var(--color-19);
 }
 
 .dg-kpi-num {
@@ -205,8 +206,9 @@ td.dg-datatxt-correo {
 }
 
 .dg-btn-icon--danger:hover {
-  background: #fee2e2;
-  border-color: var(--color-3);
+  background: var(--color-21);
+  border-color: var(--color-65);
+  -webkit-text-fill-color: var(--color-19);
 }
 
 .dg-btn {

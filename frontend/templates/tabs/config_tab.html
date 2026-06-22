@@ -232,3 +232,23 @@
     </div>
   </form>
 </div>
+
+</form>
+
+<div class="config-section">
+  <h3 class="config-section-title">Eliminación de curso</h3>
+  <div class="config-field">
+    <label class="config-label">Esta acción es irreversible. Se eliminarán todos los datos asociados al curso.</label>
+  </div>
+  <div class="config-actions">
+    <form 
+      action="{{ url_for('courses.delete_course_route', course_id=course['id_curso']) }}"
+      method="POST"
+      onsubmit="return confirm('¿Estás seguro que querés eliminar este curso? Esta acción no se puede deshacer.')"
+    >
+      <button type="submit" class="config-btn-save">
+        Eliminar curso
+      </button>
+    </form>
+  </div>
+</div>

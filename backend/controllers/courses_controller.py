@@ -175,10 +175,10 @@ def patch_course(id_course, data):
             params.append(id_profe)
         if slack_url is not None:
             updates.append("slack_url = %s")
-            params.append(slack_url)
+            params.append(slack_url if slack_url.strip() else None)
         if youtube_url is not None:
             updates.append("youtube_url = %s")
-            params.append(youtube_url)
+            params.append(youtube_url if youtube_url.strip() else None )
         if regimen_aprobacion is not None:
             updates.append("regimen_aprobacion = %s")
             params.append(regimen_aprobacion)

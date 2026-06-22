@@ -55,6 +55,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
+    margin-top: 1.5rem;
 }
 
 .config-section-title {
