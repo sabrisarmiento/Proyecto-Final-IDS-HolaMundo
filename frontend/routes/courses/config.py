@@ -218,7 +218,7 @@ def delete_course_route(course_id):
     headers = {'Authorization': f'Bearer {token}'}
     try:
         res = requests.delete(
-            f'http://127.0.0.1:5000/courses/{course_id}',
+            f'{BACKEND_URL}/courses/{course_id}',
             headers=headers
         )
         if res.status_code == 200:

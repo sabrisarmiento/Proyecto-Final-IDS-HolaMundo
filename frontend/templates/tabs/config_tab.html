@@ -62,8 +62,7 @@
 
     <div class="check-estado">
       <label for="estado">Activo</label>
-      <input type="checkbox" id="estado" name="estado" {% if course.estado %}
-      checked{% endif %} onchange="this.form.submit()">
+      <input type="checkbox" id="estado" name="estado" {% if course.estado or course.ESTADO or course.Estado %}checked{% endif %} onchange="this.form.submit()">
     </div>
   </div>
 
