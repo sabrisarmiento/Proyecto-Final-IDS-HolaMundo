@@ -2,6 +2,7 @@
 -- Cargar DESPUES del schema (database_finalIDS.sql).
 -- Login: profe@fiuba.com / Profesor123!
 
+SET NAMES utf8mb4;
 USE db_proyectofinal_ids;
 
 INSERT INTO roles (id_rol, nombre, nivel_administracion) VALUES
