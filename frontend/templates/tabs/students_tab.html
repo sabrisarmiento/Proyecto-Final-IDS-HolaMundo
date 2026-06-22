@@ -79,6 +79,8 @@
                 action="{{ url_for('courses.edit_student', course_id=course['id_curso'], student_id=student.id_alumno) }}" 
                 method="POST"
             >
+                <input type="hidden" name="form_type" value="estado">
+                <input type="hidden" name="estado_alumno" value="0">
                 <label class="switch-container">
                     <input 
                         type="checkbox" 

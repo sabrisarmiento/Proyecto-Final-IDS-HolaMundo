@@ -100,12 +100,16 @@ def course_dashboard_data(course_id):
 @courses_bp.route('/cursos/<int:course_id>/estudiantes/<int:student_id>', methods=['POST'])
 def edit_student(course_id, student_id):
     try:
-        data = {
-            "nombre":   request.form.get('nombre'),
-            "apellido": request.form.get('apellido'),
-            "padron":   int(request.form.get('padron')),
-            "correo":   request.form.get('correo'),
-        }
+        if request.form.get('form_type') == 'estado':
+            valores = request.form.getlist('estado_alumno')
+            data = {"estado_alumno": valores[-1] == '1'}
+        else:
+            data = {
+                "nombre":   request.form.get('nombre'),
+                "apellido": request.form.get('apellido'),
+                "padron":   int(request.form.get('padron')),
+                "correo":   request.form.get('correo'),
+            }
         patch_student(student_id, data)
     except Exception as e:
         print(e)

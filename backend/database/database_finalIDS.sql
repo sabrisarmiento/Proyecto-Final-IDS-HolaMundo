@@ -39,6 +39,7 @@ CREATE TABLE cursos (
     slack_url VARCHAR(500),
     youtube_url VARCHAR (500),
     regimen_aprobacion TEXT,
+    estado VARCHAR(50) DEFAULT 'Activo',
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 );
@@ -141,7 +142,7 @@ CREATE TABLE asistencia (
     presente BOOLEAN DEFAULT FALSE,
     UNIQUE (id_alumno, id_clase),
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_clase) REFERENCES clases(id_clase)
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) ON DELETE CASCADE
 );
 
 -- avisos --

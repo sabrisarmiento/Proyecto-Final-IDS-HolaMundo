@@ -96,9 +96,9 @@
 
           <td>
             <div>
-              <select class="calendar-edit-form" name="tipo">
-                <option value="Práctica"> Práctica </option>
-                <option value="Teórica"> Teórica </option>
+              <select class="calendar-edit-form" name="tipo" value="{{ clase.tipo }}">
+                <option value="Práctica" {% if clase.tipo == 'Práctica' %}selected{% endif %}> Práctica </option>
+                <option value="Teórica" {% if clase.tipo == 'Teórica' %}selected{% endif %}> Teórica </option>
               </select>
            </div>
           </td>
@@ -106,8 +106,8 @@
           <td>
             <div>
               <select class="calendar-edit-form" name="modalidad">
-              <option value="Presencial"> Presencial </option>
-              <option value="Virtual"> Virtual </option>
+              <option value="Presencial" {% if clase.modalidad == 'Presencial' %}selected{% endif %}> Presencial </option>
+              <option value="Virtual" {% if clase.modalidad == 'Virtual' %}selected{% endif %}> Virtual </option>
              </select>
              </div>
         </td>
