@@ -79,7 +79,7 @@ CREATE TABLE alumnos (
     correo VARCHAR(255) NOT NULL,
     estado_alumno BOOLEAN DEFAULT TRUE,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 -- equipos --
@@ -87,7 +87,7 @@ CREATE TABLE equipos (
     id_equipo INT AUTO_INCREMENT PRIMARY KEY,
     nombre_equipo VARCHAR(20) NOT NULL,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 -- clases --
@@ -144,7 +144,7 @@ CREATE TABLE asistencia (
     id_clase INT NOT NULL,
     presente BOOLEAN DEFAULT FALSE,
     UNIQUE (id_alumno, id_clase),
-    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno) ON DELETE CASCADE,
     FOREIGN KEY (id_clase) REFERENCES clases(id_clase) ON DELETE CASCADE
 );
 
@@ -157,7 +157,7 @@ CREATE TABLE avisos (
     mensaje TEXT NOT NULL,
     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 -- evaluaciones --
@@ -182,9 +182,9 @@ CREATE TABLE notas (
     nota DECIMAL(4, 2) NOT NULL,
     corrector_nombre VARCHAR(100) NULL,
     CONSTRAINT uq_alumno_evaluacion UNIQUE (id_alumno, id_evaluacion),
-    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion),
-    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
+    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion) ON DELETE CASCADE,
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno) ON DELETE CASCADE,
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE
 );
 
 -- configuracion promocion --

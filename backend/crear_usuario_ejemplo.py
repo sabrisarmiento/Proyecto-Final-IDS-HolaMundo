@@ -2,11 +2,11 @@ from werkzeug.security import generate_password_hash
 from database.db import modify_db
 
 def crear_usuario_ejemplo():
-    nombre = "Admin2"
-    apellido = "apellido"
-    correo = "example2@example.com"
+    nombre = "Superadmin"
+    apellido = "Admin"
+    correo = "admin@fiuba.com"
     password = "1234"
-    id_rol = 1 
+    id_rol = 1
 
     password_hash = generate_password_hash(password)
 
