@@ -8,17 +8,22 @@ from .common import BACKEND_URL, get_token, auth_headers
 @courses_bp.route('/cursos/<int:course_id>/clases/crear', methods=['POST'])
 def crear_clase(course_id):
     token = get_token()
+    user = session.get("user", {})
+
     if not token:
         return redirect(url_for('auth.login'))
-
+    
+    id_user = user.get("id_usuario")
     headers = auth_headers()
+    
     data = {
         "fecha": request.form.get("fecha_clase"),
         "semana": request.form.get("semana"),
         "temas": request.form.get("temas"),
         "tipo": request.form.get("tipo"),
         "modalidad": request.form.get("modalidad"),
-        "id_curso": course_id
+        "id_curso": course_id,
+        "id_creador_clase": id_user
     }
     if not data['fecha'] or not data['semana'] or not data['temas'] or not data['tipo'] or not data['modalidad']:
         flash('Falta ingresar datos.', 'error')

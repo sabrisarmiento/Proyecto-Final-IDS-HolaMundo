@@ -100,7 +100,9 @@ CREATE TABLE clases (
     asistencia_abierta_en DATETIME NULL,
     asistencia_valida_hasta DATETIME NULL,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
+    id_creador_clase INT NOT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_creador_clase) REFERENCES usuarios(id_usuario)
 );
 
 -- materia_temas --
