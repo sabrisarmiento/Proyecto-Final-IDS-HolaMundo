@@ -79,7 +79,7 @@ def get_course_id(id_course):
     try:
         sql = """
             SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url, c.regimen_aprobacion,
-                   u.id_usuario AS profesor_id, u.nombre AS profesor_nombre, u.apellido AS profesor_apellido
+            u.id_usuario AS profesor_id, u.nombre AS profesor_nombre, u.apellido AS profesor_apellido
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
             LEFT JOIN usuarios u ON c.id_profesor = u.id_usuario
@@ -173,10 +173,10 @@ def patch_course(id_course, data):
             params.append(id_profe)
         if slack_url is not None:
             updates.append("slack_url = %s")
-            params.append(slack_url)
+            params.append(slack_url if slack_url.strip() else None)
         if youtube_url is not None:
             updates.append("youtube_url = %s")
-            params.append(youtube_url)
+            params.append(youtube_url if youtube_url.strip() else None )
         if regimen_aprobacion is not None:
             updates.append("regimen_aprobacion = %s")
             params.append(regimen_aprobacion)
