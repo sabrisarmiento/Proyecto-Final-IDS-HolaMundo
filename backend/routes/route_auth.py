@@ -1,6 +1,4 @@
 from flask import Blueprint, request
-#from services.auth_service import login_service, register_service, me_service
-#from services.auth_service import login_service, register_service
 from services.auth_service import login_service, change_password_service
 from services.user_service import get_user_by_id
 from middleware.auth_middleware import require_auth
@@ -12,16 +10,10 @@ def login():
     data = request.get_json()
     return login_service(data)
 
-#@auth_bp.route("/register", methods=["POST"])
-#def register():
-#    data = request.get_json()
-#    return register_service(data)
-
 @auth_bp.route("/me", methods=["GET"])
 @require_auth
 def me():
     return get_user_by_id(request.user["id_usuario"])
-#    return me_service(request.user)
 
 @auth_bp.route("/change-password", methods=["PUT"])
 @require_auth

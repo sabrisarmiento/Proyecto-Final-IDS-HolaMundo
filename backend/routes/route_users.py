@@ -33,7 +33,7 @@ def get_user(id_user):
 
 @users_bp.route("/users",methods=["POST"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR) #lo ideal es crear una constante para ese 2, ese dos es el nivel de administracion. 
+@require_min_admin_level(NIVEL_PROFESOR)
 def create_user():
     data = request.get_json()
     logged_user = request.user

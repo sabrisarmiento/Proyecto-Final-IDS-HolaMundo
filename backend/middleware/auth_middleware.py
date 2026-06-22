@@ -81,28 +81,3 @@ def require_min_admin_level(min_admin_level):
         return wrapper
 
     return decorator
-
-
-
-#esto seria si solo fueran dos roles, lo dejo por las dudas si cambiamos algo a futuro
-#def require_role(role_id):
-
-#    def decorator(function): 
-
-#        @wraps(function) 
-#        def wrapper(*args, **kwargs):
-
-#            user = request.user
-
-#            if user["id_rol"] != role_id:
-#                return error_response({
-#                    "code": 403,
-#                    "message": "Forbidden",
-#                    "description": "No tienes permisos"
-#                })
-
-#           return function(*args, **kwargs)
-
-#        return wrapper
-
-#    return decorator

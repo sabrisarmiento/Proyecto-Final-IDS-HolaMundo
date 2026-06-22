@@ -152,33 +152,3 @@ def validate_change_password_data(data):
         return validation
 
     return {"ok": True}
-
-
-#def validate_register_password(password):
-#    validations = [
-#        validate_required_password(password),
-#        validate_password_length(password),
-#        validate_password_uppercase(password),
-#        validate_password_symbol(password)
-#    ]
-
-#    for validation in validations:
-#        if not validation["ok"]:
-#            return validation
-
-#    return {"ok": True}
-
-#def validate_register_data(data):
-#    if not data:
-#        return {
-#            "ok": False,
-#            "code": 400,
-#            "message": "Bad Request",
-#            "description": "Body requerido"
-#        }
-
-#    password = data.get("password")
-
-#    password_validation = validate_register_password(password)
-#    if not password_validation["ok"]:
-#        return password_validation
