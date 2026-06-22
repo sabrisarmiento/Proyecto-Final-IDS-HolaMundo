@@ -46,6 +46,10 @@ def send_attendance_link_view():
     class_id = request.form.get('id_clase')
     horas = request.form.get('horas')
     minutos = request.form.get('minutos')
+    import os
+
+    print("EMAIL_USER:", os.getenv("EMAIL_USER"))
+    print("EMAIL_PASS:", os.getenv("EMAIL_PASS"))
     result = send_attendance_link(class_id, horas, minutos)
     flash(result.get("message", "No se pudo enviar el link de asistencia."))
 
