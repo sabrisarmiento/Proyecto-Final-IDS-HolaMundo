@@ -127,17 +127,10 @@ def update_course_config(course_id):
         'catedra':      request.form.get('catedra'),
         'cuatrimestre': request.form.get('cuatrimestre'),
         'anio':         int(request.form.get('anio')),
-    }
-    slack_url   = request.form.get('slack_url', '').strip()
-    youtube_url = request.form.get('youtube_url', '').strip()
-    regimen_aprobacion = request.form.get('regimen_aprobacion', '').strip()
-
-    if slack_url:
-        data['slack_url'] = slack_url
-    if youtube_url:
-        data['youtube_url'] = youtube_url
-    if regimen_aprobacion:
-        data['regimen_aprobacion'] = regimen_aprobacion
+        'slack_url': request.form.get('slack_url', '').strip(),
+        'youtube_url': request.form.get('youtube_url', '').strip(),
+        'regimen_aprobacion': request.form.get('regimen_aprobacion', '').strip(),
+    }   
 
     try:
         res = requests.patch(f'{BACKEND_URL}/courses/{course_id}', json=data, headers=headers)
@@ -214,3 +207,22 @@ def eliminar_material_view(course_id, id_material):
     if status >= 400:
         flash(result.get("errors", [{}])[0].get("description", "No se pudo eliminar el material."))
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='materials'))
+
+@courses_bp.route('/cursos/<int:course_id>/eliminar', methods=['POST'])
+def delete_course_route(course_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+
+    headers = {'Authorization': f'Bearer {token}'}
+    try:
+        res = requests.delete(
+            f'http://127.0.0.1:5000/courses/{course_id}',
+            headers=headers
+        )
+        if res.status_code == 200:
+            return redirect(url_for('courses.courses'))
+        else:
+            return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
+    except Exception as e:
+        return redirect(url_for('courses.course_detail', course_id=course_id, tab='config'))
