@@ -221,8 +221,40 @@ def patch_course(id_course, data):
             "description": str(e)
         }
 
-def delete_course(id_course):
+def delete_course(id_course, logged_user):
     try:
+        id_logged_user = logged_user["id_usuario"]
+        id_rol_logged_user = logged_user["id_rol"]
+        nivel_logged_user = logged_user["nivel"]
+
+        sql = """
+            SELECT id_curso, id_profesor
+            FROM cursos
+            WHERE id_curso = %s
+        """
+        course = query_db(sql, (id_course,))
+
+        if len(course) == 0:
+            return {
+                "ok": False,
+                "code": 404,
+                "message": "Not Found",
+                "description": f"No se encontró el curso con el ID {id_course}."
+            }
+
+        course = course[0]
+
+        is_superadmin = id_rol_logged_user == 1 or nivel_logged_user == 3
+        is_course_professor =  nivel_logged_user == 2 and course["id_profesor"] == id_logged_user
+
+        if not is_superadmin and not is_course_professor:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permisos para eliminar este curso."
+            }
+        
         sql = "DELETE FROM cursos WHERE id_curso = %s"
         modify_row = modify_db(sql, (id_course,))
 

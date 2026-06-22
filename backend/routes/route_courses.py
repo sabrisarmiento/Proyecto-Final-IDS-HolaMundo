@@ -55,8 +55,9 @@ def patch_course_route(id_course):
 
 @courses_bp.route('/courses/<int:id_course>', methods=['DELETE'])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def delete_course_route(id_course):
-    return delete_course_service(id_course)
+    return delete_course_service(id_course, request.user)
 
 @courses_bp.route("/courses/<int:id_curso>/assistants", methods=["GET"])
 @require_auth

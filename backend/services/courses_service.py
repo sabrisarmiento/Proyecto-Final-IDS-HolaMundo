@@ -43,8 +43,8 @@ def patch_course_service(id_course, data):
         "message": result["message"]
     })
 
-def delete_course_service(id_course):
-    result = delete_course(id_course)
+def delete_course_service(id_course, logged_user):
+    result = delete_course(id_course, logged_user)
     if not result["ok"]:
         return error_response(result)
     return success_response({
