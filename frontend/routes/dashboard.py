@@ -1,9 +1,10 @@
+import os
 from flask import Blueprint, render_template, session, redirect, url_for, request, flash
 import requests
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
-API = "http://127.0.0.1:5000"
+API = os.getenv("BACKEND_URL", "http://127.0.0.1:5000")
 
 
 @dashboard_bp.route('/dashboard')

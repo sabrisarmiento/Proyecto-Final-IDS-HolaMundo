@@ -96,7 +96,8 @@ def create_advertisement(data, user):
     message = data.get("mensaje")
 #    user_mail = user["correo"]
     user_mail = user.get("correo", "Usuario Panel FIUBA")
-    
+    id_rol = int(user.get("id_rol", 0))
+
     if not id_course or not title or not message:
       return {
         "ok": False,
@@ -104,7 +105,7 @@ def create_advertisement(data, user):
         "message": "Bad Request",
         "description": "Faltan datos obligatorios"
       }
-    if not user_belongs_to_course(id_user, id_course):
+    if id_rol != 1 and not user_belongs_to_course(id_user, id_course):
       return {
         "ok": False,
         "code": 403,
@@ -143,8 +144,9 @@ def patch_advertisement_by_id(id_advertisement, data, user):
 
     id_course = advertisement["id_curso"]
     id_user = user["id_usuario"]
+    id_rol = int(user.get("id_rol", 0))
 
-    if not user_belongs_to_course(id_user, id_course):
+    if id_rol != 1 and not user_belongs_to_course(id_user, id_course):
       return {
         "ok": False,
         "code": 403,
@@ -207,8 +209,9 @@ def delete_advertisement_by_id(id_advertisement, user):
 
     id_course = advertisement["id_curso"]
     id_user = user["id_usuario"]
+    id_rol = int(user.get("id_rol", 0))
 
-    if not user_belongs_to_course(id_user, id_course):
+    if id_rol != 1 and not user_belongs_to_course(id_user, id_course):
       return {
         "ok": False,
         "code": 403,

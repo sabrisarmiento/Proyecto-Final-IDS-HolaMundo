@@ -22,9 +22,28 @@
                     <select title="select-course" id="select-courses">
                         <option value="" selected>Seleccione una cátedra</option>
                         {% for course in courses %}
-                            <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
-                        {% endfor %}
+                        <option 
+                            value="{{ course.id_curso }}"
+                            {% if selected_course == course.id_curso %}selected{% endif %}
+                        >
+                            {{ course.catedra }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                {% if selected_course %}
+                    <select class="select-source" title="select-source" id="select-source">
+                        <option value="all" {% if source == "all" %}selected{% endif %}>
+                            Todos los avisos
+                        </option>
+                        <option value="panel" {% if source == "panel" %}selected{% endif %}>
+                            Solo Panel FIUBA
+                        </option>
+                        <option value="slack" {% if source == "slack" %}selected{% endif %}>
+                            Solo Slack
+                        </option>
                     </select>
+                {% endif %}
             
                     <p id="msg-select-course">
                         Por favor, seleccione una cátedra para ver sus avisos.
@@ -41,14 +60,20 @@
         <div class="advertisements-list" id="advertisements-container">
             {% if avisos %}
                 {% for aviso in avisos %}
-                <article class="advertisement-card" data-course="{{ aviso.id_curso }}">
+                <article class="
+                    advertisement-card
+                    {% if aviso.origen == 'slack' %}origen-slack{% endif %}
+                    {% if aviso.origen == 'panel_confirmado' %}origen-panel-confirmado{% endif %}
+                    {% if aviso.origen == 'panel' or not aviso.origen %}origen-panel{% endif %}
+                " data-course="{{ aviso.id_curso }}">
                     <div class="advertisement-card-header">
                         <span class="advertisement-date">{{ aviso.fecha }}</span>
                         <span class="advertisement-issuer">Publicado por: {{ aviso.emisor }}</span>
                     </div>
                     <h2 class="advertisement-card-title">{{ aviso.titulo }}</h2>
                     <p class="advertisement-card-message">{{ aviso.mensaje }}</p>
-                    {% if session.get("token") and aviso.id_aviso %}
+                    <p>ORIGEN: {{ aviso.origen }}</p>
+                    {% if session.get("token") and aviso.id_aviso and aviso.puede_editar %}
                         <div class="advertisement-actions">
                             <a 
                                 href="{{ url_for('advertisements.edit_advertisement_front', id_aviso=aviso.id_aviso) }}?id_curso={{ aviso.id_curso }}"

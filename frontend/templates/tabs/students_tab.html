@@ -1,4 +1,9 @@
 <div id="tab-students" class="tab-panel {% if active_tab != 'students' %}hidden{% endif %}">
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash-message flash-{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
 <section>
     <button
     type="button"
@@ -33,15 +38,16 @@
 
     {% call modal("import-students-modal", "Importar alumnos (CSV)") %}
     <form id="import-students-form"
-        data-action="{{ url_for('courses.importar_alumnos', course_id=course['id_curso']) }}">
+        action="{{ url_for('courses.importar_alumnos', course_id=course['id_curso']) }}"
+        method="POST"
+        enctype="multipart/form-data">
     <div id="csv-dropzone" class="csv-dropzone">
         <p class="csv-dropzone-text">Arrastrá el archivo .csv acá o hacé clic para elegirlo</p>
     </div>
-    <input type="file" id="csv-file-input" accept=".csv" hidden />
+    <input type="file" id="csv-file-input" name="file" accept=".csv" hidden />
     <p id="csv-file-name" class="csv-file-name" hidden></p>
     <p class="csv-hint">Columnas requeridas (exactas): nombre, apellido, padron, mail</p>
     <button type="submit" id="csv-submit" disabled>Importar</button>
-    <p id="import-message" class="form-message" hidden></p>
     </form>
     {% endcall %}
 </section>
@@ -73,6 +79,8 @@
                 action="{{ url_for('courses.edit_student', course_id=course['id_curso'], student_id=student.id_alumno) }}" 
                 method="POST"
             >
+                <input type="hidden" name="form_type" value="estado">
+                <input type="hidden" name="estado_alumno" value="0">
                 <label class="switch-container">
                     <input 
                         type="checkbox" 

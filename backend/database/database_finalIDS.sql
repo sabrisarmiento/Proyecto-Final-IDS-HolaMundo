@@ -1,3 +1,4 @@
+SET NAMES utf8mb4;
 CREATE DATABASE IF NOT EXISTS DB_ProyectoFinal_IDS;
 USE DB_ProyectoFinal_IDS;
 
@@ -39,6 +40,7 @@ CREATE TABLE cursos (
     slack_url VARCHAR(500),
     youtube_url VARCHAR (500),
     regimen_aprobacion TEXT,
+    estado VARCHAR(50) DEFAULT 'Activo',
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 );
@@ -96,10 +98,12 @@ CREATE TABLE clases (
     semana INT NOT NULL,
     tipo VARCHAR(50),
     modalidad VARCHAR(50),
-    qr_generado_en DATETIME NULL,
-    qr_valido_hasta DATETIME NULL,
+    asistencia_abierta_en DATETIME NULL,
+    asistencia_valida_hasta DATETIME NULL,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
+    id_creador_clase INT NOT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_creador_clase) REFERENCES usuarios(id_usuario)
 );
 
 -- materia_temas --
@@ -141,7 +145,7 @@ CREATE TABLE asistencia (
     presente BOOLEAN DEFAULT FALSE,
     UNIQUE (id_alumno, id_clase),
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_clase) REFERENCES clases(id_clase)
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) ON DELETE CASCADE
 );
 
 -- avisos --
@@ -244,4 +248,5 @@ CREATE TABLE curso_slack_config (
 --    slack_channel_name VARCHAR(100),
 --    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  --   FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
- --   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL--);
+ --   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
+-- );

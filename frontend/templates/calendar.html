@@ -8,49 +8,45 @@
 
 {% block content %}
 <section class="section-header-schedule">
-  <h1>Cronograma</h1>
-  <p>Fechas, temas y modalidades de cada clase del cuatrimestre actual</p>
+    <h1>Cronograma</h1>
+    <p>Fechas, temas y modalidades de cada clase del cuatrimestre actual</p>
 </section>
-<section class="section-schedule" >
-  <div class="schedule-controls">
-    <select title="select-course" id="select-courses">
-      <option value="" selected>Seleccione una materia</option>
-      {% for course in courses %}
-        <option value="{{ course.id_curso }}">{{ course.catedra }}</option>
-      {% endfor %}
-    </select>
-      <input type="text"
-            id="schedule-search"
-            class="schedule-search"
-            placeholder="Buscar tema en el cronograma..."
-            onkeyup="filterSchedule()">
-  </div>
-  <div>
-    {% if selected_subject %}
-    <p id="msg-select-course">
-      Por favor, seleccione una catedra para ver su cronograma.
-    </p>
+<section class="section-schedule">
+    {% if not selected_subject %}
+        <p id="msg-select-course" class="msg-notice">Por favor, seleccione una materia para comenzar.</p>
+    {% elif not selected_course %}
+        <p id="msg-select-course" class="msg-notice">Por favor, seleccione una cátedra para ver su cronograma.</p>
+    {% endif %}   
+    <div class="schedule-controls">
+        {% if selected_subject %}
+        <select id="select-courses">
+            <option value="">Seleccione una cátedra</option>
+            {% for c in courses %}
+                <option value="{{ c.id_curso }}" {% if selected_course == c.id_curso %}selected{% endif %}>{{ c.catedra }}</option>
+            {% endfor %}
+        </select>
+        {% endif %}
+        <input type="text" id="schedule-search" class="schedule-search" placeholder="Buscar semana, fecha, tema, etc." style="display:none;" >
+    </div>
     <div id="classes-container" class="classes-container">
-      {% if schedule %}
         {% for week in schedule %}
-        <div class="class" >
-          <h2>Semana: {{ week.week }}</h2>
-          {% for class in week.classes %}
-          <article data-course="{{ class.id_curso }}" data-search="{{ class.temas|lower }}">
-            <h3>{{ class.tipo }} - {{ class.fecha }}</h3>
-            <p>{{ class.temas }}</p>
-            <span>{{ class.modalidad }}</span>
-          </article>
-          {% endfor %}
+        <div class="class">
+            <h2>Semana {{ week.week }}</h2>
+            {% for clase in week.classes %}
+            <article data-course="{{ clase.id_curso }}" data-search="{{ ('semana ' ~ week.week ~ ' ' ~ week.week ~ ' ' ~ clase.temas ~ ' ' ~ clase.tipo ~ ' ' ~ clase.fecha ~ ' ' ~ clase.modalidad)|lower }}">
+                <h3>{{ clase.tipo }} - {{ clase.fecha }}</h3>
+                <p>{{ clase.temas }}</p>
+                <span>{{ clase.modalidad }}</span>
+                <small>Publicado por: {{ clase.publicado_por or 'Desconocido' }}</small>
+            </article>
+            {% endfor %}
         </div>
         {% endfor %}
-      </div>
-      {% endif %}
     </div>
-    {% else %}
-    <p>Por favor, seleccione una materia</p>
-    {% endif %}
-  </div>
+    <p id="msg-no-classes" class="msg-notice" style="display:none;">
+        Esta cátedra aún no tiene clases publicadas.
+    </p>
 </section>
+
 <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
 {% endblock %}

@@ -8,7 +8,12 @@ def get_classes(filters):
         if id_curso is None or id_curso == '':
             id_curso = 1
         
-        query = "SELECT id_clase, fecha, temas, tipo, modalidad, semana, id_curso FROM clases"
+        query = """
+            SELECT c.id_clase, c.fecha, c.temas, c.tipo, c.modalidad, c.semana, c.id_curso,
+                   CONCAT(u.nombre, ' ', u.apellido) AS publicado_por 
+            FROM clases c 
+            LEFT JOIN usuarios u ON c.id_creador_clase = u.id_usuario
+        """        
         condition = " WHERE 1=1"
         params = []
         
@@ -16,7 +21,7 @@ def get_classes(filters):
             condition += " AND fecha = %s"
             params.append(fecha)
         
-        condition += " AND id_curso = %s"
+        condition += " AND c.id_curso = %s"
         params.append(int(id_curso))
         
 
@@ -42,7 +47,7 @@ def get_class_id(id_clase):
         query = """
             SELECT
                 c.id_clase, c.fecha, c.temas, c.tipo, c.modalidad, c.semana, c.id_curso,
-                DATE_FORMAT(c.qr_valido_hasta, '%H:%i') AS qr_vence,
+                DATE_FORMAT(c.asistencia_valida_hasta, '%H:%i') AS asistencia_vence,
                 cur.catedra,
                 m.nombre AS materia,
                 (SELECT COUNT(*) FROM clases c2
@@ -87,19 +92,20 @@ def get_classes_by_subject(id_subject):
                 c.tipo,
                 c.modalidad,
                 c.semana,
-                c.id_curso
+                c.id_curso,
+                c.id_creador_clase,
+                CONCAT(u.nombre, ' ', u.apellido) AS publicado_por
             FROM clases c
+            LEFT JOIN usuarios u ON c.id_creador_clase = u.id_usuario
             JOIN cursos co ON c.id_curso = co.id_curso
             WHERE co.id_materia = %s
             ORDER BY c.semana ASC, c.fecha ASC
         """
         result = query_db(sql, (id_subject,))
-        
         return {
             "ok": True,
             "data": result
         }
-
     except Exception as e:
         return {
             "ok": False,
@@ -116,6 +122,7 @@ def create_class(data):
         tipo = data.get('tipo')
         modalidad = data.get('modalidad')
         id_curso = data.get('id_curso')
+        id_creador_clase = data.get('id_creador_clase')
 
         if not fecha or not id_curso or not semana:
             return {
@@ -125,11 +132,18 @@ def create_class(data):
                 "description": "Faltan campos obligatorios: fecha, semana e id_curso"
             }
         
+        if not id_creador_clase:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Falta id_creador_clase"
+            }
+        
         query = """
-            INSERT INTO clases (fecha, temas, semana, tipo, modalidad, id_curso) 
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO clases (fecha, temas, semana, tipo, modalidad, id_curso, id_creador_clase) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        modify_db(query, (fecha, temas, semana, tipo, modalidad, id_curso))
+        modify_db(query, (fecha, temas, semana, tipo, modalidad, id_curso, id_creador_clase))
 
         return {
             "ok": True,

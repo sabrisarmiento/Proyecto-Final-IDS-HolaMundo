@@ -15,7 +15,8 @@ def get_all_courses(filters):
                 c.anio,
                 c.slack_url,
                 c.youtube_url,
-                c.regimen_aprobacion
+                c.regimen_aprobacion,
+                c.estado
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
         """
@@ -53,7 +54,7 @@ def get_courses_for_user(id_user, is_admin, filters):
             return get_all_courses(filters)   # superadmin ve todo
 
         sql = """
-            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url
+            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url, c.estado
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
         """
@@ -78,8 +79,8 @@ def get_courses_for_user(id_user, is_admin, filters):
 def get_course_id(id_course):
     try:
         sql = """
-            SELECT c.id_curso, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url, c.regimen_aprobacion,
-            u.id_usuario AS profesor_id, u.nombre AS profesor_nombre, u.apellido AS profesor_apellido
+            SELECT c.id_curso, c.id_materia, m.nombre AS materia, c.catedra, c.cuatrimestre, c.anio, c.slack_url, c.youtube_url, c.regimen_aprobacion, c.estado,
+                   u.id_usuario AS profesor_id, u.nombre AS profesor_nombre, u.apellido AS profesor_apellido
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
             LEFT JOIN usuarios u ON c.id_profesor = u.id_usuario
@@ -153,6 +154,7 @@ def patch_course(id_course, data):
         slack_url   = data.get('slack_url')
         youtube_url = data.get('youtube_url')
         regimen_aprobacion = data.get('regimen_aprobacion')
+        estado = data.get('estado')
         updates = []
         params = []
 
@@ -180,6 +182,10 @@ def patch_course(id_course, data):
         if regimen_aprobacion is not None:
             updates.append("regimen_aprobacion = %s")
             params.append(regimen_aprobacion)
+        if estado is not None:
+            updates.append("estado = %s")
+            params.append(estado)
+        
 
         if not updates:
             return {

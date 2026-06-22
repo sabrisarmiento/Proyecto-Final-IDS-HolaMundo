@@ -11,6 +11,10 @@
 {% call modal("export-reports-modal", "Exportar informes") %}
 <form id="export-reports-form"
       data-base="{{ url_for('courses.exportar_informes', course_id=course['id_curso']) }}">
+  <input type="hidden" name="materia" value="{{ course.materia }}">
+  <input type="hidden" name="catedra" value="{{ course.catedra }}">
+  <input type="hidden" name="cuatrimestre" value="{{ course.cuatrimestre }}">
+  <input type="hidden" name="anio" value="{{ course.anio }}">
   <label class="export-check">
     <input type="checkbox" name="alumnos" value="1" /> Listado de alumnos (sin notas)
   </label>
@@ -27,7 +31,17 @@
     {% else %}
       <p class="csv-hint">No hay tipos de evaluación cargados.</p>
     {% endif %}
+    <label class="export-check export-subcheck">
+      <input type="checkbox" name="mostrar_corrector" value="1" /> Mostrar nombre del corrector
+    </label>
+    <label class="export-check export-subcheck">
+      <input type="checkbox" name="incluir_estado_final" value="1" />
+      Incluir estado final del alumno
+    </label>
   </div>
+  <label class="export-check">
+    <input type="checkbox" name="asistencia" value="1" /> Asistencia PDF
+  </label>
   <label class="export-check">
     <input type="checkbox" name="equipos" value="1" /> Reporte de equipos con integrantes
   </label>
@@ -83,6 +97,12 @@
         <span class="dash-stat-label">Promedio General</span>
         <strong class="dash-stat-num" id="dash-promedio">—</strong>
         <span class="dash-stat-sub">escala 0 – 10</span>
+      </div>
+
+      <div class="dash-stat-card dash-stat--accent">
+        <span class="dash-stat-label">Asistencia general</span>
+        <strong class="dash-stat-num">{{ dash_data.asistencia_general.porcentaje }}%</strong>
+        <span class="dash-stat-sub">{{ dash_data.asistencia_general.presentes }} de {{ dash_data.asistencia_general.posibles }} presencias</span>
       </div>
 
       <div class="dash-stat-card">
@@ -146,8 +166,8 @@
 
     {% if dash_data.asistencia_detalle %}
     <section class="dash-chart-card dash-chart-card--wide">
-      <h4 class="dash-chart-title">Asistencia por alumno</h4>
-      <p class="dash-chart-subtitle">Presentes sobre el total de clases</p>
+      <h4 class="dash-chart-title">Detalle de asistencia</h4>
+      <p class="dash-chart-subtitle">Todos los alumnos del curso</p>
       <div class="dash-table-wrap">
         <table class="dash-table">
           <thead>

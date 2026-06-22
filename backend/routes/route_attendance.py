@@ -4,7 +4,7 @@ from services.attendance_service import (
     attendance_post_handler,
     attendance_patch_handler,
     attendance_delete_handler,
-    generate_qr_service, 
+    send_attendance_link_service, 
 )
 from middleware.auth_middleware import require_auth
 
@@ -21,10 +21,10 @@ def post_attendance():
     data = request.get_json()
     return attendance_post_handler(data)
 
-@attendance_bp.route("/asistencia/generar-qr", methods=["POST"])
-def post_generate_qr():
+@attendance_bp.route("/asistencia/enviar-link", methods=["POST"])
+def post_send_attendance_link():
     data = request.get_json()
-    return generate_qr_service(data.get("id_clase"), data.get("horas"), data.get("minutos"))
+    return send_attendance_link_service(data.get("id_clase"), data.get("horas"), data.get("minutos"))
 
 @attendance_bp.route("/asistencia/<int:id>", methods=["PATCH"])
 @require_auth
