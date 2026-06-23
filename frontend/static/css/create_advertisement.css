@@ -1,6 +1,6 @@
 .advertisement-title {
   text-align: center;
-  color: var(--color-2);
+  color: var(--color-primary-dark);
 }
 
 .advertisement-form {
@@ -10,8 +10,8 @@
   max-width: 600px;
   margin: 1.5rem auto 0;
   padding: 1.6rem 1.75rem;
-  background: var(--color-5);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
 }
 
@@ -20,7 +20,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .advertisement-form label[for] {
@@ -34,9 +34,9 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
   padding: 0.65rem 0.85rem;
-  color: var(--color-15);
-  background: var(--color-45);
-  border: 1.5px solid var(--color-6);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: 0.5rem;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -44,13 +44,13 @@
 
 .advertisement-form input::placeholder,
 .advertisement-form textarea::placeholder {
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .advertisement-form input:focus,
 .advertisement-form textarea:focus {
-  border-color: var(--color-3);
-  box-shadow: 0 0 0 3px var(--color-16);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 .advertisement-form textarea {
@@ -84,12 +84,12 @@
     justify-content: space-between;
     flex-direction: row-reverse;
     padding: 0.8rem 1rem;
-    background: var(--color-45);
-    border: 1.5px solid var(--color-6);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
     border-radius: 9px;
     font-size: 0.85rem;
     font-weight: 500;
-    color: var(--color-15);
+    color: var(--color-text);
     text-transform: none;
     letter-spacing: normal;
     cursor: pointer;
@@ -102,7 +102,7 @@
     width: 38px;
     height: 21px;
     flex-shrink: 0;
-    background: var(--color-6);
+    background: var(--color-border);
     border-radius: 999px;
     border: none;
     cursor: pointer;
@@ -122,7 +122,7 @@
 }
 
 .advertisement-form > label:not([for]) input[type="checkbox"]:checked {
-    background: var(--color-3);
+    background: var(--color-primary);
 }
 
 .advertisement-form > label:not([for]) input[type="checkbox"]:checked::before {

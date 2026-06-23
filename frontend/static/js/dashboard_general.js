@@ -71,8 +71,8 @@
       data: {
         labels: labels,
         datasets: [
-          { label: "Activos",  data: activos,  backgroundColor: CSS("--color-9") || "#111D4A", borderRadius: 6, borderSkipped: false },
-          { label: "Abandono", data: abandono, backgroundColor: CSS("--color-3") || "#92140C", borderRadius: 6, borderSkipped: false },
+          { label: "Activos",  data: activos,  backgroundColor: CSS("--color-secondary") || "#111D4A", borderRadius: 6, borderSkipped: false },
+          { label: "Abandono", data: abandono, backgroundColor: CSS("--color-primary") || "#92140C", borderRadius: 6, borderSkipped: false },
         ],
       },
       options: {
@@ -102,7 +102,7 @@
         datasets: [{
           label: "Promedio general",
           data: historico.map(function (h) { return h.promedio_notas; }),
-          borderColor: CSS("--color-3") || "#92140C",
+          borderColor: CSS("--color-primary") || "#92140C",
           backgroundColor: "rgba(146,20,12,0.1)",
           tension: 0.35,
           pointRadius: 5,

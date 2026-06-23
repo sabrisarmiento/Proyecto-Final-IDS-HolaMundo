@@ -13,12 +13,12 @@
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0 0 0.5rem;
-    color: var(--color-9);
+    color: var(--color-secondary);
 }
 
 .attendance-subtitle {
     margin: 0;
-    color: var(--color-8);
+    color: var(--color-text-muted);
     font-size: 0.95rem;
 }
 
@@ -27,8 +27,8 @@
     align-items: flex-end;
     gap: 1rem;
     flex-wrap: wrap;
-    background-color: var(--color-45);
-    border: 1px solid var(--color-6);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 0.5rem;
     padding: 1.25rem;
     margin-bottom: 1.5rem;
@@ -46,7 +46,7 @@
 .field-label {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--color-85);
+    color: var(--color-text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
@@ -55,17 +55,17 @@
     font-family: inherit;
     font-size: 0.95rem;
     padding: 0.6rem 0.75rem;
-    border: 1px solid var(--color-6);
+    border: 1px solid var(--color-border);
     border-radius: 0.5rem;
-    background-color: var(--color-5);
-    color: var(--color-9);
+    background-color: var(--color-bg);
+    color: var(--color-secondary);
     cursor: pointer;
 }
 
 .field-select:focus {
     outline: none;
-    border-color: var(--color-3);
-    box-shadow: 0 0 0 3px var(--color-16);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 .btn-send-link {
@@ -75,7 +75,7 @@
     padding: 0.6rem 1.25rem;
     border: none;
     border-radius: 0.5rem;
-    background-color: var(--color-3);
+    background-color: var(--color-primary);
     color: #ffffff;
     cursor: pointer;
     display: inline-flex;
@@ -85,7 +85,7 @@
 }
 
 .btn-send-link:hover {
-    background-color: var(--color-2);
+    background-color: var(--color-primary-dark);
 }
 
 .btn-send-link:active {
@@ -93,8 +93,8 @@
 }
 
 .attendance-table-wrap {
-    background-color: var(--color-45);
-    border: 1px solid var(--color-6);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius:  0.5rem;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -111,20 +111,20 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    color: var(--color-85);
-    background-color: var(--color-6);
+    color: var(--color-text-subtle);
+    background-color: var(--color-border);
     padding: 0.85rem 1.25rem;
 }
 
 .attendance-table tbody td {
     padding: 0.85rem 1.25rem;
-    border-top: 1px solid var(--color-6);
-    color: var(--color-9);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-secondary);
     font-size: 0.95rem;
 }
 
 .attendance-table tbody tr:hover {
-    background-color: var(--color-16);
+    background-color: var(--color-primary-glow);
 }
 
 .status {
@@ -161,17 +161,17 @@
 .empty-state p {
     margin: 0 0 0.25rem;
     font-weight: 600;
-    color: var(--color-85);
+    color: var(--color-text-subtle);
 }
 
 .empty-state small {
-    color: var(--color-8);
+    color: var(--color-text-muted);
 }
 
 .attendance-flash {
-    background-color: var(--color-6);
-    border: 1px solid var(--color-3);
-    color: var(--color-9);
+    background-color: var(--color-border);
+    border: 1px solid var(--color-primary);
+    color: var(--color-secondary);
     border-radius: 0.5rem;
     padding: 0.85rem 1.25rem;
     margin-bottom: 1.5rem;

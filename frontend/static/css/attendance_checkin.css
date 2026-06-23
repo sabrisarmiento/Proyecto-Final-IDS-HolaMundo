@@ -6,12 +6,12 @@
 }
 
 .checkin h1 {
-  color: var(--color-3);
+  color: var(--color-primary);
   font-size: 1.6rem;
 }
 
 .checkin p {
-  color: var(--color-1);
+  color: var(--color-text-heading);
 }
 
 .checkin .btn-action {
@@ -25,5 +25,5 @@
   font-weight: 600;
 }
 
-#result.ok  { color: var(--color-9); }
-#result.err { color: var(--color-25); }
+#result.ok  { color: var(--color-secondary); }
+#result.err { color: var(--color-primary-mid); }
