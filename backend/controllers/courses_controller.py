@@ -1,4 +1,5 @@
 from database.db import query_db, modify_db
+from helpers.user_belongs import user_can_manage_course
 
 def get_all_courses(filters):
     try:
@@ -144,8 +145,15 @@ def create_course(data):
             "description": str(e)
         }
 
-def patch_course(id_course, data):
+def patch_course(id_course, data, logged_user):
     try:
+        if not user_can_manage_course(id_course, logged_user):
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permisos sobre este curso"
+            }
         id_materia = data.get('id_materia')
         catedra = data.get('catedra')
         term = data.get('cuatrimestre')
