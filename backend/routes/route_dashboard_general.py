@@ -3,13 +3,15 @@ from helpers.responses import error_response, success_response
 from controllers.dashboard_general_controller import get_general_dashboard
 from controllers.users_controller import create_user, update_user_by_id, delete_user_by_id
 from controllers.roles_controller import create_rol, delete_rol_by_id
-from middleware.auth_middleware import require_auth
+from middleware.auth_middleware import require_auth, require_min_admin_level
+from helpers.constants import NIVEL_SUPERADMIN
 
 dashboard_general_bp = Blueprint('dashboard_general', __name__)
 
 
 @dashboard_general_bp.route('/dashboard/general', methods=['GET'])
 @require_auth
+@require_min_admin_level(NIVEL_SUPERADMIN)
 def get_dashboard_general():
     result = get_general_dashboard()
     if not result["ok"]:
@@ -49,6 +51,7 @@ def eliminar_usuario_dashboard(id_user):
 
 @dashboard_general_bp.route('/dashboard/roles', methods=['POST'])
 @require_auth
+@require_min_admin_level(NIVEL_SUPERADMIN)
 def crear_rol_dashboard():
     data = request.get_json(silent=True)
     result = create_rol(data)
@@ -59,6 +62,7 @@ def crear_rol_dashboard():
 
 @dashboard_general_bp.route('/dashboard/roles/<int:id_rol>', methods=['DELETE'])
 @require_auth
+@require_min_admin_level(NIVEL_SUPERADMIN)
 def eliminar_rol_dashboard(id_rol):
     result = delete_rol_by_id(id_rol)
     if not result["ok"]:
