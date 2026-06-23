@@ -1,6 +1,7 @@
 <div class="materials-tab">
 <h2>Materiales del curso</h2>
 
+{% if nivel >= 2 %}
 <form method="POST"
         action="{{ url_for('courses.create_material_view', course_id=course_id) }}"
         class="material-form">
@@ -15,6 +16,7 @@
     </select>
     <button type="submit" class="btn-action">Subir material</button>
 </form>
+{% endif %}
 
 {% if materiales %}
     <ul class="material-list">
@@ -27,14 +29,17 @@
         </div>
         <div class="material-actions">
             <a href="{{ m.url_externo }}" target="_blank" class="btn-action">Ver recurso</a>
+            {% if nivel >= 2 %}
             <button type="button" class="btn-action" onclick="openModal('edit-material-{{ m.id_material }}')">Editar</button>
             <form method="POST"
                 action="{{ url_for('courses.eliminar_material_view', course_id=course_id, id_material=m.id_material) }}"
                 onsubmit="return confirm('¿Eliminar este material?')">
                 <button type="submit" class="btn-action">Eliminar</button>
             </form>
+            {% endif %}
         </div>
 
+        {% if nivel >= 2 %}
         {% call modal("edit-material-" ~ m.id_material, "Editar material") %}
         <form method="POST"
             action="{{ url_for('courses.editar_material_view', course_id=course_id, id_material=m.id_material) }}"
@@ -51,6 +56,7 @@
             <button type="submit" class="btn-action">Guardar cambios</button>
         </form>
         {% endcall %}
+        {% endif %}
     </li>
 
     {% endfor %}

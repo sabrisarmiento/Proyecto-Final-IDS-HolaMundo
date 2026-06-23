@@ -146,7 +146,7 @@
                 </select>
               </form>
 
-              {% if eval_seleccionada %}
+              {% if eval_seleccionada and nivel >= 2 %}
               {% set nombre_eval_activa = eval_seleccionada.nombre if eval_seleccionada.nombre else 'Evaluación ' ~ eval_seleccionada.id_evaluacion %}
               {% set cant_students = students | length %}
               <form action="{{ url_for('courses.eliminar_evaluacion', course_id=course.id_curso, eval_id=eval_seleccionada.id_evaluacion) }}"
@@ -170,6 +170,7 @@
             {% endif %}
           </div>
 
+          {% if nivel >= 2 %}
           <div class="mgmt-box mgmt-box--right">
             <label class="mgmt-label">CREAR UN NUEVO TIPO DE EVALUACIÓN</label>
             <p class="mgmt-hint">Se incorporará una nueva columna interactiva en la planilla inferior al instante</p>
@@ -182,6 +183,7 @@
               <button type="submit" class="btn-crear">+ CREAR</button>
             </form>
           </div>
+          {% endif %}
 
         </div>
       </div>
@@ -223,6 +225,7 @@
             </div>
           </div>
 
+          {% if nivel >= 2 %}
           <form action="/cursos/{{ course.id_curso }}/notas/guardar" method="POST" id="form-notas">
             <input type="hidden" name="id_evaluacion" value="{{ eval_seleccionada.id_evaluacion }}">
             <div class="grade-grid" id="grade-grid">
@@ -279,6 +282,7 @@
               <button type="submit" class="btn-guardar">GUARDAR CALIFICACIONES</button>
             </div>
           </form>
+          {% endif %}
         </div>
 
         {% else %}
@@ -315,6 +319,7 @@
 
           {% set teams_con_alumnos = teams | selectattr("alumnos") | list %}
           {% if teams_con_alumnos %}
+          {% if nivel >= 2 %}
           <form action="{{ url_for('courses.asociar_nota_grupal', course_id=course.id_curso) }}" method="POST">
             <input type="hidden" name="id_evaluacion" value="{{ eval_seleccionada.id_evaluacion }}">
 
@@ -383,6 +388,7 @@
               <button type="submit" class="btn-guardar">GUARDAR NOTAS GRUPALES</button>
             </div>
           </form>
+          {% endif %}
           {% else %}
           <p class="tab-empty">No hay equipos con integrantes en este curso, crea equipos desde la pestaña Equipos</p>
           {% endif %}
@@ -468,6 +474,7 @@
                     <span class="th-eval-tipo" title="{% if eval.asociacion == 'Equipo' %}Grupal{% else %}Individual{% endif %}">
                       {% if eval.asociacion == 'Equipo' %}👥{% else %}👤{% endif %}
                     </span>
+                    {% if nivel >= 2 %}
                     <form action="{{ url_for('courses.eliminar_evaluacion', course_id=course.id_curso, eval_id=eval.id_evaluacion) }}"
                           method="POST"
                           style="display:inline;"
@@ -475,6 +482,7 @@
                           data-nombre="{{ nombre_eval_col }}">
                       <button type="submit" class="btn-del-col" title="Eliminar columna">🗑️</button>
                     </form>
+                    {% endif %}
                   </div>
                 </th>
                 {% endfor %}
