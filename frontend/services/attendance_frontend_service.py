@@ -1,6 +1,6 @@
 import os
 import requests
-from config import BASE_URL
+from config import BASE_URL, get_headers
 BASE = os.getenv("BACKEND_URL", "http://127.0.0.1:5000")
 
 def attendance_get_all(id_clase=None):
@@ -14,11 +14,11 @@ def attendance_get_all(id_clase=None):
 
 def send_attendance_link(id_clase, horas=None, minutos=None):
     try:
-        r = requests.post(f"{BASE}/asistencia/enviar-link", json={"id_clase": id_clase, "horas": horas, "minutos": minutos})
+        r = requests.post(f"{BASE}/asistencia/enviar-link", json={"id_clase": id_clase, "horas": horas, "minutos": minutos}, headers=get_headers())
         return r.json()
     except Exception as e:
         print(f"Error: {e}")
-        return []
+        return {"message": "No se pudo enviar el link de asistencia."}
 
 def mark_attendance(payload):
     try:
