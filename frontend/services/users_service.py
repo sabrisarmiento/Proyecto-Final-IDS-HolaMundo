@@ -66,3 +66,29 @@ def put_password_user(data):
             "ok": False,
             "description": str(e)
         }
+
+def login_user(correo, contraseña):
+    try:
+        response = requests.post(f'{BASE_URL}/login', json={
+            "correo": correo,
+            "contraseña": contraseña
+        })
+        body = response.json() if response.content else {}
+
+        if response.status_code == 200:
+            return {
+                "ok": True,
+                "token": body.get('token'),
+                "user": body.get('user')
+            }
+        else:
+            desc = (body.get('errors') or [{}])[0].get('description', 'Credenciales inválidas')
+            return {
+                "ok": False,
+                "description": desc
+            }
+    except Exception as e:
+        return {
+            "ok": False,
+            "description": "Error de conexión"
+        }
