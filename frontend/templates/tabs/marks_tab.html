@@ -1,11 +1,16 @@
+{% set user_session = session.get('user', {}) if session.get('user') is mapping else {} %}
+{% set user_nivel = user_session.get('nivel', 0)|int %}
+{% set user_role = session.get('role', '')|string|lower %}
+
+{% if user_nivel != 1 and user_role != 'ayudante' %}
 <div class="promo-config-block">
         <div class="promo-config-title-row">
           <div>
             <label class="promo-config-title">CONFIGURACIÓN DE PROMOCIÓN</label>
-            <p class="promo-config-subtitle">Define si la materia es promocionable y qué evaluaciones cuentan para promocionar</p>
+            <p class="promo-config-subtitle">Define si el curso es promocionable y qué evaluaciones cuentan para promocionar</p>
           </div>
           <div class="promo-toggle-group">
-            <span class="promo-toggle-label">¿La materia es promocionable?</span>
+            <span class="promo-toggle-label">¿El curso es promocionable?</span>
             <form id="form-toggle-promo"
                   action="/cursos/{{ course.id_curso }}/promocion/guardar"
                   method="POST"
@@ -115,6 +120,7 @@
           </form>
         </div>
       </div>
+{% endif %}
 
       <div class="mgmt-wrapper">
         <div class="mgmt-card">
