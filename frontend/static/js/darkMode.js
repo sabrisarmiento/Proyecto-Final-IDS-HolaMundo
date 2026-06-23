@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.documentElement.setAttribute('data-theme','light');
                 localStorage.setItem('theme', 'light');
             }
+            window.dispatchEvent(new Event("themeChanged"));
             
         });
     }
