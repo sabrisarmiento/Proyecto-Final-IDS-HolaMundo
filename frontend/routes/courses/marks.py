@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request, session, flash
+from flask import redirect, url_for, request, session, flash, abort
 import requests
 
 from . import courses_bp
@@ -79,6 +79,9 @@ def guardar_promocion(course_id):
     token = get_token()
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
+    
+    if session.get('role') == 'ayudante':
+        return abort(403)
 
     es_promocionable      = request.form.get('es_promocionable') == '1'
     cuenta_asistencia     = 'cuenta_asistencia' in request.form
