@@ -168,3 +168,25 @@ def test_tipos_evaluacion_require_superadmin(client, make_token):
     assert client.post("/tipos-evaluacion", json={}, headers=auth_header(prof)).status_code == 403
     assert client.patch("/tipos-evaluacion/1", json={}, headers=auth_header(prof)).status_code == 403
     assert client.delete("/tipos-evaluacion/1", headers=auth_header(prof)).status_code == 403
+
+
+def test_marks_mutations_reject_unauthenticated(client):
+    assert client.post("/marks", json={}).status_code == 401
+    assert client.patch("/marks/1", json={}).status_code == 401
+    assert client.delete("/marks/1").status_code == 401
+
+
+def test_marks_mutations_reject_ayudante(client, make_token):
+    token = make_token(1)
+    assert client.post("/marks", json={"id_evaluacion": 1}, headers=auth_header(token)).status_code == 403
+    assert client.patch("/marks/1", json={}, headers=auth_header(token)).status_code == 403
+    assert client.delete("/marks/1", headers=auth_header(token)).status_code == 403
+
+
+def test_marks_non_owner_forbidden(client, make_token, monkeypatch):
+    monkeypatch.setattr("services.mark_service.user_can_manage_evaluacion", lambda id_eval, user: False, raising=False)
+    monkeypatch.setattr("services.mark_service.user_can_manage_nota", lambda id_nota, user: False, raising=False)
+    token = make_token(2)
+    assert client.post("/marks", json={"id_evaluacion": 1}, headers=auth_header(token)).status_code == 403
+    assert client.patch("/marks/1", json={"nota": 5}, headers=auth_header(token)).status_code == 403
+    assert client.delete("/marks/1", headers=auth_header(token)).status_code == 403

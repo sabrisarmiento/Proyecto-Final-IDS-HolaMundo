@@ -59,3 +59,13 @@ def user_can_manage_evaluacion(id_evaluacion, user):
         return True
     row = query_db("SELECT id_curso FROM evaluaciones WHERE id_evaluacion = %s", (id_evaluacion,))
     return bool(row) and user_can_manage_course(row[0]["id_curso"], user)
+
+
+def user_can_manage_nota(id_nota, user):
+    if (user.get("nivel") or 0) >= NIVEL_SUPERADMIN:
+        return True
+    row = query_db(
+        "SELECT e.id_curso FROM notas n JOIN evaluaciones e ON n.id_evaluacion = e.id_evaluacion WHERE n.id_nota = %s",
+        (id_nota,),
+    )
+    return bool(row) and user_can_manage_course(row[0]["id_curso"], user)
