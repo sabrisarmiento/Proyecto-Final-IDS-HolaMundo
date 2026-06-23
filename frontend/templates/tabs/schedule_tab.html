@@ -1,3 +1,4 @@
+{% if nivel >= 2 %}
 <form class="calendar-form" action="{{ url_for('courses.crear_clase', course_id=course.id_curso) }}"
   method="POST">
   <div class="calendar-form-group">
@@ -57,6 +58,17 @@
 {% endwith %}
 
 </form>
+{% else %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+{% endif %}
 
 <form class="calendar-filter" method="GET">
     <input type="hidden" name="tab" value="calendar">
@@ -112,14 +124,17 @@
              </div>
         </td>
 
+          {% if nivel >= 2 %}
           <td>
               <button class="class-action-btn" type="submit">
                 Guardar
               </button>
           </td>
+          {% endif %}
       </form>
-          
 
+
+          {% if nivel >= 2 %}
           <td>
             <form method="GET">
               <input type="hidden" name="tab" value="calendar" >
@@ -128,6 +143,7 @@
               </button>
             </form>
           </td>
+          {% endif %}
 
        {% else %}
 
@@ -136,9 +152,10 @@
           <td>{{ clase.temas }}</td>
           <td>{{ clase.tipo }}</td>
           <td>{{ clase.modalidad }}</td>
-      
+
+          {% if nivel >= 2 %}
           <td>
-           <form action="{{ url_for('courses.eliminar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}" 
+           <form action="{{ url_for('courses.eliminar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}"
            method="POST" style="display:inline;">
              <button class="class-action-btn" type="submit">
               🗑️
@@ -154,6 +171,7 @@
              </button>
            </form>
          </td>
+          {% endif %}
       {% endif %}
     </tr>
     {% endfor %}

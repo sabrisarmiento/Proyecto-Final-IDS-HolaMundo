@@ -72,6 +72,7 @@
           href="{{ url_for('advertisements.create_advertisement_front', id_curso=course['id_curso']) }}">
           + Crear aviso
         </a>
+        {% if nivel >= 2 %}
         <a class="btn-crear"
           href="{{ url_for('advertisements.configure_slack_front', id_curso=course['id_curso']) }}">
           Configurar Slack
@@ -81,6 +82,7 @@
             Desconectar Slack
           </button>
         </form>
+        {% endif %}
       </div>
       <div class="ads-filter">
         <label for="select-source-dashboard">Ver avisos:</label>
