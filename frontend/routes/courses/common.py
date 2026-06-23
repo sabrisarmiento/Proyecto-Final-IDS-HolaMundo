@@ -8,3 +8,7 @@ def get_token():
 
 def auth_headers():
     return {'Authorization': f'Bearer {session.get("token")}'}
+
+def get_user():
+    user = session.get("user")
+    return user if user else None

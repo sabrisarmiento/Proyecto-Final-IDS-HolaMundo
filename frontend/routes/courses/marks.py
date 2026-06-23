@@ -1,8 +1,8 @@
 from flask import redirect, url_for, request, session, flash, abort
 import requests
-
+from helpers.logger import log_action
 from . import courses_bp
-from .common import BACKEND_URL, get_token, auth_headers
+from .common import BACKEND_URL, get_token, auth_headers, get_user
 
 
 @courses_bp.route('/cambiar-evaluacion', methods=['POST'])
@@ -16,6 +16,7 @@ def cambiar_evaluacion():
 
 @courses_bp.route('/cursos/<int:course_id>/notas/guardar', methods=['POST'])
 def guardar_notas(course_id):
+    user=get_user()
     token = get_token()
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
@@ -41,6 +42,13 @@ def guardar_notas(course_id):
         json={'id_evaluacion': id_eval, 'notas': notas_dict, 'correctores': correctores_dict},
         headers=headers
     )
+    log_action(
+            method='POST',
+            description=f'Guardar notas de evaluación {id_eval}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=resp.status_code
+        )
     print(f"[guardar_notas] backend response: {resp.status_code} {resp.text}")
 
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
@@ -48,6 +56,7 @@ def guardar_notas(course_id):
 
 @courses_bp.route('/cursos/<int:course_id>/evaluaciones/crear', methods=['POST'])
 def crear_evaluacion(course_id):
+    user=get_user()
     token = get_token()
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
@@ -58,17 +67,32 @@ def crear_evaluacion(course_id):
         json={'id_curso': course_id, 'id_tipo': 1, 'nombre': nombre, 'asociacion': asociacion},
         headers=auth_headers()
     )
+    log_action(
+            method='POST',
+            description=f'Se creo una nueva evaluación {nombre} en el curso {course_id}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=200
+        )
     session.pop('eval_seleccionada', None)
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
 
 
 @courses_bp.route('/cursos/<int:course_id>/evaluaciones/eliminar/<int:eval_id>', methods=['POST'])
 def eliminar_evaluacion(course_id, eval_id):
+    user=get_user()
     token = get_token()
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
 
     requests.delete(f'{BACKEND_URL}/evaluaciones/{eval_id}', headers=auth_headers())
+    log_action(
+            method='DELETE',
+            description=f'Se elimino la evaluación {eval_id} en el curso {course_id}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=200
+        )
     if session.get('eval_seleccionada') == eval_id:
         session.pop('eval_seleccionada', None)
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='marks'))
@@ -76,6 +100,7 @@ def eliminar_evaluacion(course_id, eval_id):
 
 @courses_bp.route('/cursos/<int:course_id>/promocion/guardar', methods=['POST'])
 def guardar_promocion(course_id):
+    user=get_user()
     token = get_token()
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
@@ -109,6 +134,13 @@ def guardar_promocion(course_id):
             },
             headers=auth_headers()
         )
+        log_action(
+            method='POST',
+            description=f'Se determino la promocion para el curso {course_id}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=200
+        )
     except Exception as e:
         print(f"Error guardando promo: {e}")
 
@@ -117,6 +149,7 @@ def guardar_promocion(course_id):
 
 @courses_bp.route('/cursos/<int:course_id>/notas/grupal', methods=['POST'])
 def asociar_nota_grupal(course_id):
+    user=get_user()
     token = get_token()
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debes iniciar sesión')
@@ -173,6 +206,13 @@ def asociar_nota_grupal(course_id):
             f'{BACKEND_URL}/notas/guardar',
             json={'id_evaluacion': id_evaluacion, 'notas': notas_dict, 'correctores': correctores_dict},
             headers=headers
+        )
+        log_action(
+            method='POST',
+            description=f'Se asocioraron las notas de la evaluación {id_evaluacion} a los alumnos de los equipos del curso {course_id}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=resp.status_code
         )
         print(f"[asociar_nota_grupal] backend response: {resp.status_code} {resp.text}")
         flash('Notas grupales guardadas correctamente.', 'ok')
