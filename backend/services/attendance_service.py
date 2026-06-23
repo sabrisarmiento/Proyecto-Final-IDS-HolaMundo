@@ -57,7 +57,7 @@ def send_attendance_link_service(id_clase, horas=None, minutos=None, user=None):
             return jsonify({"error": "No tenés permisos sobre esta clase"}), 403
 
         try:
-            horas = int(horas) if horas not in (None, "") else 3
+            horas = int(horas) if horas not in (None, "") else 0
             minutos = int(minutos) if minutos not in (None, "") else 0
         except (ValueError, TypeError):
             return jsonify({"error": "Horas y minutos deben ser numéricos"}), 400
