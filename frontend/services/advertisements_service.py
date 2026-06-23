@@ -1,5 +1,7 @@
 import os
 import requests
+from helpers.logger import log_action
+from config import get_user
 
 API_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:5000")
 
@@ -70,6 +72,7 @@ def get_all_combined_advertisements(id_course=None):
 
 
 def create_advertisement(id_course, title, message, token):
+    user=get_user()
     try:
         headers = {
             "Authorization": f"Bearer {token}"
@@ -86,8 +89,13 @@ def create_advertisement(id_course, title, message, token):
             json=data,
             headers=headers
         )
-        print("STATUS CREATE AD:", response.status_code)
-        print("TEXT CREATE AD:", response.text)
+        log_action(
+            method='POST',
+            description=f'Se creo el aviso {id_course} sobre {title}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=response.status_code
+        )
         if response.status_code in [200, 201]:
             return {
                 "ok": True,

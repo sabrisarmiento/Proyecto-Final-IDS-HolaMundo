@@ -1,4 +1,5 @@
-from config import BASE_URL, get_headers
+from config import BASE_URL, get_headers, get_user
+from helpers.logger import log_action
 import requests
 
 def patch_user(id, data):
@@ -24,9 +25,16 @@ def patch_user(id, data):
         }
 
 def patch_user2(id, data):
+    user=get_user()
     try:
         response = requests.patch(f'{BASE_URL}/users/{id}', json=data, headers=get_headers())
-
+        log_action(
+            method='PATCH',
+            description=f'Se actualizo el usuario de {data["nombre"]} y correo {data["correo"]}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=response.status_code
+        )
         if response.status_code == 200:
             return {
                 "ok": True,
@@ -46,10 +54,17 @@ def patch_user2(id, data):
         }
 
 def put_password_user(data):
+    user = get_user()
     try:
         response = requests.put(f'{BASE_URL}/change-password', json=data, headers=get_headers())
         body = response.json() if response.content else {}
-
+        log_action(
+            method='PUT',
+            description=f'Se actualizo la contraseña del usuario de {user.get("correo")}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=response.status_code
+        )
         if response.status_code == 200:
             return {
                 "ok": True,
@@ -74,7 +89,6 @@ def login_user(correo, contraseña):
             "contraseña": contraseña
         })
         body = response.json() if response.content else {}
-
         if response.status_code == 200:
             return {
                 "ok": True,

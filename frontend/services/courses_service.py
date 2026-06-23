@@ -1,4 +1,5 @@
-from config import BASE_URL, get_headers
+from config import BASE_URL, get_headers, get_user
+from helpers.logger import log_action
 import requests
 
 def get_courses():
@@ -40,13 +41,18 @@ def get_course_by_subject(name):
   except Exception as e:
     return {}
 
-import requests
-from config import BASE_URL, get_headers
-
 def post_course(data):
+    user = get_user()
     try:
         response = requests.post(f"{BASE_URL}/courses", json=data, headers=get_headers())
         response.raise_for_status()
+        log_action(
+            method='POST',
+            description=f'Se creo el curso {data["catedra"]}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=response.status_code
+        )
         return response.json()
     except Exception as e:
         print(f"Error al crear curso: {e}")
