@@ -1,6 +1,5 @@
-from config import BASE_URL
 from flask import Blueprint, request, redirect, url_for, session
-import requests
+from services.users_service import login_user
 
 login_bp = Blueprint('login', __name__)
 
@@ -9,27 +8,16 @@ def login():
   correo = request.form.get('correo')
   contraseña = request.form.get('contraseña')
 
-  try:
-    response = requests.post(f"{BASE_URL}/login", json={  # requests (librería)
-      "correo": correo,
-      "contraseña": contraseña
-    })
-    print("STATUS:", response.status_code)
-    print("TEXT:", response.text)
-    data = response.json()
+  result = login_user(correo, contraseña)
 
-    if response.status_code == 200:
-      session['token'] = data['token']
-      session['user'] = data['user']
-      return redirect(url_for('dashboard.dashboard'))
-    else:
-      errors = data.get('errors') or [{}]
-      msg = errors[0].get('description', 'Credenciales inválidas')
-      return redirect(url_for('landing.landing') + f'?error={msg}')
+  if result['ok']:
+    session['token'] = result['token']
+    session['user'] = result['user']
+    return redirect(url_for('dashboard.dashboard'))
 
-  except Exception:
-    return redirect(url_for('landing.landing') + '?error=Error de conexión')
-  
+  return redirect(url_for('landing.landing') + f'?error={result["description"]}')
+
+
 @login_bp.route('/logout')
 def logout():
   session.clear()
