@@ -238,12 +238,6 @@
   align-items: flex-start;
 }
 
-.student-preview {
-  width: 100%;
-  margin-top: .6rem;
-  display: block;
-}
-
 .padron-wrapper {
   max-width: 320px;
   flex: none;
@@ -300,18 +294,6 @@
 .student-preview {
   margin-top: 8px;
   font-size: 14px;
-}
-
-.student-found { 
-  padding: 8px; 
-  background: var(--color-16); 
-  border-radius: 6px; 
-  color: var(--color-9); 
-} 
-
-.student-not-found { 
-  color: var(--color-3); 
-  font-weight: 600; 
 }
 
 .hidden {
@@ -508,4 +490,141 @@
 
 .team-warning-actions button:hover {
   opacity: 0.9;
+}
+
+.student-found {
+  margin-top: .85rem;
+  padding: 1rem 1.1rem;
+  background: rgba(45, 210, 0, .06);
+  border: 1px solid rgba(45, 210, 0, .18);
+  border-radius: .85rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.student-found p {
+  margin: 0;
+  color: var(--color-15);
+  font-size: .9rem;
+  line-height: 1.4;
+}
+
+.student-found strong {
+  color: var(--color-9);
+  font-weight: 600;
+}
+
+.student-not-found {
+  margin-top: .85rem;
+  padding: .9rem 1rem;
+  background: rgba(230, 11, 11, .06);
+  border: 1px solid rgba(230, 11, 11, .15);
+  border-radius: .85rem;
+  color: var(--color-3);
+  font-size: .9rem;
+  font-weight: 500;
+}
+
+.student-not-found::before {
+  content: "⚠ ";
+}
+
+.team-add-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+
+.team-add-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+.team-add-form input[type="number"] {
+  width: 220px;
+  height: 38px;
+  padding: 0 12px;
+  border: 1.5px solid var(--color-6);
+  border-radius: .75rem;
+  background: var(--color-45);
+  color: var(--color-15);
+  font: .9rem 'Poppins', sans-serif;
+  transition: .2s;
+}
+
+.team-add-form input[type="number"]:focus {
+  outline: none;
+  border-color: var(--color-3);
+  box-shadow: 0 0 0 3px var(--color-16);
+}
+
+.team-add-form .btn-primary,
+.team-add-form .btn-add-student {
+  height: 38px;
+  padding: 0 16px;
+  border: none;
+  border-radius: .75rem;
+  font: 500 .9rem 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.team-add-form .btn-primary {
+  background: var(--color-9);
+  color: var(--color-10);
+}
+
+.team-add-form .btn-primary:hover {
+  opacity: .92;
+}
+
+.team-add-form .btn-add-student {
+  background: var(--color-3);
+  color: var(--color-10);
+}
+
+.team-add-form .btn-add-student:hover {
+  background: var(--color-2);
+}
+
+.student-found form {
+  margin-top: .25rem;
+}
+
+.student-found .btn-add-student {
+  height: 38px;
+  padding: 0 16px;
+  border: none;
+  border-radius: .75rem;
+  background: var(--color-3);
+  color: var(--color-10);
+  font: 500 .9rem 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.student-found .btn-add-student:hover {
+  background: var(--color-2);
+}
+
+.btn-edit-team {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-6);
+  color: var(--color-9);
+  cursor: pointer;
+  transition: .2s;
+  flex-shrink: 0;
+}
+
+.btn-edit-team:hover {
+  background: var(--color-9);
+  color: var(--color-10);
 }

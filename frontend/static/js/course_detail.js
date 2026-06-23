@@ -344,31 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".padron-input").forEach(input => {
-        input.addEventListener("input", async () => {
-            const padron = input.value;
-            const preview = input.closest("form").querySelector(".student-preview");
-            if (!padron) return preview.innerHTML = "";
-            try {
-                const res = await fetch(`/cursos/${input.dataset.courseId}/buscar-alumno?padron=${padron}`);
-                const data = await res.json();
-                if (!data.found) {
-                    preview.innerHTML = `<span class="student-not-found">Padrón inexistente en este curso</span>`;
-                    return;
-                }
-                preview.innerHTML = `
-                    <div class="student-found">
-                        Alumno encontrado: <strong>${data.nombre} ${data.apellido}</strong><br>
-                        Estado: <strong>${data.estado}</strong>
-                    </div>`;
-            } catch (error) {
-                preview.innerHTML = `<span class="student-not-found">Error al buscar alumno</span>`;
-            }
-        });
-    });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".flash-message").forEach(msg => {
         msg.style.transition = "opacity 0.5s ease, transform 0.5s ease";
         setTimeout(() => {
