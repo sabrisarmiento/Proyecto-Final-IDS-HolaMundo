@@ -120,3 +120,21 @@ def test_students_non_owner_forbidden(client, make_token, monkeypatch):
     token = make_token(2)
     assert client.post("/students", json={"id_curso": 1}, headers=auth_header(token)).status_code == 403
     assert client.patch("/students/1", json={"nombre": "X"}, headers=auth_header(token)).status_code == 403
+
+
+def test_equipo_alumno_reject_unauthenticated(client):
+    assert client.post("/equipo-alumno", json={}).status_code == 401
+    assert client.delete("/equipo-alumno", json={}).status_code == 401
+
+
+def test_equipo_alumno_reject_ayudante(client, make_token):
+    token = make_token(1)
+    assert client.post("/equipo-alumno", json={"id_equipo": 1}, headers=auth_header(token)).status_code == 403
+    assert client.delete("/equipo-alumno", json={"id_equipo": 1}, headers=auth_header(token)).status_code == 403
+
+
+def test_equipo_alumno_non_owner_forbidden(client, make_token, monkeypatch):
+    monkeypatch.setattr("services.team_student_service.user_can_manage_equipo", lambda id_equipo, user: False, raising=False)
+    token = make_token(2)
+    assert client.post("/equipo-alumno", json={"id_equipo": 1}, headers=auth_header(token)).status_code == 403
+    assert client.delete("/equipo-alumno", json={"id_equipo": 1}, headers=auth_header(token)).status_code == 403
