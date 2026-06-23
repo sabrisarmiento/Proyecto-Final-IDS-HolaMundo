@@ -2,15 +2,16 @@ from database.db import query_db
 from datetime import datetime
 
 
+from database.db import query_db
+from datetime import datetime
+
 def get_general_dashboard():
     try:
         total_usuarios = query_db("SELECT COUNT(*) AS total FROM usuarios")[0]["total"]
         anio_actual = datetime.now().year
-        mes_actual = datetime.now().month
-        cuatrimestre_actual = 1 if mes_actual <= 7 else 2
+        
         cursos_activos = query_db(
-            "SELECT COUNT(*) AS total FROM cursos WHERE anio = %s AND cuatrimestre = %s",
-            (anio_actual, cuatrimestre_actual)
+            "SELECT COUNT(*) AS total FROM cursos WHERE estado = 1"
         )[0]["total"]
 
         total_alumnos = query_db("SELECT COUNT(*) AS total FROM alumnos")[0]["total"]
@@ -51,11 +52,10 @@ def get_general_dashboard():
             FROM cursos c
             JOIN materias m ON c.id_materia = m.id_materia
             LEFT JOIN alumnos a ON c.id_curso = a.id_curso
-            WHERE c.anio = %s AND c.cuatrimestre = %s
+            WHERE c.estado = 1
             GROUP BY c.id_curso, m.nombre, c.catedra, c.anio, c.cuatrimestre
-            ORDER BY m.nombre
-            """,
-            (anio_actual, cuatrimestre_actual)
+            ORDER BY c.anio DESC, c.catedra
+            """
         )
 
         return {
@@ -69,7 +69,7 @@ def get_general_dashboard():
                 "rendimiento_historico": rendimiento_historico,
                 "cursos_stats": cursos_stats,
                 "anio_actual": anio_actual,
-                "cuatrimestre_actual": cuatrimestre_actual,
+                "cuatrimestre_actual": "Todos",
             }
         }
 
