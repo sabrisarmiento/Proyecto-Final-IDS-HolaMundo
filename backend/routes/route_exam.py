@@ -28,9 +28,10 @@ def obtain_exams_params():
  
 @exam_bp.route("/evaluaciones", methods=["POST"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def add_exam():
     data = request.get_json()
-    return create_exam_service(data)
+    return create_exam_service(data, request.user)
  
  
 @exam_bp.route("/evaluaciones/<int:id>", methods=["GET"])
@@ -40,15 +41,17 @@ def obtain_exam_id(id):
  
 @exam_bp.route("/evaluaciones/<int:id>", methods=["PATCH"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def modify_exam(id):
     data = request.get_json()
-    return patch_exam_service(id, data)
+    return patch_exam_service(id, data, request.user)
  
  
 @exam_bp.route("/evaluaciones/<int:id>", methods=["DELETE"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def delete_exam(id):
-    return delete_exam_service(id)
+    return delete_exam_service(id, request.user)
  
  
 @exam_bp.route("/notas/guardar", methods=["POST"])

@@ -138,3 +138,33 @@ def test_equipo_alumno_non_owner_forbidden(client, make_token, monkeypatch):
     token = make_token(2)
     assert client.post("/equipo-alumno", json={"id_equipo": 1}, headers=auth_header(token)).status_code == 403
     assert client.delete("/equipo-alumno", json={"id_equipo": 1}, headers=auth_header(token)).status_code == 403
+
+
+def test_evaluaciones_mutations_reject_unauthenticated(client):
+    assert client.post("/evaluaciones", json={}).status_code == 401
+    assert client.patch("/evaluaciones/1", json={}).status_code == 401
+    assert client.delete("/evaluaciones/1").status_code == 401
+
+
+def test_evaluaciones_mutations_reject_ayudante(client, make_token):
+    token = make_token(1)
+    assert client.post("/evaluaciones", json={"id_curso": 1}, headers=auth_header(token)).status_code == 403
+    assert client.patch("/evaluaciones/1", json={}, headers=auth_header(token)).status_code == 403
+    assert client.delete("/evaluaciones/1", headers=auth_header(token)).status_code == 403
+
+
+def test_evaluaciones_non_owner_forbidden(client, make_token, monkeypatch):
+    monkeypatch.setattr("services.exam_service.user_can_manage_course", lambda id_course, user: False, raising=False)
+    monkeypatch.setattr("services.exam_service.user_can_manage_evaluacion", lambda id_eval, user: False, raising=False)
+    token = make_token(2)
+    assert client.post("/evaluaciones", json={"id_curso": 1}, headers=auth_header(token)).status_code == 403
+    assert client.patch("/evaluaciones/1", json={"fecha": "2026-01-01"}, headers=auth_header(token)).status_code == 403
+    assert client.delete("/evaluaciones/1", headers=auth_header(token)).status_code == 403
+
+
+def test_tipos_evaluacion_require_superadmin(client, make_token):
+    prof = make_token(2)
+    assert client.post("/tipos-evaluacion", json={}).status_code == 401
+    assert client.post("/tipos-evaluacion", json={}, headers=auth_header(prof)).status_code == 403
+    assert client.patch("/tipos-evaluacion/1", json={}, headers=auth_header(prof)).status_code == 403
+    assert client.delete("/tipos-evaluacion/1", headers=auth_header(prof)).status_code == 403
