@@ -255,7 +255,11 @@ function recalcularEstadoPlanilla() {
                 if (!cfg || !cfg.cuenta) return;
 
                 var notaAlumno = notasStr[idEvalStr];
-                if (notaAlumno === '' || notaAlumno === null || notaAlumno === undefined) return;
+                
+                if (notaAlumno === '' || notaAlumno === null || notaAlumno === undefined) {
+                    cumpleNotas = false;
+                    return;
+                }
 
                 var minima = (cfg.nota_minima !== null && cfg.nota_minima !== undefined)
                     ? parseFloat(cfg.nota_minima)
