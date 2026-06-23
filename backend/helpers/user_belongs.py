@@ -31,3 +31,10 @@ def user_can_manage_course(id_course, user):
         return True
     course = query_db("SELECT id_profesor FROM cursos WHERE id_curso = %s", (id_course,))
     return bool(course) and course[0].get("id_profesor") == user.get("id_usuario")
+
+
+def user_can_manage_clase(id_clase, user):
+    if (user.get("nivel") or 0) >= NIVEL_SUPERADMIN:
+        return True
+    row = query_db("SELECT id_curso FROM clases WHERE id_clase = %s", (id_clase,))
+    return bool(row) and user_can_manage_course(row[0]["id_curso"], user)

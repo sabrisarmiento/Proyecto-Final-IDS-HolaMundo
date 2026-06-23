@@ -62,3 +62,25 @@ def test_promocion_non_owner_forbidden(client, make_token, monkeypatch):
     monkeypatch.setattr("services.exam_service.user_can_manage_course", lambda id_course, user: False, raising=False)
     token = make_token(2)
     assert client.post("/cursos/1/promocion", json={"es_promocionable": True}, headers=auth_header(token)).status_code == 403
+
+
+def test_clases_mutations_reject_unauthenticated(client):
+    assert client.post("/clases", json={}).status_code == 401
+    assert client.patch("/clases/1", json={}).status_code == 401
+    assert client.delete("/clases/1").status_code == 401
+
+
+def test_clases_mutations_reject_ayudante(client, make_token):
+    token = make_token(1)
+    assert client.post("/clases", json={}, headers=auth_header(token)).status_code == 403
+    assert client.patch("/clases/1", json={}, headers=auth_header(token)).status_code == 403
+    assert client.delete("/clases/1", headers=auth_header(token)).status_code == 403
+
+
+def test_clases_non_owner_forbidden(client, make_token, monkeypatch):
+    monkeypatch.setattr("services.class_service.user_can_manage_course", lambda id_course, user: False, raising=False)
+    monkeypatch.setattr("services.class_service.user_can_manage_clase", lambda id_clase, user: False, raising=False)
+    token = make_token(2)
+    assert client.post("/clases", json={"id_curso": 1}, headers=auth_header(token)).status_code == 403
+    assert client.patch("/clases/1", json={"temas": "X"}, headers=auth_header(token)).status_code == 403
+    assert client.delete("/clases/1", headers=auth_header(token)).status_code == 403
