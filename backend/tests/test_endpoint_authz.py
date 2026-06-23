@@ -84,3 +84,18 @@ def test_clases_non_owner_forbidden(client, make_token, monkeypatch):
     assert client.post("/clases", json={"id_curso": 1}, headers=auth_header(token)).status_code == 403
     assert client.patch("/clases/1", json={"temas": "X"}, headers=auth_header(token)).status_code == 403
     assert client.delete("/clases/1", headers=auth_header(token)).status_code == 403
+
+
+def test_enviar_link_reject_unauthenticated(client):
+    assert client.post("/asistencia/enviar-link", json={}).status_code == 401
+
+
+def test_enviar_link_reject_ayudante(client, make_token):
+    token = make_token(1)
+    assert client.post("/asistencia/enviar-link", json={"id_clase": 1}, headers=auth_header(token)).status_code == 403
+
+
+def test_enviar_link_non_owner_forbidden(client, make_token, monkeypatch):
+    monkeypatch.setattr("services.attendance_service.user_can_manage_clase", lambda id_clase, user: False, raising=False)
+    token = make_token(2)
+    assert client.post("/asistencia/enviar-link", json={"id_clase": 1}, headers=auth_header(token)).status_code == 403
