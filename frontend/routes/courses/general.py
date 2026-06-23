@@ -4,7 +4,7 @@ import requests
 from . import courses_bp
 from .common import BACKEND_URL, get_token, auth_headers
 from services.courses_service import post_course
-from services.subjects_service import get_my_subjects
+from services.subjects_service import get_my_subjects, get_subjects
 from config import get_headers
 
 
@@ -77,6 +77,7 @@ def courses():
     except (TypeError, ValueError):
         nivel = 0
     es_superadmin = nivel >= 3
+    materias_para_curso = get_subjects() if es_superadmin else assigned_subjects
 
     return render_template(
         'courses.html',
@@ -85,6 +86,7 @@ def courses():
         subjects=subjects,
         nivel=nivel,
         es_superadmin=es_superadmin,
+        materias_para_curso=materias_para_curso,
         active_page='courses',
         filtro_materia=filtro_materia,
         filtro_catedra=filtro_catedra,

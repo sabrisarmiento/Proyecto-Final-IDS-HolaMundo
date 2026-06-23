@@ -197,10 +197,10 @@
 {% call modal("create-course-modal", "Crear Curso") %}
 <form action="{{ url_for('courses.courses') }}" method="POST">
   <label for="new-materia">Materia</label>
-  {% if assigned_subjects %}
+  {% if materias_para_curso %}
   <select class="select-new-materia" id="new-materia" name="id_materia" required>
     <option value="" disabled selected>Seleccioná una materia</option>
-    {% for subject in assigned_subjects %}
+    {% for subject in materias_para_curso %}
       <option value="{{ subject.id_materia }}">
         {{ subject.nombre }}
         {% if subject.codigo %}
