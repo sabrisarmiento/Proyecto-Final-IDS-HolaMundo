@@ -21,6 +21,21 @@ def create_team(course_id):
         flash("Ocurrió un error al crear el equipo.", "error")
     return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
 
+@courses_bp.route('/cursos/<int:course_id>/equipos/<int:team_id>/editar', methods=['POST'])
+def edit_team(course_id, team_id):
+    try:
+        response = requests.patch(f"{BACKEND_URL}/equipos/{team_id}", headers=auth_headers(), json={"nombre_equipo": request.form.get("nombre_equipo")})
+        if response.ok:
+            flash("Equipo actualizado correctamente.", "success")
+        elif response.status_code == 409:
+            flash(response.json()["errors"][0]["description"], "error")
+        else:
+            flash("No se pudo actualizar el equipo.", "error")
+    except Exception as e:
+        print("Error editando equipo:", e)
+        flash("Ocurrió un error al actualizar el equipo.", "error")
+    return redirect(url_for('courses.course_detail', course_id=course_id, tab='teams'))
+
 @courses_bp.route('/cursos/<int:course_id>/equipos/eliminar', methods=['POST'])
 def delete_teams(course_id):
     equipos = [t for t in request.form.get("selected_teams", "").split(",") if t]

@@ -151,6 +151,22 @@ def patch_team_by_id(id_team, data):
         updates = []
         params = []
         if name is not None:
+            team = query_db("SELECT id_curso FROM equipos WHERE id_equipo = %s", (id_team,))
+            if not team:
+                return {
+                    "ok": False,
+                    "code": 404,
+                    "message": "Team not found",
+                    "description": f"No existe un equipo con id {id_team}"
+                }
+            existing = query_db("""SELECT id_equipo FROM equipos WHERE id_curso = %s AND LOWER(nombre_equipo) = LOWER(%s) AND id_equipo <> %s""", (team[0]["id_curso"], name, id_team))
+            if existing:
+                return {
+                    "ok": False,
+                    "code": 409,
+                    "message": "Conflict",
+                    "description": "Ya existe un equipo con ese nombre"
+                }
             updates.append("nombre_equipo = %s")
             params.append(name)
         if id_course is not None:
@@ -163,7 +179,7 @@ def patch_team_by_id(id_team, data):
                 "message": "Bad Request",
                 "description": "No se enviaron campos para actualizar"
             }
-        sql = f"""UPDATE equipos SET {', '.join(updates)} WHERE id_equipo = %s"""
+        sql = f"""UPDATE equipos SET {', '.join(updates)} WHERE id_equipo = %s """
         params.append(id_team)
         modify_db(sql, params)
         return {

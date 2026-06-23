@@ -23,7 +23,7 @@ def create_team_service(data):
         return error_response(result)
     return success_response({
         "message": "Equipo creado correctamente",
-        "id_equipo": result["data"]["id_equipo"]
+        "id_equipo": result["id_equipo"]
     }, 201)
 
 def patch_team_service(id_team, data):

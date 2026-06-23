@@ -377,12 +377,28 @@ def course_detail(course_id):
         current_user_name = f"{current_user.get('nombre', '')} {current_user.get('apellido', '')}".strip()
     except Exception:
         current_user_name = ''
+    
+    student_found = None
+    searched_team_id = request.args.get("team_id")
+    searched_padron = request.args.get("padron")
+    if searched_padron:
+        try:
+            response = requests.get(f"{BACKEND_URL}/students", headers=headers, params={"padron": searched_padron, "id_curso": course_id})
+            if response.ok:
+                students = response.json().get("students", [])
+                if students:
+                    student_found = students[0]
+        except Exception as e:
+            print(f"Error buscando alumno: {e}")
 
     return render_template(
         'course_detail.html',
         course=course,
         students=students_data,
         teams=teams,
+        student_found=student_found,
+        searched_team_id=searched_team_id,
+        searched_padron=searched_padron,
         clases=clases,
         filtro_modalidad=filtro_modalidad,
         filtro_tipo=filtro_tipo,
