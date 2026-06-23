@@ -22,6 +22,7 @@ def post_attendance():
     return attendance_post_handler(data)
 
 @attendance_bp.route("/asistencia/enviar-link", methods=["POST"])
+@require_auth
 def post_send_attendance_link():
     data = request.get_json()
     return send_attendance_link_service(data.get("id_clase"), data.get("horas"), data.get("minutos"))
