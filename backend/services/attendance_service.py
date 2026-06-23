@@ -53,7 +53,7 @@ def send_attendance_link_service(id_clase, horas=None, minutos=None):
             return jsonify({"error": "ID de clase no proporcionado"}), 400
 
         try:
-            horas = int(horas) if horas not in (None, "") else 3
+            horas = int(horas) if horas not in (None, "") else 0
             minutos = int(minutos) if minutos not in (None, "") else 0
         except (ValueError, TypeError):
             return jsonify({"error": "Horas y minutos deben ser numéricos"}), 400
