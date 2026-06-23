@@ -480,16 +480,16 @@
 .catedra-nombre {
   font-weight: 600;
   font-size: 1rem;
-  color: var(--color-border-focus);
+  color: var(--color-primary-light);
 }
 
 .catedra-meta {
   font-size: 0.85rem;
-  color: var(--color-text-muted);
+  color: var(--color-primary-muted);
 }
 
 .catedra-empty {
-  color: var(--color-text-muted);
+  color: var(--color-primary-muted);
   font-size: 1rem;
   margin-top: 1rem;
 }

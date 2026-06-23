@@ -37,6 +37,11 @@
     max-width: 40rem;
 }
 
+#msg-no-classes{
+    color: var(--color-text-muted);
+}
+
+
 /* Contenedor principal */
 .section-schedule {
     display: flex;
@@ -92,6 +97,10 @@
     font-size: 0.95rem;
     box-sizing: border-box;
     margin: 0;
+}
+
+::placeholder{
+    color:var(--color-text-muted);
 }
 
 .classes-container {
