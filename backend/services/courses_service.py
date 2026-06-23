@@ -35,8 +35,8 @@ def create_course_service(data):
         "message": result["message"]
     }, 201)
 
-def patch_course_service(id_course, data):
-    result = patch_course(id_course, data)
+def patch_course_service(id_course, data, logged_user):
+    result = patch_course(id_course, data, logged_user)
     if not result["ok"]:
         return error_response(result)
     return success_response({

@@ -43,15 +43,17 @@ def get_course(id_course):
 
 @courses_bp.route('/courses', methods=['POST'])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def create_course_route():
     data = request.get_json()
     return create_course_service(data)
 
 @courses_bp.route('/courses/<int:id_course>', methods=['PATCH'])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def patch_course_route(id_course):
     data = request.get_json()
-    return patch_course_service(id_course, data)
+    return patch_course_service(id_course, data, request.user)
 
 @courses_bp.route('/courses/<int:id_course>', methods=['DELETE'])
 @require_auth
