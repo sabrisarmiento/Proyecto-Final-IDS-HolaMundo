@@ -12,6 +12,7 @@ from controllers.attendance_controller import (
     open_attendance_window,
 )
 from controllers.classes_controller import get_class_id
+from helpers.user_belongs import user_can_manage_clase
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5001")
 
@@ -47,13 +48,16 @@ def attendance_delete_handler(id):
         "message": result["message"]
     })
 
-def send_attendance_link_service(id_clase, horas=None, minutos=None):
+def send_attendance_link_service(id_clase, horas=None, minutos=None, user=None):
     try:
         if not id_clase:
             return jsonify({"error": "ID de clase no proporcionado"}), 400
 
+        if not user_can_manage_clase(id_clase, user):
+            return jsonify({"error": "No tenés permisos sobre esta clase"}), 403
+
         try:
-            horas = int(horas) if horas not in (None, "") else 3
+            horas = int(horas) if horas not in (None, "") else 0
             minutos = int(minutos) if minutos not in (None, "") else 0
         except (ValueError, TypeError):
             return jsonify({"error": "Horas y minutos deben ser numéricos"}), 400

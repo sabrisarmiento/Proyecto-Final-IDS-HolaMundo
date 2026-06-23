@@ -2,6 +2,7 @@
 <script id="dash-curso-data" type="application/json">{{ dash_data | tojson }}</script>
 {% endif %}
 
+{% if nivel >= 2 %}
 <section class="export-reports-bar">
   <button type="button" class="btn-action" onclick="openModal('export-reports-modal')">
     Exportar informes
@@ -49,6 +50,7 @@
   <p id="export-message" class="form-message" hidden></p>
 </form>
 {% endcall %}
+{% endif %}
 
 <div id="dash-curso-root" data-course-id="{{ course.id_curso }}">
 

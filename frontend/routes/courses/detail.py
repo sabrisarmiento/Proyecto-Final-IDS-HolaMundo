@@ -398,6 +398,7 @@ def course_detail(course_id):
         assistants=assistants,
         available_assistants=available_assistants,
         temas=temas,
+        nivel=nivel,
     )
 
 @courses_bp.route("/cursos/<int:course_id>/ayudantes/agregar", methods=["POST"])
