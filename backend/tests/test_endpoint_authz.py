@@ -99,3 +99,24 @@ def test_enviar_link_non_owner_forbidden(client, make_token, monkeypatch):
     monkeypatch.setattr("services.attendance_service.user_can_manage_clase", lambda id_clase, user: False, raising=False)
     token = make_token(2)
     assert client.post("/asistencia/enviar-link", json={"id_clase": 1}, headers=auth_header(token)).status_code == 403
+
+
+def test_students_mutations_reject_unauthenticated(client):
+    assert client.post("/students", json={}).status_code == 401
+    assert client.post("/students/import").status_code == 401
+    assert client.patch("/students/1", json={}).status_code == 401
+
+
+def test_students_mutations_reject_ayudante(client, make_token):
+    token = make_token(1)
+    assert client.post("/students", json={"id_curso": 1}, headers=auth_header(token)).status_code == 403
+    assert client.post("/students/import", headers=auth_header(token)).status_code == 403
+    assert client.patch("/students/1", json={}, headers=auth_header(token)).status_code == 403
+
+
+def test_students_non_owner_forbidden(client, make_token, monkeypatch):
+    monkeypatch.setattr("services.student_service.user_can_manage_course", lambda id_course, user: False, raising=False)
+    monkeypatch.setattr("services.student_service.user_can_manage_alumno", lambda id_alumno, user: False, raising=False)
+    token = make_token(2)
+    assert client.post("/students", json={"id_curso": 1}, headers=auth_header(token)).status_code == 403
+    assert client.patch("/students/1", json={"nombre": "X"}, headers=auth_header(token)).status_code == 403
