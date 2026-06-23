@@ -2,9 +2,7 @@ from controllers.slack_controller import configure_slack_course, get_slack_messa
 from helpers.responses import error_response, success_response
 
 def configure_slack_course_service(id_curso, data, user):
-    id_usuario = user["id_usuario"]
-
-    result = configure_slack_course(id_curso, data, id_usuario)
+    result = configure_slack_course(id_curso, data, user)
 
     if not result["ok"]:
         return error_response(result)
@@ -13,8 +11,8 @@ def configure_slack_course_service(id_curso, data, user):
         "message": result["data"]
     })
 
-def disconnect_slack_service(id_curso):
-    result = disconnect_slack_course(id_curso)
+def disconnect_slack_service(id_curso, user):
+    result = disconnect_slack_course(id_curso, user)
 
     if not result["ok"]:
         return error_response(result)
