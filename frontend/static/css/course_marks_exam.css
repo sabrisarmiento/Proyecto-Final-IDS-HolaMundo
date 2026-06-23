@@ -521,3 +521,13 @@
 .grupal-corrector-row {
   display: none !important;
 }
+
+.nota-reprobado {
+  background: #fdecea !important;
+  border-color: #f5c2c2 !important;
+  color: #991b1b !important;
+}
+
+.dot-rojo { 
+  background: #991b1b; 
+}
