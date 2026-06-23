@@ -10,8 +10,9 @@ from services.exam_service import (
     get_promocion_config_service,
     save_promocion_config_service,
 )
-from middleware.auth_middleware import require_auth
- 
+from middleware.auth_middleware import require_auth, require_min_admin_level
+from helpers.constants import NIVEL_PROFESOR
+
 exam_bp = Blueprint('exam', __name__)
 
 @exam_bp.route("/evaluaciones", methods=["GET"])
@@ -88,5 +89,6 @@ def get_promocion_config(id_curso):
 
 @exam_bp.route("/cursos/<int:id_curso>/promocion", methods=["POST"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def save_promocion_config(id_curso):
-    return save_promocion_config_service(id_curso, request.get_json(silent=True))
+    return save_promocion_config_service(id_curso, request.get_json(silent=True), request.user)

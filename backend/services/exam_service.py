@@ -1,4 +1,5 @@
 from helpers.responses import error_response, success_response
+from helpers.user_belongs import user_can_manage_course
 from controllers.exam_controller import (
     get_all_exams,
     create_exam,
@@ -105,7 +106,12 @@ def get_promocion_config_service(id_curso):
     return success_response({"config": result["data"]})
 
 
-def save_promocion_config_service(id_curso, data):
+def save_promocion_config_service(id_curso, data, user):
+    if not user_can_manage_course(id_curso, user):
+        return error_response({
+            "ok": False, "code": 403,
+            "message": "Forbidden", "description": "No tenés permisos sobre este curso"
+        })
     if not id_curso or not data:
         return error_response({
             "ok": False, "code": 400,
