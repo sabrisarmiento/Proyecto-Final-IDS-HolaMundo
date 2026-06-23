@@ -1,6 +1,7 @@
 import os
 from flask import Blueprint, render_template, session, redirect, url_for, request, flash
 import requests
+from helpers.logger import log_action
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -30,6 +31,7 @@ def dashboard():
 
 @dashboard_bp.route('/dashboard/usuarios', methods=['POST'])
 def crear_usuario():
+    user = session.get('user', {})
     token = session.get('token')
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debés iniciar sesión')
@@ -54,6 +56,13 @@ def crear_usuario():
             body = res.json() if res.content else {}
             desc = (body.get('errors') or [{}])[0].get('description', 'No se pudo crear el usuario')
             flash(desc, 'error')
+        log_action(
+            method='POST',
+            description=f'Creó al usuario {payload["nombre"]} {payload["apellido"]} con el rol {payload["id_rol"]}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=res.status_code
+        )
     except Exception as e:
         flash(f'Error de conexión: {e}', 'error')
 
