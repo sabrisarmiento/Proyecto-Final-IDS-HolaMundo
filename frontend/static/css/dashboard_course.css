@@ -54,7 +54,7 @@
 .dash-info-value {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--color-1);
+  color: var(--color-15);
 }
 
 .dash-stats-grid {
@@ -144,7 +144,7 @@
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--color-1);
+  color: var(--color-15);
   margin: 0 0 0.15rem;
 }
 
@@ -206,4 +206,120 @@
 .dash-stat--warn {
   border-color: var(--color-6);
   background: var(--color-45);
+}
+
+.dash-table-wrap {
+  overflow-x: auto;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.dash-table thead tr {
+  background: var(--color-9);
+}
+
+.dash-table thead th {
+  color: var(--color-45);
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+}
+
+.dash-table tbody tr:hover {
+  background: var(--color-5);
+}
+
+.dash-table td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--color-6);
+  color: var(--color-1);
+  vertical-align: middle;
+}
+
+.dash-attendance {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.dash-attendance-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.dash-select {
+  flex: 1 1 200px;
+  padding: 0.5rem 0.7rem;
+  border: 1.5px solid var(--color-6);
+  border-radius: 8px;
+  background: var(--color-45);
+  color: var(--color-15);
+  font-family: inherit;
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.dash-attendance-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-8);
+  white-space: nowrap;
+}
+
+.dash-attendance-filtros {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+  font-size: 0.82rem;
+  color: var(--color-8);
+}
+
+.dash-attendance-filtros label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+}
+
+.dash-attendance-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.dash-attendance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-6);
+  border-radius: 8px;
+  background: var(--color-5);
+  font-size: 0.9rem;
+  color: var(--color-15);
+}
+
+.dash-attendance-empty {
+  text-align: center;
+  color: var(--color-8);
+  font-size: 0.85rem;
+  padding: 1rem 0;
+  font-style: italic;
 }

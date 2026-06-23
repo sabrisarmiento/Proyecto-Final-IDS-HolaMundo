@@ -60,13 +60,14 @@ def get_advertisement_by_id(id_advertisement):
       SELECT
         id_aviso,
         id_usuario,
+        id_curso,
         titulo,
         mensaje,
         fecha
       FROM avisos
-      WHERE id_usuario = %s
+      WHERE id_aviso = %s
     """
-    result = query_db(sql, (id_advertisement,))\
+    result = query_db(sql, (id_advertisement,))
     
     if not result:
       return {
@@ -77,7 +78,7 @@ def get_advertisement_by_id(id_advertisement):
       }
     return {
       "ok": True,
-      "data": result
+      "data": result[0]
     }
   except Exception as e:
     return {
@@ -94,9 +95,9 @@ def create_advertisement(data, user):
     title = data.get("titulo")
     message = data.get("mensaje")
 #    user_mail = user["correo"]
-    print("USER DEL TOKEN:", user)
     user_mail = user.get("correo", "Usuario Panel FIUBA")
-    
+    id_rol = int(user.get("id_rol", 0))
+
     if not id_course or not title or not message:
       return {
         "ok": False,
@@ -104,7 +105,7 @@ def create_advertisement(data, user):
         "message": "Bad Request",
         "description": "Faltan datos obligatorios"
       }
-    if not user_belongs_to_course(id_user, id_course):
+    if id_rol != 1 and not user_belongs_to_course(id_user, id_course):
       return {
         "ok": False,
         "code": 403,
@@ -133,28 +134,37 @@ def create_advertisement(data, user):
       "description": str(e)
     }
 
-def patch_advertisement_by_id(id_advertisement, data):
+def patch_advertisement_by_id(id_advertisement, data, user):
   try:
-    id_user = data.get("id_usuario")
+    advertisement_result = get_advertisement_by_id(id_advertisement)
+    if not advertisement_result["ok"]:
+      return advertisement_result
+
+    advertisement = advertisement_result["data"]
+
+    id_course = advertisement["id_curso"]
+    id_user = user["id_usuario"]
+    id_rol = int(user.get("id_rol", 0))
+
+    if id_rol != 1 and not user_belongs_to_course(id_user, id_course):
+      return {
+        "ok": False,
+        "code": 403,
+        "message": "Forbidden",
+        "description": "No tenés permiso para editar este aviso"
+      }
     title = data.get("titulo")
     message = data.get("mensaje")
-    date = data.get("fecha")
 
     updates = []
     params = []
 
-    if id_user is not None:
-      updates.append("id_usuario = %s")
-      params.append(int(id_user))
     if title is not None:
       updates.append("titulo = %s")
       params.append(title)
     if message is not None:
       updates.append("mensaje = %s")
       params.append(message)
-    if date is not None:
-      updates.append("fecha = %s")
-      params.append(date)
 
     if not updates:
       return {
@@ -164,7 +174,7 @@ def patch_advertisement_by_id(id_advertisement, data):
         "description": "No se enviaron campos para actualizar"
       }
 
-    sql = f"UPDATE avisos SET {', '.join(updates)} WHERE id_usuario = %s"
+    sql = f"UPDATE avisos SET {', '.join(updates)} WHERE id_aviso = %s"
     params.append(id_advertisement)
 
     modify_row = modify_db(sql, params)
@@ -178,20 +188,37 @@ def patch_advertisement_by_id(id_advertisement, data):
     
     return {
       "ok": True,
-      "data": "aviso actualizado correctamente",
+      "message": "aviso actualizado correctamente",
       "id_aviso": id_advertisement
     }
   except Exception as e:
     return {
       "ok": False,
-      "code": 400,
-      "message": "Bad Request",
+      "code": 500,
+      "message": "Internal Server Error",
       "description": str(e)
     }
 
-def delete_advertisement_by_id(id_advertisement):
+def delete_advertisement_by_id(id_advertisement, user):
   try:
-    sql = "DELETE FROM avisos WHERE id_usuario = %s"
+    advertisement_result = get_advertisement_by_id(id_advertisement)
+    if not advertisement_result["ok"]:
+      return advertisement_result
+
+    advertisement = advertisement_result["data"]
+
+    id_course = advertisement["id_curso"]
+    id_user = user["id_usuario"]
+    id_rol = int(user.get("id_rol", 0))
+
+    if id_rol != 1 and not user_belongs_to_course(id_user, id_course):
+      return {
+        "ok": False,
+        "code": 403,
+        "message": "Forbidden",
+        "description": "No tenés permiso para eliminar este aviso"
+      }
+    sql = "DELETE FROM avisos WHERE id_aviso = %s"
 
     modify_row = modify_db(sql, (id_advertisement,))
 
@@ -204,7 +231,7 @@ def delete_advertisement_by_id(id_advertisement):
       }
     return {
       "ok": True,
-      "data": f"Aviso con ID {id_advertisement} eliminado correctamente"
+      "message": f"Aviso con ID {id_advertisement} eliminado correctamente"
     }
   except Exception as e:
     return {
@@ -215,30 +242,34 @@ def delete_advertisement_by_id(id_advertisement):
     }
 
 def get_advertisements_by_subject(id_materia):
-    try:
-        sql = """
-            SELECT
-                a.id_aviso,
-                a.id_usuario,
-                a.id_curso,
-                a.titulo,
-                a.mensaje,
-                a.fecha,
-                CONCAT(u.nombre, ' ', u.apellido) as emisor
-            FROM avisos a
-            JOIN usuarios u ON a.id_usuario = u.id_usuario
-            JOIN cursos c ON a.id_curso = c.id_curso
-            WHERE c.id_materia = %s
-        """
-        result = query_db(sql, (id_materia,))
-        return {
-            "ok": True,
-            "data": result
-        }
-    except Exception as e:
-        return {
-            "ok": False,
-            "code": 500,
-            "message": "Internal Server Error",
-            "description": str(e)
-        }
+  try:
+    sql = """
+      SELECT
+        a.id_aviso,
+        a.id_usuario,
+        a.id_curso,
+        a.titulo,
+        a.mensaje,
+        a.fecha,
+        CONCAT(u.nombre, ' ', u.apellido) as emisor
+      FROM avisos a
+      JOIN usuarios u ON a.id_usuario = u.id_usuario
+      JOIN cursos c ON a.id_curso = c.id_curso
+      WHERE c.id_materia = %s
+      ORDER BY a.fecha DESC
+    """
+
+    result = query_db(sql, (id_materia,))
+
+    return {
+      "ok": True,
+      "data": result
+    }
+
+  except Exception as e:
+    return {
+      "ok": False,
+      "code": 500,
+      "message": "Internal Server Error",
+      "description": str(e)
+    }

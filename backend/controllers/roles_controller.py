@@ -1,5 +1,19 @@
-from flask import jsonify
-from database.db import query_db, modify_db
+from database.db import query_db, modify_db, insert_db
+
+def get_role_by_id(id_rol):
+    sql = """
+        SELECT id_rol, nombre, nivel_administracion
+        FROM roles
+        WHERE id_rol = %s
+    """
+
+    result = query_db(sql, (int(id_rol),))
+
+    if result:
+        return result[0]
+
+    return None
+
 _FILTER_COLUMNS = {
     "id_roles": "id_roles",
     "name": "nombre",
@@ -60,7 +74,7 @@ def create_rol(data):
             return {"ok": False, "code": 409, "message": "Conflict",
                     "description": "El rol ya existe"}
 
-        rol_id = modify_db(
+        rol_id = insert_db(
             "INSERT INTO roles (nombre, nivel_administracion) VALUES (%s, %s)",
             (data["nombre"], data["nivel_administracion"]),
         )

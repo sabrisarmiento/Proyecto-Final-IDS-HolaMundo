@@ -1,5 +1,10 @@
 import math
+import hashlib
+import os
+from dotenv import load_dotenv
 from database.db import query_db, modify_db
+
+load_dotenv()
 
 def get_attendance(id_clase=None, id_alumno=None):
     try:
@@ -26,7 +31,7 @@ def student_active(id_alumno):
     result = query_db(sql, (id_alumno,))
     return result[0]['estado_alumno'] if result else False
 
-def students_active_qr(id_clase):
+def active_students_for_class(id_clase):
     try:
         sql = """
             SELECT a.id_alumno, a.correo, a.nombre, a.apellido
@@ -37,6 +42,14 @@ def students_active_qr(id_clase):
         return query_db(sql, (id_clase,))
     except Exception:
         return []
+    
+def open_attendance_window(id_clase, total_minutos):
+    modify_db(
+        "UPDATE clases SET asistencia_abierta_en = NOW(), asistencia_valida_hasta = NOW() + INTERVAL %s MINUTE WHERE id_clase = %s",
+        (total_minutos, id_clase),
+    )
+    result = query_db("SELECT asistencia_valida_hasta FROM clases WHERE id_clase = %s", (id_clase,))
+    return result[0]["asistencia_valida_hasta"] if result else None
 
 def proximity_fiuba(user_lat, user_lon):
     FACULTAD_LAT = -34.61771131976023
@@ -62,10 +75,23 @@ def create_attendance(data):
             }
 
         id_alumno = data["id_alumno"]
+        id_clase = data["id_clase"]
+        code = data.get("code")
         lat = data.get("latitud")
         lon = data.get("longitud")
 
+        expected_code = hashlib.sha256(f"{id_alumno}-{id_clase}-{os.getenv('ATTENDANCE_SECRET')}".encode()).hexdigest()
+
+        if not code or code != expected_code:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "Link inválido o ausente"
+            }
+
         if not student_active(id_alumno):
+
             return {
                 "ok": False,
                 "code": 403,
@@ -73,22 +99,62 @@ def create_attendance(data):
                 "description": "El alumno figura como abandonó la cursada"
             }
 
-        if lat is None or lon is None:
-            return {
-                "ok": False,
-                "code": 400,
-                "message": "Bad Request",
-                "description": "Se requiere ubicación GPS para validar asistencia"
-            }
+        clase = query_db("SELECT modalidad FROM clases WHERE id_clase = %s", (id_clase,))
+        is_virtual = bool(clase) and clase[0]["modalidad"] == "Virtual"
 
-        if not proximity_fiuba(float(lat), float(lon)):
+        if not is_virtual:
+            if lat is None or lon is None:
+                return {
+                    "ok": False,
+                    "code": 400,
+                    "message": "Bad Request",
+                    "description": "Se requiere ubicación GPS para validar asistencia"
+                }
+
+            if not proximity_fiuba(float(lat), float(lon)):
+                return {
+                    "ok": False,
+                    "code": 403,
+                    "message": "Forbidden",
+                    "description": "Ubicación fuera del rango permitido"
+                }
+        
+        belongs = query_db(
+            "SELECT 1 FROM alumnos a JOIN clases c ON a.id_curso = c.id_curso WHERE a.id_alumno = %s AND c.id_clase = %s",
+            (id_alumno, id_clase),
+        )
+        if not belongs:
             return {
                 "ok": False,
                 "code": 403,
                 "message": "Forbidden",
-                "description": "Ubicación fuera del rango permitido"
+                "description": "El alumno no pertenece al curso de esta clase"
             }
 
+        window_open = query_db(
+            "SELECT 1 FROM clases WHERE id_clase = %s AND asistencia_valida_hasta IS NOT NULL AND NOW() <= asistencia_valida_hasta",
+            (id_clase,),
+        )
+        if not window_open:
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "El link expiró o no fue generado para esta clase"
+            }
+
+        already = query_db(
+            "SELECT id_asistencia FROM asistencia WHERE id_alumno = %s AND id_clase = %s",
+            (id_alumno, id_clase),
+        )
+        if already:
+            return {
+                "ok": False,
+                "code": 409,
+                "message": "Conflict",
+                "description": "La asistencia para esta clase ya fue registrada"
+            }
+        
         sql = "INSERT INTO asistencia (id_alumno, id_clase, presente) VALUES (%s, %s, %s)"
         modify_db(sql, (data["id_alumno"], data["id_clase"], data.get("presente", True)))
         return {

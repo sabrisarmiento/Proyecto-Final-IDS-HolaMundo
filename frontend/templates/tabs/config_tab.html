@@ -1,0 +1,259 @@
+{% if config_msg %}
+  {% if config_ok %}
+    <p class="config-msg config-msg--ok">{{ config_msg }}</p>
+  {% else %}
+    <p class="config-msg config-msg--error">{{ config_msg }}</p>
+  {% endif %}
+{% endif %}
+
+<div class="config-header">
+  <h2 class="config-title">Configuración del curso</h2>
+  <p class="config-subtitle">Editá los datos generales del curso, los cambios se van a reflejar de inmediato en la plataforma</p>
+</div>
+
+<form
+  action="{{ url_for('courses.update_course_config', course_id=course['id_curso']) }}"
+  method="POST"
+  class="config-form"
+>
+  <div class="config-section">
+    <h3 class="config-section-title">Datos generales</h3>
+
+    <div class="config-field">
+      <label class="config-label" for="cfg-catedra">Cátedra</label>
+      <input
+        class="config-input"
+        type="text"
+        id="cfg-catedra"
+        name="catedra"
+        value="{{ course.catedra or '' }}"
+        required
+      />
+    </div>
+
+    <div class="config-row">
+      <div class="config-field">
+        <label class="config-label" for="cfg-cuatrimestre">Cuatrimestre</label>
+        <input
+          class="config-input"
+          type="text"
+          id="cfg-cuatrimestre"
+          name="cuatrimestre"
+          value="{{ course.cuatrimestre or '' }}"
+          placeholder="Ej: 1C"
+          required
+        />
+      </div>
+
+      <div class="config-field">
+        <label class="config-label" for="cfg-anio">Año</label>
+        <input
+          class="config-input"
+          type="number"
+          id="cfg-anio"
+          name="anio"
+          value="{{ course.anio or '' }}"
+          min="2000"
+          max="2100"
+          required
+        />
+      </div>
+    </div>
+
+    <div class="check-estado">
+      <label for="estado">Activo</label>
+      <input type="checkbox" id="estado" name="estado" {% if course.estado or course.ESTADO or course.Estado %}checked{% endif %} onchange="this.form.submit()">
+    </div>
+  </div>
+
+  <div class="config-section">
+    <h3 class="config-section-title">Links externos</h3>
+
+    <div class="config-field">
+      <label class="config-label" for="cfg-slack">
+        <span class="config-label-icon">SLACK</span>
+        URL de Slack
+      </label>
+      <input
+        class="config-input"
+        type="url"
+        id="cfg-slack"
+        name="slack_url"
+        value="{{ course.slack_url or '' }}"
+        placeholder="https://app.slack.com/client/..."
+      />
+    </div>
+
+    <div class="config-field">
+      <label class="config-label" for="cfg-youtube">
+        <span class="config-label-icon">YT</span>
+        URL de YouTube
+      </label>
+      <input
+        class="config-input"
+        type="url"
+        id="cfg-youtube"
+        name="youtube_url"
+        value="{{ course.youtube_url or '' }}"
+        placeholder="https://www.youtube.com/@..."
+      />
+    </div>
+  </div>
+
+<div class="config-section">
+    <h3 class="config-section-title">Regimen de aprobación</h3>
+
+    <div class="config-field">
+      <label class="config-label">
+        Introduzca su regimen de aprobación <br>(Escriba un mensaje)
+      </label>
+      <textarea
+      class="config-input"
+      id="cfg-regimen"
+      name="regimen_aprobacion"
+      rows="5"
+      placeholder="Ej: 75% de asistencia, 2 parciales obligatorios..."
+    >{{ course.regimen_aprobacion or '' }}</textarea>
+    </div>
+
+  <div class="config-actions">
+    <button type="submit" class="config-btn-save">Guardar cambios</button>
+  </div>
+</div>
+
+</form>
+
+<div class="config-section config-temas">
+  <h3 class="config-section-title">Temas de la materia</h3>
+  <p class="config-subtitle">Estos temas se muestran en la página pública de la materia</p>
+
+  <form method="POST" action="{{ url_for('courses.update_temas', course_id=course['id_curso']) }}" class="config-form">
+    <input type="hidden" name="id_materia" value="{{ course['id_materia'] }}">
+
+    <div id="temas-list">
+      {% for tema in temas %}
+      <div class="config-row tema-row">
+        <!-- Name -->
+        <div class="config-field">
+          <label class="config-label">Nombre del tema</label>
+          <input class="config-input" type="text" name="temas_nombre[]" value="{{ tema.nombre }}" placeholder="Ej: Bases de datos" required>
+        </div>
+
+        <!-- Icon -->
+        <div class="config-field">
+          <label class="config-label">Ícono</label>
+
+          <div class="icon-picker-wrapper">
+            <input type="hidden" name="temas_icono[]" value="{{ tema.icono or '' }}">
+            <button type="button" class="icon-picker-btn" onclick="toggleIconPicker(this)">
+              {% if tema.icono %}<i class="{{ tema.icono }}"></i>{% else %}—{% endif %}
+            </button>
+            <div class="icon-picker-dropdown">
+              <button type="button" class="icon-option icon-option--none" title="Sin ícono" onclick="selectIcon(this, '')">—</button>
+              {% for icon in [
+                'fa-solid fa-code', 'fa-solid fa-database', 'fa-solid fa-network-wired',
+                'fa-solid fa-terminal', 'fa-solid fa-laptop-code', 'fa-solid fa-brain',
+                'fa-solid fa-robot', 'fa-solid fa-shield-halved', 'fa-solid fa-chart-bar',
+                'fa-solid fa-flask', 'fa-solid fa-microchip', 'fa-solid fa-layer-group',
+                'fa-solid fa-sitemap', 'fa-solid fa-server', 'fa-solid fa-bug',
+                'fa-solid fa-gear', 'fa-solid fa-calculator', 'fa-solid fa-book',
+                'fa-solid fa-graduation-cap', 'fa-brands fa-github'
+              ] %}
+              <button type="button" class="icon-option" title="{{ icon }}" onclick="selectIcon(this, '{{ icon }}')">
+                <i class="{{ icon }}"></i>
+              </button>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="config-btn-remove" onclick="this.closest('.tema-row').remove()">✕</button>
+      </div>
+      {% endfor %}
+    </div>
+
+    <button type="button" class="config-btn-add" onclick="addTemaRow()">+ Agregar tema</button>
+
+    <div class="config-actions">
+      <button type="submit" class="config-btn-save">Guardar temas</button>
+    </div>
+  </form>
+</div>
+
+
+<div class="config-section">
+  <h3 class="config-section-title">Ayudantes del curso</h3>
+
+  {% if assistants %}
+    <div class="assistants-list">
+      {% for assistant in assistants %}
+        <div class="assistant-card">
+          <p>
+            {{ assistant.nombre }} {{ assistant.apellido }}
+            - {{ assistant.correo }}
+          </p>
+
+          <form
+            method="POST"
+            action="{{ url_for('courses.quitar_ayudante_curso', course_id=course.id_curso, assistant_id=assistant.id_usuario) }}"
+            onsubmit="return confirm('¿Quitar este ayudante del curso?')"
+          >
+            <button type="submit" class="config-btn-save">
+              Quitar
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="config-subtitle">Este curso todavía no tiene ayudantes asignados.</p>
+  {% endif %}
+
+  <h3 class="config-section-title">Agregar ayudante</h3>
+
+  <form
+    method="POST"
+    action="{{ url_for('courses.agregar_ayudante_curso', course_id=course.id_curso) }}"
+    class="config-form"
+  >
+    <div class="config-field">
+      <label class="config-label" for="id_ayudante">Ayudante</label>
+
+      <select class="config-input" name="id_ayudante" id="id_ayudante" required>
+        <option value="">Seleccioná un ayudante</option>
+
+        {% for assistant in available_assistants %}
+          <option value="{{ assistant.id_usuario }}">
+            {{ assistant.nombre }} {{ assistant.apellido }} - {{ assistant.correo }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="config-actions">
+      <button type="submit" class="config-btn-save">
+        Agregar ayudante
+      </button>
+    </div>
+  </form>
+</div>
+
+</form>
+
+<div class="config-section">
+  <h3 class="config-section-title">Eliminación de curso</h3>
+  <div class="config-field">
+    <label class="config-label">Esta acción es irreversible. Se eliminarán todos los datos asociados al curso.</label>
+  </div>
+  <div class="config-actions">
+    <form 
+      action="{{ url_for('courses.delete_course_route', course_id=course['id_curso']) }}"
+      method="POST"
+      onsubmit="return confirm('¿Estás seguro que querés eliminar este curso? Esta acción no se puede deshacer.')"
+    >
+      <button type="submit" class="config-btn-save">
+        Eliminar curso
+      </button>
+    </form>
+  </div>
+</div>

@@ -51,7 +51,7 @@ def require_auth(function):
     return wrapper
 
 
-def require_min_role(min_role_id):
+def require_min_admin_level(min_admin_level):
 
     def decorator(function):
 
@@ -67,9 +67,9 @@ def require_min_role(min_role_id):
                     "description": "Usuario no autenticado"
                 })
             
-            user_role = user.get("id_rol")
+            user_level = user.get("nivel")
 
-            if user_role is None or user_role < min_role_id:
+            if user_level is None or user_level < min_admin_level:
                 return error_response({
                     "code": 403,
                     "message": "Forbidden",
@@ -81,28 +81,3 @@ def require_min_role(min_role_id):
         return wrapper
 
     return decorator
-
-
-
-#esto seria si solo fueran dos roles, lo dejo por las dudas si cambiamos algo a futuro
-#def require_role(role_id):
-
-#    def decorator(function): 
-
-#        @wraps(function) 
-#        def wrapper(*args, **kwargs):
-
-#            user = request.user
-
-#            if user["id_rol"] != role_id:
-#                return error_response({
-#                    "code": 403,
-#                    "message": "Forbidden",
-#                    "description": "No tienes permisos"
-#                })
-
-#           return function(*args, **kwargs)
-
-#        return wrapper
-
-#    return decorator

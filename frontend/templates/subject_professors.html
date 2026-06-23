@@ -1,0 +1,82 @@
+{% extends "base_private.html" %}
+
+{% block title %}Panel FIUBA - Profesores de materia{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/courses_management.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section class="mgmt-section">
+  <div class="mgmt-section-header">
+    <div>
+      <h2 class="mgmt-section-title">Profesores de {{ subject.nombre }}</h2>
+      <p class="mgmt-section-desc">
+        Asigná o quitá profesores para esta materia
+      </p>
+    </div>
+
+    <a href="{{ url_for('courses.courses') }}" class="btn-mgmt-create">
+      Volver
+    </a>
+  </div>
+
+  <h3>Profesores asignados</h3>
+
+  {% if assigned_professors %}
+    <div class="subjects-grid">
+      {% for professor in assigned_professors %}
+        <div class="subject-card">
+          <div class="subject-card-icon">👨‍🏫</div>
+
+          <div class="subject-card-body">
+            <span class="subject-card-name">
+              {{ professor.nombre }} {{ professor.apellido }}
+            </span>
+            <span class="subject-card-code">
+              {{ professor.correo }}
+            </span>
+          </div>
+
+          <div class="subject-card-actions">
+            <form method="POST"
+                  action="{{ url_for('courses.quitar_profesor_materia', subject_id=subject.id_materia, professor_id=professor.id_usuario) }}"
+                  onsubmit="return confirm('¿Quitar este profesor de la materia?')">
+              <button type="submit" class="btn-subject-action btn-subject-delete">
+                Quitar
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="mgmt-empty">Esta materia todavía no tiene profesores asignados</p>
+  {% endif %}
+
+  <hr class="section-divider">
+
+  <h3>Agregar profesor</h3>
+
+  <form method="POST">
+    <label for="id_profesor">Profesor</label>
+
+    <select id="id_profesor" name="id_profesor" required>
+      <option value="">Seleccioná un profesor</option>
+
+      {% for professor in professors %}
+        <option value="{{ professor.id_usuario }}">
+          {{ professor.nombre }} {{ professor.apellido }} - {{ professor.correo }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="btn-mgmt-create">
+      Agregar profesor
+    </button>
+  </form>
+</section>
+
+{% endblock %}

@@ -14,12 +14,12 @@
     margin-bottom: 3rem;
     padding: 3.5rem 1.5rem;
     border-radius: 16px;
-    background: linear-gradient(135deg, var(--color-3), var(--color-25));
+    background: linear-gradient(135deg, var(--color-35), var(--color-25));
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
 }
 
 .materials-title {
-    color: var(--color-45);
+    color: white;
     font-size: 2.8rem;
     font-weight: 800;
     margin-bottom: 0.5rem;
@@ -255,4 +255,129 @@
 
     .material-empty{padding: 2.5rem 1.25rem;}
     .material-empty i {font-size: 2.4rem;}
+}
+
+.materials-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.materials-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 220px;
+}
+
+.materials-field-label {
+    font-family: 0.85rem;
+    font-weight: 700;
+    color: var(--color-9);
+}
+
+.material-select {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-8);
+    border-radius: 10px;
+    background-color: var(--color-45);
+    color: var(--color-1);
+    cursor: pointer;
+}
+
+.material-select:focus {
+    outline: none;
+    border-color: var(--color-3);
+    box-shadow: 0 0 0 3px var(--color-16)
+}
+.materials-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.material-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 220px;
+}
+
+.material-field-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-9);
+}
+
+.materials-tab h2 {
+  margin: 0 0 1rem;
+  font-size: 1.4rem;
+  color: var(--color-15);
+}
+
+.material-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.material-form input {
+  flex: 1 1 200px;
+  padding: 0.55rem 0.8rem;
+  border: 1.5px solid var(--color-6);
+  border-radius: 8px;
+  background: var(--color-45);
+  color: var(--color-15);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.material-form input:focus {
+  border-color: var(--color-3);
+}
+
+.material-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.material-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--color-45);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.material-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.material-info strong {
+  color: var(--color-9);
+  font-size: 1.05rem;
+}
+
+.material-info p {
+  margin: 0.3rem 0 0;
+  color: var(--color-15);
+  line-height: 1.5;
 }

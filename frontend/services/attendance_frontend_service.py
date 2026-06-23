@@ -1,12 +1,35 @@
+import os
 import requests
+from config import BASE_URL
+BASE = os.getenv("BACKEND_URL", "http://127.0.0.1:5000")
 
-def attendance_get_all():
+def attendance_get_all(id_clase=None):
     try:
-        response = requests.get('http://localhost:5000/asistencia')
-        if response.status_code == 200:
-            datos_api = response.json()
-            return datos_api.get("attendance", [])
-        return []
+        params = {"id_clase": id_clase} if id_clase else {}
+        r = requests.get(f"{BASE}/asistencia", params=params)
+        return r.json().get("attendance", []) if r.status_code == 200 else []
     except Exception as e:
         print(f"Error: {e}")
         return []
+
+def send_attendance_link(id_clase, horas=None, minutos=None):
+    try:
+        r = requests.post(f"{BASE}/asistencia/enviar-link", json={"id_clase": id_clase, "horas": horas, "minutos": minutos})
+        return r.json()
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+
+def mark_attendance(payload):
+    try:
+        r = requests.post(f"{BASE}/asistencia", json=payload)
+        return r.json(), r.status_code
+    except Exception as e:
+        return {"errors": [{"description": str(e)}]}, 502
+    
+def get_class(id_clase):
+    try:
+        r = requests.get(f"{BASE_URL}/clases/{id_clase}")
+        return r.json().get("class") if r.status_code == 200 else None
+    except Exception:
+        return None

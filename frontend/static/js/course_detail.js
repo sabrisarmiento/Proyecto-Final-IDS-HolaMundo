@@ -74,11 +74,16 @@ function filtrarPorEquipo(equipoSeleccionado) {
     recalcularPromedio();
 }
 
-/**
- * @param {string} nombreEval
- * @param {number} tieneNotas
- * @returns {boolean}
- */
+function filtrarEquiposGrupales(equipoId) {
+    document.querySelectorAll('.grupal-equipo-card').forEach(function(card) {
+        if (!equipoId || card.dataset.equipoId === equipoId) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
 function confirmarEliminarEval(nombreEval, cant) {
     var tieneNotas = parseInt(cant, 10) > 0;
     if (tieneNotas) {
@@ -106,17 +111,35 @@ function toggleTeam(teamId) {
     div.classList.toggle('hidden');
 }
 
+function filterTeams() {
+    const searchInput = document
+        .getElementById("team-search")
+        .value
+        .toLowerCase();
+    const teams = document.querySelectorAll(".searchable-team");
+    teams.forEach(team => {
+        const teamName =
+            team.dataset.teamName.toLowerCase();
+        if (teamName.includes(searchInput)) {
+            team.style.display = "";
+        } else {
+            team.style.display = "none";
+        }
+    });
+}
+
 function togglePromocionable(checked) {
     var wrapper = document.getElementById('promo-table-wrapper');
-    if (!wrapper) return;
-    var hidden = document.querySelector('#form-promo input[name="es_promocionable"]');
-    if (checked) {
-        wrapper.classList.remove('hidden');
-        if (hidden) hidden.value = '1';
-    } else {
-        wrapper.classList.add('hidden');
-        if (hidden) hidden.value = '0';
+    var hidden = document.getElementById('hidden-es-promocionable');
+
+    if (hidden) hidden.value = checked ? '1' : '0';
+
+    if (wrapper) {
+        wrapper.style.display = checked ? '' : 'none';
     }
+
+    var form = document.getElementById('form-toggle-promo');
+    if (form) form.submit();
 }
 
 function toggleNotaMinima(checkbox) {
@@ -132,6 +155,16 @@ function toggleNotaMinima(checkbox) {
         minInput.classList.add('hidden');
         dash.classList.remove('hidden');
         minInput.value = '';
+    }
+}
+
+function togglePctAsistencia(checked) {
+    var wrap = document.getElementById('pct-asistencia-wrap');
+    if (!wrap) return;
+    if (checked) {
+        wrap.classList.remove('hidden');
+    } else {
+        wrap.classList.add('hidden');
     }
 }
 
@@ -182,7 +215,9 @@ function recalcularEstadoPlanilla() {
     var tabla = document.getElementById('planilla-table');
     if (!tabla) return;
 
-    var esPromocionable = tabla.dataset.esPromocionable === '1';
+    var esPromocionable  = tabla.dataset.esPromocionable === '1';
+    var cuentaAsistencia = tabla.dataset.cuentaAsistencia === '1';
+    var pctAsistenciaMin = parseFloat(tabla.dataset.pctAsistencia || '75');
 
     var promoConfig = {};
     try {
@@ -212,10 +247,9 @@ function recalcularEstadoPlanilla() {
         if (recursa) {
             estado = 'recursa';
         } else if (!esPromocionable) {
-            estado = 'final';
+            estado = vals.length > 0 ? 'final' : 'final';
         } else {
-            var puedePromo = true;
-
+            var cumpleNotas = true;
             Object.keys(promoConfig).forEach(function (idEvalStr) {
                 var cfg = promoConfig[idEvalStr];
                 if (!cfg || !cfg.cuenta) return;
@@ -228,11 +262,21 @@ function recalcularEstadoPlanilla() {
                     : 4;
 
                 if (parseFloat(notaAlumno) < minima) {
-                    puedePromo = false;
+                    cumpleNotas = false;
                 }
             });
 
-            estado = puedePromo ? 'promociona' : 'final';
+            var cumpleAsistencia = true;
+            if (cuentaAsistencia) {
+                var pctAlumno = row.dataset.pctAsistencia;
+                if (pctAlumno === '' || pctAlumno === null || pctAlumno === undefined) {
+                    cumpleAsistencia = false;
+                } else {
+                    cumpleAsistencia = parseFloat(pctAlumno) >= pctAsistenciaMin;
+                }
+            }
+
+            estado = (cumpleNotas && cumpleAsistencia) ? 'promociona' : 'final';
         }
 
         row.dataset.estado = estado;
@@ -250,48 +294,77 @@ window.addEventListener('DOMContentLoaded', function () {
     recalcularEstadoPlanilla();
 });
 
-function createClass() {
-    const data={
-        fecha: document.getElementById("fecha-clase").value,
-        semana:document.getElementById("semana-clase").value,
-        temas:document.getElementById("temas-clase").value,
-        tipo:document.getElementById("tipo-clase").value,
-        modalidad:document.getElementById("modalidad-clase").value,
-    }
-    const courseId =document.getElementById("tab-calendar").dataset.courseId;
-
-    fetch(`/cursos/${courseId}/clases/crear`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
+let removeStudentForm = null;
+function openRemoveStudentModal(form) {
+    removeStudentForm = form;
+    openModal("remove-student-modal");
 }
 
-function deleteClass(idClase) {
-
-    console.log("Intentando borrar:", idClase);
-
-    if (!confirm("¿Eliminar esta clase?")) {
-        return;
+function confirmRemoveStudent() {
+    if (removeStudentForm) {
+        removeStudentForm.submit();
     }
+}
 
-    const idCurso =
-        document.getElementById("tab-calendar").dataset.courseId;
+function toggleDeleteMode() {
+    const form = document.getElementById("delete-teams-form");
+    document.querySelectorAll(".team-checkbox").forEach(cb => cb.classList.toggle("hidden"));
+    form.classList.toggle("hidden");
+    const warning = document.getElementById("delete-warning");
+    if (form.classList.contains("hidden")) {
+        warning.classList.add("hidden");
+    } else {
+        warning.innerHTML = "Seleccioná uno o más equipos y luego presioná <strong>Confirmar eliminación</strong>.";
+        warning.classList.remove("hidden");
+    }
+    document.querySelector(".btn-danger").textContent = form.classList.contains("hidden") ? "Eliminar equipos" : "Cancelar";
+}
 
-    fetch(`/cursos/${idCurso}/clases/${idClase}/eliminar`, {
-        method: "DELETE"
-    })
-    .then(response => {
-        console.log("Status:", response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log("Respuesta:", data);
-        location.reload();
-    })
-    .catch(error => {
-        console.error(error);
+function submitDeleteTeams() {
+    closeModal("delete-teams-modal");
+    document.getElementById("delete-teams-form").submit();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const deleteForm = document.getElementById("delete-teams-form");
+    if (!deleteForm) return;
+    deleteForm.addEventListener("submit", (e) => {
+        const selected = [...document.querySelectorAll(".team-checkbox:checked")].map(cb => cb.value);
+        if (!selected.length) {
+            e.preventDefault();
+            const warning = document.getElementById("delete-warning");
+            warning.innerHTML = "<strong>⚠ Atención:</strong> Seleccioná al menos un equipo para continuar.";
+            warning.classList.remove("hidden");
+            return;
+        }
+        e.preventDefault();
+        document.getElementById("selected-teams").value = selected.join(",");
+        openModal("delete-teams-modal");
     });
-}
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".flash-message").forEach(msg => {
+        msg.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+        setTimeout(() => {
+            msg.style.opacity = "0";
+            msg.style.transform = "translateY(-8px)";
+        }, 4500);
+        setTimeout(() => msg.remove(), 5000);
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const selectSourceDashboard = document.getElementById("select-source-dashboard");
+
+    if (!selectSourceDashboard) return;
+
+    selectSourceDashboard.addEventListener("change", function () {
+        const params = new URLSearchParams(window.location.search);
+
+        params.set("tab", "ads");
+        params.set("source", this.value);
+
+        window.location.search = params.toString();
+    });
+});

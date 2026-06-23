@@ -18,9 +18,10 @@ def login_user(data):
         contrasenia = data.get("contraseña")
         result = query_db(
             """
-            SELECT id_usuario, nombre, apellido, correo, contraseña, id_rol
-            FROM usuarios
-            WHERE correo = %s
+            SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.contraseña, u.id_rol, r.nivel_administracion
+            FROM usuarios u
+            JOIN roles r ON u.id_rol = r.id_rol
+            WHERE u.correo = %s
             """,
             (correo,)
         )
@@ -46,7 +47,8 @@ def login_user(data):
             "id_usuario": user["id_usuario"],
             "correo": user["correo"],
             "id_rol": user["id_rol"],
-            "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+            "nivel":user["nivel_administracion"],
+            "exp": datetime.now(timezone.utc) + timedelta(hours=12)
         }, os.getenv("SECRET_KEY"), algorithm="HS256")
 
         return {
@@ -58,7 +60,8 @@ def login_user(data):
                 "nombre": user["nombre"],
                 "apellido": user["apellido"],
                 "correo": user["correo"],
-                "id_rol": user["id_rol"]
+                "id_rol": user["id_rol"],
+                "nivel": user["nivel_administracion"]
             }
         }
 
@@ -100,7 +103,6 @@ def change_password(data, id_usuario):
             }
 
         user = result[0]
-        #para cambiar la contraseña el usuario debe saber la contraseña anterior.
         if not check_password_hash(user["contraseña"], current_password):
             return {
                 "ok": False,
@@ -140,56 +142,3 @@ def change_password(data, id_usuario):
             "message": "Internal Server Error",
             "description": str(e)
         }
-
-
-#def register_user(data):
-#    try:
-#        nombre = data.get("nombre")
-#        apellido = data.get("apellido")
-#        correo = data.get("correo")
-#        contrasenia = data.get("contraseña")
-#        id_rol = data.get("id_rol")
-
-#        if not nombre or not apellido or not correo or not contrasenia or not id_rol:
-#            return {
-#                "ok": False,
-#                "code": 400,
-#                "message": "Bad Request",
-#                "description": "Nombre, apellido, correo, contraseña e id_rol son obligatorios"
-#            }
-
-#        existing_user = query_db(
-#            "SELECT id_usuario FROM usuarios WHERE correo = %s",
-#            (correo,)
-#        )
-
-#        if existing_user:
-#            return {
-#                "ok": False,
-#                "code": 409,
-#                "message": "Conflict",
-#                "description": "Ya existe un usuario con ese correo"
-#            }
-
-#        contrasenia_hash = generate_password_hash(contrasenia)
-
-#        sql = """
-#            INSERT INTO usuarios (nombre, apellido, correo, contraseña, id_rol)
-#            VALUES (%s, %s, %s, %s, %s)
-#        """
-
-#       modify_db(sql, (nombre, apellido, correo, contrasenia_hash, id_rol))
-
-#        return {
-#            "ok": True,
-#            "message": "Usuario registrado con éxito"
-#        }
-
-#    except Exception as e:
-#        return {
-#            "ok": False,
-#            "code": 500,
-#            "message": "Internal Server Error",
-#            "description": str(e)
-#        }
-    

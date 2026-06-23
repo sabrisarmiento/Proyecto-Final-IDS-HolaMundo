@@ -26,7 +26,7 @@ def obtain_exams_params():
  
  
 @exam_bp.route("/evaluaciones", methods=["POST"])
-# @require_auth # descomentar cuando el auth este listo
+@require_auth
 def add_exam():
     data = request.get_json()
     return create_exam_service(data)
@@ -45,13 +45,13 @@ def modify_exam(id):
  
  
 @exam_bp.route("/evaluaciones/<int:id>", methods=["DELETE"])
-# @require_auth # descomentar cuando el auth este listo
+@require_auth
 def delete_exam(id):
     return delete_exam_service(id)
  
  
 @exam_bp.route("/notas/guardar", methods=["POST"])
-# @require_auth  # descomentar cuando el auth este listo
+@require_auth
 def save_notes():
     data = request.get_json()
     id_exam = data.get('id_evaluacion')
@@ -65,6 +65,7 @@ def save_notes():
     return save_exam_notes_service(id_exam, notes, id_corrector, correctores)
  
 @exam_bp.route("/students_with_notes", methods=["GET"])
+@require_auth
 def obtain_students_report():
     id_curso   = request.args.get('id_curso')
     page       = request.args.get('page', 1)
@@ -80,11 +81,12 @@ def obtain_students_report():
 # PROMOCIÓN
 
 @exam_bp.route("/cursos/<int:id_curso>/promocion", methods=["GET"])
+@require_auth
 def get_promocion_config(id_curso):
     return get_promocion_config_service(id_curso)
 
 
 @exam_bp.route("/cursos/<int:id_curso>/promocion", methods=["POST"])
-# @require_auth # descomentar cuando el auth este listo
+@require_auth
 def save_promocion_config(id_curso):
     return save_promocion_config_service(id_curso, request.get_json(silent=True))

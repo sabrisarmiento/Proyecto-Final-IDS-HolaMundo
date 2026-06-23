@@ -1,4 +1,4 @@
-from database.db import query_db, modify_db
+from database.db import query_db, modify_db, insert_db
 
 def get_all_teams(filters):
     try:
@@ -12,7 +12,9 @@ def get_all_teams(filters):
             a.id_alumno,
             a.nombre,
             a.apellido,
-            a.padron
+            a.padron,
+            a.correo,
+            a.estado_alumno
         FROM equipos e
         LEFT JOIN equipo_alumno ea
             ON e.id_equipo = ea.id_equipo
@@ -22,8 +24,7 @@ def get_all_teams(filters):
         condition = " WHERE 1=1 "
         params = []
         if id_student is not None:
-            sql += """INNER JOIN equipo_alumno ea ON e.id_equipo = ea.id_equipo"""
-            condition += " AND ea.id_alumno = %s "
+            condition += " AND e.id_equipo IN (SELECT id_equipo FROM equipo_alumno WHERE id_alumno = %s) "
             params.append(int(id_student))
         if id_course is not None:
             condition += " AND e.id_curso = %s"
@@ -44,7 +45,9 @@ def get_all_teams(filters):
                     "id_alumno": row["id_alumno"],
                     "nombre": row["nombre"],
                     "apellido": row["apellido"],
-                    "padron": row["padron"]
+                    "padron": row["padron"],
+                    "correo": row["correo"],
+                    "estado_alumno": row["estado_alumno"]
                 })
         return {
             "ok": True,
@@ -60,7 +63,22 @@ def get_all_teams(filters):
 
 def get_team_by_id(id):
     try:
-        sql = """SELECT id_equipo, nombre_equipo, id_curso FROM equipos WHERE id_equipo = %s;"""
+        sql = """
+        SELECT
+            e.id_equipo,
+            e.nombre_equipo,
+            e.id_curso,
+            a.id_alumno,
+            a.nombre,
+            a.apellido,
+            a.padron,
+            a.correo,
+            a.estado_alumno
+        FROM equipos e
+        LEFT JOIN equipo_alumno ea ON e.id_equipo = ea.id_equipo
+        LEFT JOIN alumnos a ON ea.id_alumno = a.id_alumno
+        WHERE e.id_equipo = %s
+        """
         result = query_db(sql, (id,))
         if not result:
             return {
@@ -69,9 +87,25 @@ def get_team_by_id(id):
                 "message": "Team not found",
                 "description": f"No existe un equipo con id {id}"
             }
+        equipo = {
+            "id_equipo": result[0]["id_equipo"],
+            "nombre_equipo": result[0]["nombre_equipo"],
+            "id_curso": result[0]["id_curso"],
+            "alumnos": []
+        }
+        for row in result:
+            if row["id_alumno"] is not None:
+                equipo["alumnos"].append({
+                    "id_alumno": row["id_alumno"],
+                    "nombre": row["nombre"],
+                    "apellido": row["apellido"],
+                    "padron": row["padron"],
+                    "correo": row["correo"],
+                    "estado_alumno": row["estado_alumno"]
+                })
         return {
             "ok": True,
-            "data": result
+            "data": equipo
         }
     except Exception as e:
         return {
@@ -83,17 +117,24 @@ def get_team_by_id(id):
 
 def create_team(data):
     try:
-        name = data.get("nombre_equipo")
+        name = data.get("nombre_equipo", "").strip()
         id_course = data.get("id_curso")
+        existing = query_db("SELECT id_equipo FROM equipos WHERE id_curso = %s AND LOWER(nombre_equipo) = LOWER(%s)", (id_course, name))
+        if existing:
+            return {
+                "ok": False,
+                "code": 409,
+                "message": "Conflict",
+                "description": "Ya existe un equipo con ese nombre"
+            }
         sql = """INSERT INTO equipos(nombre_equipo, id_curso) VALUES (%s, %s);"""
-        id_team = modify_db(sql, (name, id_course))
+        id_team = insert_db(sql, (name, id_course))
         return {
             "ok": True,
-            "data": {
-                "id_equipo": id_team,
-                "nombre_equipo": name,
-                "id_curso": id_course
-            }
+            "message": "Equipo creado correctamente",
+            "id_equipo": id_team,
+            "nombre_equipo": name,
+            "id_curso": id_course
         }
     except Exception as e:
         return {
@@ -110,6 +151,22 @@ def patch_team_by_id(id_team, data):
         updates = []
         params = []
         if name is not None:
+            team = query_db("SELECT id_curso FROM equipos WHERE id_equipo = %s", (id_team,))
+            if not team:
+                return {
+                    "ok": False,
+                    "code": 404,
+                    "message": "Team not found",
+                    "description": f"No existe un equipo con id {id_team}"
+                }
+            existing = query_db("""SELECT id_equipo FROM equipos WHERE id_curso = %s AND LOWER(nombre_equipo) = LOWER(%s) AND id_equipo <> %s""", (team[0]["id_curso"], name, id_team))
+            if existing:
+                return {
+                    "ok": False,
+                    "code": 409,
+                    "message": "Conflict",
+                    "description": "Ya existe un equipo con ese nombre"
+                }
             updates.append("nombre_equipo = %s")
             params.append(name)
         if id_course is not None:
@@ -122,7 +179,7 @@ def patch_team_by_id(id_team, data):
                 "message": "Bad Request",
                 "description": "No se enviaron campos para actualizar"
             }
-        sql = f"""UPDATE equipos SET {', '.join(updates)} WHERE id_equipo = %s"""
+        sql = f"""UPDATE equipos SET {', '.join(updates)} WHERE id_equipo = %s """
         params.append(id_team)
         modify_db(sql, params)
         return {

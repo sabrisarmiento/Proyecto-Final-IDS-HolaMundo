@@ -12,6 +12,7 @@ def get_all_exams(filters):
                 e.id_curso,
                 e.id_usuario,
                 e.fecha,
+                e.asociacion,
                 t.nombre AS nombre
             FROM evaluaciones e
             JOIN tipos_evaluacion t ON e.id_tipo = t.id_tipo
@@ -68,7 +69,7 @@ def create_exam(data):
         fecha      = data.get('fecha')
         id_curso   = data.get('id_curso')
         nombre     = data.get('nombre')
-        asociacion = data.get('asociacion', 'Individual')  # default individual
+        asociacion = data.get('asociacion', 'Individual')
 
         if not nombre:
             return {
@@ -222,11 +223,30 @@ def delete_exam_by_id(id_exam):
 
 def save_notes_to_db(id_exam, notes_dict, id_corrector, correctores_dict=None):
     try:
-        if correctores_dict is None:
-            correctores_dict = {}
+        corrector_nombre = None
+        if id_corrector:
+            user_result = query_db(
+                "SELECT nombre, apellido FROM usuarios WHERE id_usuario = %s",
+                (id_corrector,)
+            )
+            if user_result:
+                corrector_nombre = f"{user_result[0]['nombre']} {user_result[0]['apellido']}"
 
         for id_alumno, nota in notes_dict.items():
-            corrector_texto = correctores_dict.get(str(id_alumno)) or None
+            existing = query_db(
+                "SELECT nota, corrector_nombre FROM notas WHERE id_alumno = %s AND id_evaluacion = %s",
+                (id_alumno, id_exam)
+            )
+
+            if existing:
+                nota_actual = existing[0]['nota']
+                corrector_actual = existing[0]['corrector_nombre']
+                if float(nota_actual) == float(nota):
+                    final_corrector = corrector_actual
+                else:
+                    final_corrector = corrector_nombre
+            else:
+                final_corrector = corrector_nombre
 
             sql = """
                 INSERT INTO notas (id_alumno, id_evaluacion, nota, corrector_nombre)
@@ -235,7 +255,7 @@ def save_notes_to_db(id_exam, notes_dict, id_corrector, correctores_dict=None):
                     nota = VALUES(nota),
                     corrector_nombre = VALUES(corrector_nombre)
             """
-            modify_db(sql, (id_alumno, id_exam, nota, corrector_texto))
+            modify_db(sql, (id_alumno, id_exam, nota, final_corrector))
 
         return {
             "ok": True
@@ -302,60 +322,17 @@ def get_students_with_notes_db(id_curso, limit=None, offset=0, order_by=None, or
             "message": "Internal Server Error",
             "description": f"Error al obtener reporte: {str(e)}"
         }
-# def get_students_with_notes_db(id_curso):
-#     try:
-#         sql = """
-#             SELECT 
-#                 a.id_alumno,
-#                 a.nombre,
-#                 a.apellido,
-#                 a.padron,
-#                 a.estado_alumno,
-#                 e.nombre_equipo AS equipo,
-#                 IFNULL(
-#                     GROUP_CONCAT(
-#                         CONCAT(n.id_evaluacion, ':', n.nota)
-#                         ORDER BY n.id_evaluacion
-#                         SEPARATOR ','
-#                     ), ''
-#                 ) AS notas_raw,
-#                 IFNULL(
-#                     GROUP_CONCAT(
-#                         CONCAT(n.id_evaluacion, ':', IFNULL(n.corrector_nombre, ''))
-#                         ORDER BY n.id_evaluacion
-#                         SEPARATOR ','
-#                     ), ''
-#                 ) AS correctores_raw
-#             FROM alumnos a
-#             LEFT JOIN equipo_alumno ea ON a.id_alumno = ea.id_alumno
-#             LEFT JOIN equipos e ON ea.id_equipo = e.id_equipo
-#             LEFT JOIN notas n ON a.id_alumno = n.id_alumno
-#             WHERE a.id_curso = %s
-#             GROUP BY a.id_alumno, a.nombre, a.apellido, a.padron, a.estado_alumno, e.nombre_equipo
-#             ORDER BY a.apellido, a.nombre
-#         """
-#         result = query_db(sql, (id_curso,))
-#         return {
-#             "ok": True,
-#             "data": result if result else []
-#         }
-#     except Exception as e:
-#         return {
-#             "ok": False,
-#             "code": 500,
-#             "message": "Internal Server Error",
-#             "description": f"Error al obtener reporte: {str(e)}"
-#         }
 
-# PROMOCION
 
 def get_promocion_config_db(id_curso):
     try:
         flag = query_db(
-            "SELECT es_promocionable FROM curso_promocion_config WHERE id_curso = %s",
+            "SELECT es_promocionable, cuenta_asistencia, porcentaje_asistencia FROM curso_promocion_config WHERE id_curso = %s",
             (id_curso,)
         )
-        es_promocionable = flag[0]['es_promocionable'] if flag else False
+        es_promocionable   = flag[0]['es_promocionable']      if flag else False
+        cuenta_asistencia  = bool(flag[0]['cuenta_asistencia']) if flag else False
+        pct_asistencia     = float(flag[0]['porcentaje_asistencia']) if flag else 75.0
 
         detalle = query_db(
             """
@@ -369,8 +346,10 @@ def get_promocion_config_db(id_curso):
         return {
             "ok": True,
             "data": {
-                "es_promocionable": bool(es_promocionable),
-                "evaluaciones": detalle or []
+                "es_promocionable":      bool(es_promocionable),
+                "cuenta_asistencia":     cuenta_asistencia,
+                "porcentaje_asistencia": pct_asistencia,
+                "evaluaciones":          detalle or []
             }
         }
     except Exception as e:
@@ -382,26 +361,29 @@ def get_promocion_config_db(id_curso):
         }
 
 
-def save_promocion_config_db(id_curso, es_promocionable, evaluaciones):
+def save_promocion_config_db(id_curso, es_promocionable, evaluaciones, cuenta_asistencia=False, porcentaje_asistencia=75.0):
     try:
         modify_db(
             """
-            INSERT INTO curso_promocion_config (id_curso, es_promocionable)
-            VALUES (%s, %s)
-            ON DUPLICATE KEY UPDATE es_promocionable = VALUES(es_promocionable)
+            INSERT INTO curso_promocion_config (id_curso, es_promocionable, cuenta_asistencia, porcentaje_asistencia)
+            VALUES (%s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE 
+                es_promocionable      = VALUES(es_promocionable),
+                cuenta_asistencia     = VALUES(cuenta_asistencia),
+                porcentaje_asistencia = VALUES(porcentaje_asistencia)
             """,
-            (id_curso, bool(es_promocionable))
+            (id_curso, bool(es_promocionable), bool(cuenta_asistencia), float(porcentaje_asistencia))
         )
 
         for ev in evaluaciones:
-            id_eval = ev.get('id_evaluacion')
-            cuenta = bool(ev.get('cuenta', ev.get('cuenta_para_promocion', False)))
-            nota_min = ev.get('nota_minima', None)
-            if nota_min is not None:
-                try:
-                    nota_min = float(nota_min)
-                except (ValueError, TypeError):
-                    nota_min = None
+            id_eval  = ev.get('id_evaluacion')
+            cuenta   = bool(ev.get('cuenta', ev.get('cuenta_para_promocion', False)))
+            nota_raw = ev.get('nota_minima', None)
+            nota_min = float(nota_raw) if nota_raw is not None else None
+            try:
+                nota_min = float(nota_min)
+            except (ValueError, TypeError):
+                nota_min = None
 
             modify_db(
                 """

@@ -4,35 +4,189 @@
     display: none;
 }
 
-#msg-select-course {
-    display: block;
+.hidden {
+    display: none;
 }
 
-.classes-container{
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    gap: 1rem;
+#msg-select-course {
+    display: block;
+    color: var(--color-8);
+    text-align: center;
     margin-top: 1rem;
 }
 
+/* Encabezado */
+.section-header-schedule {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem auto 1rem;
+    text-align: center;
+}
+
+.section-header-schedule h1 {
+    margin: 0;
+    color: var(--color-9);
+    font-weight: 700;
+}
+
+.section-header-schedule p {
+    margin: 0;
+    color: var(--color-8);
+    max-width: 40rem;
+}
+
+/* Contenedor principal */
 .section-schedule {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 2rem 3rem;
+    box-sizing: border-box;
 }
 
-.section-header-schedule{
+.schedule-controls {
     display: flex;
     align-items: center;
-    flex-direction: column;
-    margin: 0 auto;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.class{
-    background: var(--color-6);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+#select-courses {
+    width: 100%;
+    max-width: 22rem;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--color-6);
+    border-radius: 0.75rem;
+    background: var(--color-45);
+    color: var(--color-8);
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#select-courses:hover {
+    border-color: var(--color-2);
+}
+
+#select-courses:focus {
+    outline: none;
+    border-color: var(--color-2);
+    box-shadow: 0 0 0 3px var(--color-16);
+}
+
+.schedule-search {
+    width: 100%;
+    color:var(--color-19);
+    max-width: 280px;
+    height: 38px;
+    padding: 0 0.9rem;
+    border: 1px solid var(--color-7);
+    border-radius: 0.75rem;
+    background: var(--color-45);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.classes-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* Card por semana */
+.class {
+    width: 100%;
+    background: var(--color-45);
+    border: 1px solid var(--color-6);
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.class:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.10);
+}
+
+.class h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-9);
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-3);
+}
+
+/* Clases dentro de la semana */
+.class article {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.75rem;
+    background: var(--color-5);
+    border: 1px solid var(--color-6);
+    border-left: 5px solid var(--color-20);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+
+.class article:last-of-type {
+    margin-bottom: 0;
+}
+
+.class article:hover {
+    transform: translateX(6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.class article h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-9);
+}
+
+.class article p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-15);
+    line-height: 1.5;
+}
+
+/* Badge de modalidad */
+.class article span {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+    padding: 0.35rem 0.9rem;
+    background: var(--color-3);
+    color: var(--color-10);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    width: fit-content;
+}
+
+.class article small {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 0.75rem;
+    color: var(--color-8);
+    opacity: 0.8;
+    background: transparent;
+    padding: 0;
 }

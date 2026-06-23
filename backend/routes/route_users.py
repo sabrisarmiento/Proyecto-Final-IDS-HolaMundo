@@ -7,13 +7,14 @@ from services.user_service import (
     delete_user_service
 )
 
-from middleware.auth_middleware import require_auth
+from middleware.auth_middleware import require_auth, require_min_admin_level
+from helpers.constants import NIVEL_PROFESOR
 
 users_bp = Blueprint('users', __name__)
 
 @users_bp.route("/users",methods=["GET"])
+@require_auth
 def get_users():
-
     filters = {
         "id_usuario": request.args.get("id_usuario"),
         "nombre": request.args.get("nombre"),
@@ -26,25 +27,36 @@ def get_users():
 
 
 @users_bp.route("/users/<int:id_user>",methods=["GET"])
+@require_auth
 def get_user(id_user):
     return user_service(id_user)
 
-
 @users_bp.route("/users",methods=["POST"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def create_user():
     data = request.get_json()
-    return create_user_service(data)
+    logged_user = request.user
+    return create_user_service(data, logged_user)
 
 
 @users_bp.route("/users/<int:id_user>",methods=["PATCH"])
 @require_auth
 def patch_user(id_user):
     data = request.get_json()
-    return patch_user_service(id_user, data)
+    logged_user = request.user
+    
+    if logged_user.get("id_usuario") != id_user:
+        nivel = logged_user.get("nivel")
+        if nivel is None or nivel < NIVEL_PROFESOR:
+            from helpers.responses import error_response
+            return error_response({"code": 403, "message": "Forbidden", "description": "No tienes permisos"})
+    return patch_user_service(id_user, data, logged_user)
 
 
 @users_bp.route("/users/<int:id_user>",methods=["DELETE"])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def delete_user(id_user):
-    return delete_user_service(id_user)
+    logged_user = request.user
+    return delete_user_service(id_user, logged_user)

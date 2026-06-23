@@ -1,126 +1,51 @@
-import os
 import requests
-from urllib.parse import urlencode
+from datetime import datetime
 from database.db import modify_db, query_db
+from helpers.crypto import encrypt_value, decrypt_value
+from helpers.constants import NIVEL_SUPERADMIN
 
 
-def build_slack_install_url(id_curso, user):
-    id_usuario = user["id_usuario"]
+def user_can_manage_course(id_curso, user):
+    if (user.get("nivel") or 0) >= NIVEL_SUPERADMIN:
+        return True
+    course = query_db("SELECT id_profesor FROM cursos WHERE id_curso = %s", (id_curso,))
+    if not course or course[0].get("id_profesor") is None:
+        return False
+    return course[0]["id_profesor"] == user.get("id_usuario")
 
-    params = {
-        "client_id": os.getenv("SLACK_CLIENT_ID"),
-        "scope": "chat:write,channels:read,incoming-webhook",
-        "redirect_uri": os.getenv("SLACK_REDIRECT_URI"),
-        "state": f"{id_curso}:{id_usuario}"
+def get_slack_user_name(token, user_id):
+    url = "https://slack.com/api/users.info"
+
+    headers = {
+        "Authorization": f"Bearer {token}"
     }
 
-    query_string = urlencode(params)
+    params = {
+        "user": user_id
+    }
 
-    return f"https://slack.com/oauth/v2/authorize?{query_string}"
+    response = requests.get(url, headers=headers, params=params)
+    data = response.json()
 
+    user_name = "Slack"
 
-def handle_slack_callback(code, state):
-    try:
-        if not code or not state:
-            return {
-                "ok": False,
-                "code": 400,
-                "message": "Bad Request",
-                "description": "Falta code o state"
-            }
+    if data.get("ok"):
+        user = data.get("user", {})
+        profile = user.get("profile", {})
 
-        state_parts = state.split(":")
-
-        if len(state_parts) != 2:
-            return {
-                "ok": False,
-                "code": 400,
-                "message": "Bad Request",
-                "description": "State inválido"
-            }
-
-        id_curso = int(state_parts[0])
-        id_usuario = int(state_parts[1])
-
-        response = requests.post(
-            "https://slack.com/api/oauth.v2.access",
-            data={
-                "code": code,
-                "redirect_uri": os.getenv("SLACK_REDIRECT_URI")
-            },
-            auth=(
-                os.getenv("SLACK_CLIENT_ID"),
-                os.getenv("SLACK_CLIENT_SECRET")
-            )
+        user_name = (
+            profile.get("display_name")
+            or profile.get("real_name")
+            or user.get("name")
+            or "Slack"
         )
 
-        data = response.json()
-
-        if not data.get("ok"):
-            return {
-                "ok": False,
-                "code": 400,
-                "message": "Bad Request",
-                "description": data.get("error")
-            }
-
-        access_token = data.get("access_token")
-        team = data.get("team", {})
-        incoming_webhook = data.get("incoming_webhook", {})
-
-        slack_team_id = team.get("id")
-        slack_channel_id = incoming_webhook.get("channel_id")
-        slack_channel_name = incoming_webhook.get("channel")
-        slack_webhook_url = incoming_webhook.get("url")
-
-        sql = """
-            INSERT INTO curso_slack_config (
-                id_curso,
-                slack_team_id,
-                slack_channel_id,
-                slack_channel_name,
-                slack_bot_token,
-                slack_webhook_url,
-                instalado_por
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE
-                slack_team_id = VALUES(slack_team_id),
-                slack_channel_id = VALUES(slack_channel_id),
-                slack_channel_name = VALUES(slack_channel_name),
-                slack_bot_token = VALUES(slack_bot_token),
-                slack_webhook_url = VALUES(slack_webhook_url),
-                instalado_por = VALUES(instalado_por)
-        """
-
-        modify_db(sql, (
-            id_curso,
-            slack_team_id,
-            slack_channel_id,
-            slack_channel_name,
-            access_token,
-            slack_webhook_url,
-            id_usuario
-        ))
-
-        return {
-            "ok": True,
-            "id_curso": id_curso,
-            "data": "Slack conectado correctamente"
-        }
-
-    except Exception as e:
-        return {
-            "ok": False,
-            "code": 500,
-            "message": "Internal Server Error",
-            "description": str(e)
-        }
+    return user_name
     
 def send_advertisement_to_slack(id_curso, title, message, user_mail):
     try:
         sql = """
-            SELECT slack_webhook_url
+            SELECT slack_bot_token, slack_channel_id, permite_escritura
             FROM curso_slack_config
             WHERE id_curso = %s
         """
@@ -133,25 +58,38 @@ def send_advertisement_to_slack(id_curso, title, message, user_mail):
                 "message": "El curso no tiene Slack configurado"
             }
 
-        webhook_url = result[0].get("slack_webhook_url")
+        config = result[0]
 
-        if not webhook_url:
+        if not config.get("permite_escritura"):
             return {
                 "ok": True,
-                "message": "El curso no tiene webhook configurado"
+                "message": "El curso no tiene habilitado poder mandar avisos de la web a slack"
             }
+        slack_bot_token = decrypt_value(config.get("slack_bot_token"))
+        slack_channel_id = config.get("slack_channel_id")
 
+        if not slack_bot_token or not slack_channel_id:
+            return {
+                "ok": False,
+                "message": "Faltan datos de configuración de Slack"
+            }
+        
         response = requests.post(
-            webhook_url,
+            "https://slack.com/api/chat.postMessage",
+            headers={
+                "Authorization": f"Bearer {slack_bot_token}",
+                "Content-Type": "application/json"
+            },
             json={
+                "channel": slack_channel_id,
                 "text": f"*Nuevo aviso publicado desde Panel FIUBA*\n\n*{title}*\n{message}\n\nPublicado por: {user_mail}"
             }
         )
+        data = response.json()
 
-        print("SLACK STATUS:", response.status_code)
-        print("SLACK RESPONSE:", response.text)
+        print("SLACK RESPONSE:", data)
 
-        if response.status_code == 200:
+        if data.get("ok"):
             return {
                 "ok": True,
                 "message": "Aviso enviado a Slack"
@@ -160,7 +98,7 @@ def send_advertisement_to_slack(id_curso, title, message, user_mail):
         return {
             "ok": False,
             "message": "Slack respondió con error",
-            "description": response.text
+            "description": data.get("error")
         }
 
     except Exception as e:
@@ -171,8 +109,15 @@ def send_advertisement_to_slack(id_curso, title, message, user_mail):
             "description": str(e)
         }
     
-def disconnect_slack_course(id_curso):
+def disconnect_slack_course(id_curso, user):
     try:
+        if not user_can_manage_course(id_curso, user):
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permiso sobre este curso"
+            }
         sql = """
             DELETE FROM curso_slack_config
             WHERE id_curso = %s
@@ -183,6 +128,173 @@ def disconnect_slack_course(id_curso):
         return {
             "ok": True,
             "data": "Slack desconectado correctamente"
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
+    
+
+
+def configure_slack_course(id_curso, data, user):
+    try:
+        if not user_can_manage_course(id_curso, user):
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permiso sobre este curso"
+            }
+        id_usuario = user["id_usuario"]
+        slack_bot_token = data.get("slack_bot_token")
+        slack_channel_id = data.get("slack_channel_id")
+        slack_channel_name = data.get("slack_channel_name")
+        permite_escritura = data.get("permite_escritura", False)
+        permite_lectura = data.get("permite_lectura", False)
+
+        if not slack_bot_token or not slack_channel_id:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": "Faltan slack_bot_token o slack_channel_id"
+            }
+        encrypted_slack_bot_token = encrypt_value(slack_bot_token)
+        sql = """
+            INSERT INTO curso_slack_config (
+                id_curso,
+                slack_channel_id,
+                slack_channel_name,
+                slack_bot_token,
+                permite_escritura,
+                permite_lectura,
+                instalado_por
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                slack_channel_id = VALUES(slack_channel_id),
+                slack_channel_name = VALUES(slack_channel_name),
+                slack_bot_token = VALUES(slack_bot_token),
+                permite_escritura = VALUES(permite_escritura),
+                permite_lectura = VALUES(permite_lectura),
+                instalado_por = VALUES(instalado_por)
+        """
+
+        modify_db(sql, (
+            id_curso,
+            slack_channel_id,
+            slack_channel_name,
+            encrypted_slack_bot_token,
+            permite_escritura,
+            permite_lectura,
+            id_usuario
+        ))
+
+        return {
+            "ok": True,
+            "data": "Slack configurado correctamente"
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "code": 500,
+            "message": "Internal Server Error",
+            "description": str(e)
+        }
+
+def get_slack_messages(id_curso):
+    try:
+        sql = """
+            SELECT 
+                slack_bot_token,
+                slack_channel_id,
+                permite_lectura
+            FROM curso_slack_config
+            WHERE id_curso = %s
+        """
+
+        result = query_db(sql, (id_curso,))
+
+        if not result:
+            return {
+                "ok": True,
+                "data": [],
+                "message": "El curso no tiene Slack configurado"
+            }
+
+        config = result[0]
+
+        if not config.get("permite_lectura"):
+            return {
+                "ok": True,
+                "data": [],
+                "message": "El curso no tiene habilitada la lectura de Slack"
+            }
+
+        slack_bot_token = decrypt_value(config.get("slack_bot_token"))
+        slack_channel_id = config.get("slack_channel_id")
+
+        if not slack_bot_token or not slack_channel_id:
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": "Faltan slack_bot_token o slack_channel_id"
+            }
+
+        response = requests.get(
+            "https://slack.com/api/conversations.history",
+            headers={
+                "Authorization": f"Bearer {slack_bot_token}"
+            },
+            params={
+                "channel": slack_channel_id,
+                "limit": 10
+            }
+        )
+
+        data = response.json()
+
+        if not data.get("ok"):
+            return {
+                "ok": False,
+                "code": 400,
+                "message": "Bad Request",
+                "description": data.get("error")
+            }
+
+        slack_messages = []
+
+        for message in data.get("messages", []):
+            ts = message.get("ts")
+            fecha = ""
+
+            if ts:
+                fecha = datetime.fromtimestamp(float(ts)).strftime("%d/%m/%Y %H:%M")
+
+            if message.get("subtype") == "bot_message" or message.get("bot_id") or message.get("app_id"):
+                emisor = "Slack Bot"
+                origen = "panel_confirmado"
+            else:
+                emisor = "Usuario Slack"
+                origen = "slack"
+
+            slack_messages.append({
+                "titulo": "Mensaje de Slack",
+                "mensaje": message.get("text", ""),
+                "emisor": emisor,
+                "fecha": fecha,
+                "origen": origen
+            })
+
+        return {
+            "ok": True,
+            "data": slack_messages
         }
 
     except Exception as e:

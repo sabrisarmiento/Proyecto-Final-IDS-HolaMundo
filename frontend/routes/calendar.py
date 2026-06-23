@@ -8,10 +8,11 @@ calendar_bp = Blueprint('calendar', __name__)
 @calendar_bp.route('/cronograma', methods=['GET'])
 def calendar():
   view = request.args.get("subject")
+  selected_course = request.args.get("course")
   schedule = []
   courses = []
   subjects = get_subjects()
-  
+
   if view is not None:
     try:
       classes = get_schedule_by_subject(int(view))
@@ -32,12 +33,11 @@ def calendar():
     except Exception as e:
       print(f"Error al obetener cronograma para la materia {view}: {e}")
 
-  print("courses",courses)
-
   return render_template(
     'calendar.html',
     active_page='calendar',
     selected_subject=int(view) if view else None,
+    selected_course=int(selected_course) if selected_course else None,
     subjects=subjects,
     schedule=schedule,
     courses=courses

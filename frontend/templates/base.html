@@ -6,51 +6,40 @@
   <title>{% block title %}Panel FIUBA{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/subject_select.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=PT+Sans:wght@400;700&family=Prompt:wght@400;500;700&family=Red+Hat+Display:wght@400;500;700&display=swap" rel="stylesheet">
   
   {% block extra_styles %}{% endblock %}
   
 </head>
 <body>
-  {% from "components/dropdown.html" import dropdown_settings %}
+  {% from "components/dropdown.html" import dropdown_settings, dropdown_profile_welcome %}
   {% from "components/modal.html" import modal %}
 
   <header class="header-private">
-    <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+    <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="header-private-logo">
     Panel FIUBA
 </a>
 
     <nav class="header-private-nav">
-  <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+  <a href="{{ url_for('landing.landing') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="{% if active_page == 'landing' %}is-active{% endif %}">Inicio</a>
 
-  <a href="{{ url_for('materials.public_materials') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+  <a href="{{ url_for('materials.public_materials') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="{% if active_page == 'materials' %}is-active{% endif %}">Materiales</a>
 
-  <a href="{{ url_for('advertisements.public_advertisements') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+  <a href="{{ url_for('advertisements.public_advertisements') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="{% if active_page == 'advertisements' %}is-active{% endif %}">Avisos</a>
 
-  <a href="{{ url_for('calendar.calendar') }}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}"
+  <a href="{{ url_for('calendar.calendar') }}{% if selected_subject %}?subject={{ selected_subject }}{% if selected_curso %}&curso={{ selected_curso }}{% endif %}{% endif %}"
     class="{% if active_page == 'calendar' %}is-active{% endif %}">Cronograma</a>
 
   {% if session.get('user') %}
     <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
   {% endif %}
 
-  <div class="subject-select-container">
-    <select title="subject-select" id="subject-select" onchange="changeSubject(this.value)">
-      <option value="general" {% if not selected_subject %}selected{% endif %}>
-        General
-      </option>
-      {% for s in subjects %}
-        <option value="{{ s.id_materia }}"
-          {% if s.id_materia == selected_subject %}selected{% endif %}>
-          {{ s.nombre }}
-        </option>
-      {% endfor %}
-    </select>
-  </div>
+  {% include "components/subject_select.html" %}
 </nav>
 
     <div class="config-box">
@@ -58,23 +47,32 @@
         {{ dropdown_settings() }}
       </div>
       {% if session.get('user') %}
-        <p>Bienvenido, {{ session['user']['nombre'] }}</p>
+        {{ dropdown_profile_welcome(session.get('user')) }}
       {% else %}
         <button type="button" class="btn-primary" onclick="openModal('login-modal')">
           Iniciar Sesion
         </button>
   
-        {% call modal("login-modal", "iniciar Sesion") %}
+        {% call modal("login-modal", "Iniciar Sesion") %}
           <form action="{{ url_for("login.login") }}" method="POST">
             <input type="email" name="correo" placeholder="Ingresar correo ..." required>
             <input type="password" name="contraseña" placeholder="Ingresar contraseña ...">
+            {% if request.args.get('error') %}
+              <p class="form-message form-message-error">{{ request.args.get('error') }}</p>
+            {% endif %}
             <button type="submit">Iniciar Sesion</button>
           </form>
         {% endcall %}
+        {% if request.args.get('error') %}
+          <script>document.addEventListener('DOMContentLoaded', () => openModal('login-modal'));</script>
+        {% endif %}
       {% endif %}
     </div>
 
   </header>
+  {% if session.get('user') %}
+    {% include "profile.html" %}
+  {% endif %}
   <main class="main-private">
     {% block content %}{% endblock %}
   </main>

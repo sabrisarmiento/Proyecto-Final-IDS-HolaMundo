@@ -11,27 +11,106 @@
     <div class="advertisements-container">
         <div class="advertisements-header">
             <h1 class="advertisements-title">Avisos de la Cátedra</h1>
-            <p class="advertisements-subtitle">Enterate al instante sobre novedades de la materia, cambios de aula, publicaciones de notas y recordatorios importantes</p>
+            <p class="advertisements-subtitle">
+                Enterate al instante sobre novedades de la materia, cambios de aula, publicaciones de notas y recordatorios importantes
+            </p>
         </div>
+
+        {% if selected_subject %}
+            <div class="advertisements-filter">
+                {% if courses and courses|length > 0 %}
+                    <select title="select-course" id="select-courses">
+                        <option value="" selected>Seleccione una cátedra</option>
+                        {% for course in courses %}
+                        <option 
+                            value="{{ course.id_curso }}"
+                            {% if selected_course == course.id_curso %}selected{% endif %}
+                        >
+                            {{ course.catedra }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                {% if selected_course %}
+                    <select class="select-source" title="select-source" id="select-source">
+                        <option value="all" {% if source == "all" %}selected{% endif %}>
+                            Todos los avisos
+                        </option>
+                        <option value="panel" {% if source == "panel" %}selected{% endif %}>
+                            Solo Panel FIUBA
+                        </option>
+                        <option value="slack" {% if source == "slack" %}selected{% endif %}>
+                            Solo Slack
+                        </option>
+                    </select>
+                {% endif %}
+                    <p id="msg-select-course">
+                        Por favor, seleccione una cátedra para ver sus avisos.
+                    </p>
+                {% else %}
+                    <div class="advertisement-empty">
+                        <p>No hay cátedras disponibles por el momento</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
         
-        <div class="advertisements-list">
+        
+        <div class="advertisements-list" id="advertisements-container">
             {% if avisos %}
                 {% for aviso in avisos %}
-                <article class="advertisement-card">
+                <article class="
+                    advertisement-card
+                    {% if aviso.origen == 'slack' %}origen-slack{% endif %}
+                    {% if aviso.origen == 'panel_confirmado' %}origen-panel-confirmado{% endif %}
+                    {% if aviso.origen == 'panel' or not aviso.origen %}origen-panel{% endif %}
+                " data-course="{{ aviso.id_curso }}">
                     <div class="advertisement-card-header">
                         <span class="advertisement-date">{{ aviso.fecha }}</span>
                         <span class="advertisement-issuer">Publicado por: {{ aviso.emisor }}</span>
                     </div>
                     <h2 class="advertisement-card-title">{{ aviso.titulo }}</h2>
                     <p class="advertisement-card-message">{{ aviso.mensaje }}</p>
+                    <p>ORIGEN: {{ aviso.origen }}</p>
+                    {% if session.get("token") and aviso.id_aviso and aviso.puede_editar %}
+                        <div class="advertisement-actions">
+                            <a 
+                                href="{{ url_for('advertisements.edit_advertisement_front', id_aviso=aviso.id_aviso) }}?id_curso={{ aviso.id_curso }}"
+                                class="btn-edit-advertisement"
+                            >
+                                Editar
+                            </a>
+
+                            <form 
+                                method="POST"
+                                action="{{ url_for('advertisements.delete_advertisement_front', id_aviso=aviso.id_aviso) }}"
+                                class="delete-advertisement-form"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="id_curso"
+                                    value="{{ aviso.id_curso }}"
+                                >
+                                <button 
+                                    type="submit" 
+                                    class="btn-delete-advertisement"
+                                    onclick="return confirm('¿Seguro que querés borrar este aviso?')"
+                                >
+                                    Borrar
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
                 </article>
                 {% endfor %}
             {% else %}
                 <div class="advertisement-empty">
-                    <p>Elije una materia para ver sus avisos</p>
+                    <p>No hay avisos publicados en este momento</p>
                 </div>
             {% endif %}
         </div>
     </div>
 </section>
+
+<script src="{{ url_for('static', filename='js/advertisements.js') }}"></script>
 {% endblock %}

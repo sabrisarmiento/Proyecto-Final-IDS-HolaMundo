@@ -1,6 +1,7 @@
 /* ===== HERO ===== */
 .hero {
   width: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -177,6 +178,48 @@
 .week-title i {
   color: var(--color-9);
 }
+
+/* ============ REGIMEN DE APROBACION ========== */
+
+.regimen-dropdown {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.regimen-dropdown > button {
+  width: 100%;
+  background: var(--color-45);
+  border: none;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  color: var(--color-9);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: background 0.2s;
+}
+
+.regimen-dropdown > button:hover {
+  background: var(--color-6);
+}
+
+.regimen-content {
+  display: none;
+  padding: 1rem 1.5rem;
+  background: var(--color-45);
+  border-radius: 0 0 10px 10px;
+  border-top: 1px solid var(--color-6);
+  color: var(--color-8);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.regimen-content.open { display: block; }
 
 /* ===== CALENDER BUTTON ===== */
 .classes-container button {
@@ -399,4 +442,54 @@
 .teacher-card p {
   margin: 0;
   color: var(--color-8);
+}
+/* Cátedra selector */
+.catedra-title {
+  font-size: 1.1rem;
+  color: var(--color-9);
+  margin: 1.5rem 0 1rem 0;
+  font-weight: 600;
+}
+
+.catedra-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.catedra-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-6);
+  border-radius: 10px;
+  background: var(--color-2);
+  text-decoration: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 180px;
+}
+
+.catedra-card:hover {
+  border-color: var(--color-3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.catedra-nombre {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-7);
+}
+
+.catedra-meta {
+  font-size: 0.85rem;
+  color: var(--color-8);
+}
+
+.catedra-empty {
+  color: var(--color-8);
+  font-size: 1rem;
+  margin-top: 1rem;
 }

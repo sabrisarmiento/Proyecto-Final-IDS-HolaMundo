@@ -1,13 +1,127 @@
 {% extends "base_private.html" %}
 
-{% block title %}Panel FIUBA - Dashboard{% endblock %}
+{% block title %}Panel FIUBA - Asistencia{% endblock %}
 
 {% block extra_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/attendance.css') }}">
 {% endblock %}
 
 {% block content %}
-<section class="attendance" >
-    <h2>Asistencia</h2>
+<section class="attendance">
+    <header class="attendance-head">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="attendance-flash">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <h2>Asistencia</h2>
+        <p class="attendance-subtitle">
+            Elegí materia, curso y clase para ver la asistencia y enviar los links de asistencia.
+        </p>
+    </header>
+
+    <div class="attendance-actions">
+        <form method="GET" action="/asistencia" class="field">
+            <span class="field-label">Materia</span>
+            <select name="subject" class="field-select" onchange="this.form.submit()">
+                <option value="" disabled {% if not subject_id %}selected{% endif %}>Elegi una materia...</option>
+                {% for s in subjects %}
+                    <option value="{{ s.id_materia }}" {% if s.id_materia|string == subject_id %}selected{% endif %}>
+                        {{ s.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if subject_id %}
+        <form method="GET" action="/asistencia" class="field">
+            <input type="hidden" name="subject" value="{{ subject_id }}">
+            <span class="field-label">Curso</span>
+            <select name="curso" class="field-select" onchange="this.form.submit()">
+                <option value="" disabled {% if not course_id %}selected{% endif %}>Elegi un curso...</option>
+                {% for c in courses %}
+                    <option value="{{ c.id_curso }}" {% if c.id_curso|string == course_id %}selected{% endif %}>
+                        Curso {{ c.id_curso }}{% if c.catedra %} · {{ c.catedra }}{% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endif %}
+
+        {% if course_id %}
+        <form method="GET" action="/asistencia" class="field">
+            <input type="hidden" name="subject" value="{{ subject_id }}">
+            <input type="hidden" name="curso" value="{{ course_id }}">
+            <span class="field-label">Clase</span>
+            <select name="clase" class="field-select" onchange="this.form.submit()">
+                <option value="" disabled {% if not class_id %}selected{% endif %}>Elegí una clase…</option>
+                {% for cl in classes %}
+                    <option value="{{ cl.id_clase }}" {% if cl.id_clase|string == class_id %}selected{% endif %}>
+                        {{ cl.temas or ("Semana " ~ cl.semana) }}{% if cl.fecha %} · {{ cl.fecha }}{% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+        {% endif %}
+
+        {% if class_id %}
+        <form method="POST" action="/asistencia/enviar-link">
+            <input type="hidden" name="subject" value="{{ subject_id }}">
+            <input type="hidden" name="curso" value="{{ course_id }}">
+            <input type="hidden" name="id_clase" value="{{ class_id }}">
+            <label>Validez del link:
+                <input type="number" name="horas" min="0" max="24" value="3"> h
+                <input type="number" name="minutos" min="0" max="59" value="0"> min
+            </label>
+            <button type="submit" class="btn-send-link">
+                <span class="btn-send-link-icon">▦</span> Enviar link de asistencia
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if class_id %}
+    <div class="attendance-table-wrap">
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>Alumno</th>
+                    <th>Clase</th>
+                    <th>Presente</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance %}
+                    <tr>
+                        <td>{{ record.id_alumno }}</td>
+                        <td>{{ record.id_clase }}</td>
+                        <td>
+                            {% if record.presente %}
+                                <span class="status status-present">Presente</span>
+                            {% else %}
+                                <span class="status status-absent">Ausente</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <span class="empty-icon">▦</span>
+                                <p>No hay registros de asistencia todavía.</p>
+                                <small>Enviá los links para que los alumnos den el presente.</small>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
 </section>
 {% endblock %}

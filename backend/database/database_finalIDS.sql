@@ -1,3 +1,4 @@
+SET NAMES utf8mb4;
 CREATE DATABASE IF NOT EXISTS DB_ProyectoFinal_IDS;
 USE DB_ProyectoFinal_IDS;
 
@@ -38,6 +39,8 @@ CREATE TABLE cursos (
     anio INT NOT NULL,
     slack_url VARCHAR(500),
     youtube_url VARCHAR (500),
+    regimen_aprobacion TEXT,
+    estado BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
 );
@@ -48,6 +51,15 @@ CREATE TABLE curso_ayudantes (
     id_usuario INT NOT NULL,
     PRIMARY KEY (id_curso, id_usuario),
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
+-- materia_profesores
+CREATE TABLE materia_profesores (
+    id_materia INT NOT NULL,
+    id_usuario INT NOT NULL,
+    PRIMARY KEY (id_materia, id_usuario),
+    FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
@@ -67,7 +79,7 @@ CREATE TABLE alumnos (
     correo VARCHAR(255) NOT NULL,
     estado_alumno BOOLEAN DEFAULT TRUE,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 -- equipos --
@@ -75,7 +87,7 @@ CREATE TABLE equipos (
     id_equipo INT AUTO_INCREMENT PRIMARY KEY,
     nombre_equipo VARCHAR(20) NOT NULL,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 -- clases --
@@ -86,8 +98,22 @@ CREATE TABLE clases (
     semana INT NOT NULL,
     tipo VARCHAR(50),
     modalidad VARCHAR(50),
+    asistencia_abierta_en DATETIME NULL,
+    asistencia_valida_hasta DATETIME NULL,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
+    id_creador_clase INT NOT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_creador_clase) REFERENCES usuarios(id_usuario)
+);
+
+-- materia_temas --
+CREATE TABLE materia_temas (
+    id_tema INT AUTO_INCREMENT PRIMARY KEY,
+    id_materia INT NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    icono VARCHAR(100),
+    orden INT DEFAULT 0,
+    FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE
 );
 
 -- materiales --
@@ -97,7 +123,9 @@ CREATE TABLE materiales (
     descripcion TEXT,
     url_externo VARCHAR(500) NOT NULL,
     id_curso INT NOT NULL,
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
+    id_clase INT NULL,
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) ON DELETE SET NULL
 );
 
 -- equipo_alumno --
@@ -115,8 +143,9 @@ CREATE TABLE asistencia (
     id_alumno INT NOT NULL,
     id_clase INT NOT NULL,
     presente BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_clase) REFERENCES clases(id_clase)
+    UNIQUE (id_alumno, id_clase),
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno) ON DELETE CASCADE,
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) ON DELETE CASCADE
 );
 
 -- avisos --
@@ -128,7 +157,7 @@ CREATE TABLE avisos (
     mensaje TEXT NOT NULL,
     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
-    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso)
+    FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 -- evaluaciones --
@@ -153,9 +182,9 @@ CREATE TABLE notas (
     nota DECIMAL(4, 2) NOT NULL,
     corrector_nombre VARCHAR(100) NULL,
     CONSTRAINT uq_alumno_evaluacion UNIQUE (id_alumno, id_evaluacion),
-    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion),
-    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno),
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo)
+    FOREIGN KEY (id_evaluacion) REFERENCES evaluaciones(id_evaluacion) ON DELETE CASCADE,
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id_alumno) ON DELETE CASCADE,
+    FOREIGN KEY (id_equipo) REFERENCES equipos(id_equipo) ON DELETE CASCADE
 );
 
 -- configuracion promocion --
@@ -174,34 +203,21 @@ CREATE TABLE configuracion_promocion (
 CREATE TABLE curso_promocion_config (
     id_curso INT PRIMARY KEY,
     es_promocionable BOOLEAN NOT NULL DEFAULT FALSE,
+    porcentaje_asistencia DECIMAL(5,2) DEFAULT 75.00,
+    cuenta_asistencia BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
 CREATE TABLE curso_slack_config (
     id_curso INT PRIMARY KEY,
-    slack_team_id VARCHAR(100),
-    slack_channel_id VARCHAR(100),
+    slack_channel_id VARCHAR(100) NOT NULL,
     slack_channel_name VARCHAR(100),
-    slack_bot_token VARCHAR(500),
-    slack_webhook_url VARCHAR(1000),
+    slack_bot_token VARCHAR(500) NOT NULL,
+    permite_escritura BOOLEAN DEFAULT FALSE,
+    permite_lectura BOOLEAN DEFAULT FALSE,
     instalado_por INT,
-    creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
     actualizado TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
     FOREIGN KEY (instalado_por) REFERENCES usuarios(id_usuario)
 );
-
-
-
---CREATE TABLE slack_config_logs (
---    id_log INT AUTO_INCREMENT PRIMARY KEY,
---    id_curso INT NOT NULL,
---    id_usuario INT,
---  accion VARCHAR(50) NOT NULL,
---    slack_team_id VARCHAR(100),
---    slack_channel_id VARCHAR(100),
---    slack_channel_name VARCHAR(100),
---    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- --   FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE,
- --   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
---);

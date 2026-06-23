@@ -22,7 +22,7 @@ def create_team_service(data):
     if not result["ok"]:
         return error_response(result)
     return success_response({
-        "message": result["message"],
+        "message": "Equipo creado correctamente",
         "id_equipo": result["id_equipo"]
     }, 201)
 

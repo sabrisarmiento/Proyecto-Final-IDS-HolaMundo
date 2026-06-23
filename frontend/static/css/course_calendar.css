@@ -1,0 +1,205 @@
+/* ===== CALENDAR TAB ===== */
+
+.calendar-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.25rem;
+  padding: 1.4rem 1.5rem;
+  background: var(--color-5);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+}
+
+/* Each field: label stacked over its input */
+.calendar-form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.calendar-form label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-8);
+}
+
+.calendar-form input,
+.calendar-form select {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.8rem;
+  color: var(--color-15);
+  background: var(--color-45);
+  border: 1.5px solid var(--color-6);
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendar-form input::placeholder {
+  color: var(--color-8);
+}
+
+.calendar-form input:focus,
+.calendar-form select:focus {
+  border-color: var(--color-3);
+  box-shadow: 0 0 0 3px var(--color-16);
+}
+
+.calendar-form select {
+  cursor: pointer;
+  appearance: none;
+}
+
+/* Submit button: sits on the same baseline, never shrinks */
+.calendar-form .btn-primary {
+  flex: 0 0 auto;
+  align-self: flex-end;
+}
+
+.calendar-filter{
+  padding:2rem;
+}
+
+.select-modalidad{
+  border: 1.5px solid var(--color-65);
+  border-radius: 8px;
+  background: var(--color-45);
+  color: var(--color-15);
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+  padding:0.2rem;
+}
+
+.select-type{
+  border: 1.5px solid var(--color-65);
+  border-radius: 8px;
+  background: var(--color-45);
+  color: var(--color-15);
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+  padding:0.2rem;
+}
+
+.calendar-table{
+  background: var(--color-5);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.flash-message{
+  color: var(--color-1);
+}
+.flash-message.success{
+  color:var(--color-17);
+}
+.flash-message.error{
+  color:var(--color-18);
+}
+
+.calendar-header{
+  color:var(--color-2);
+}
+.calendar-columns{
+  color:var(--color-2);
+}
+
+.class-filter-btn {
+  font-family: 'Poppins', sans-serif;
+  font: size 0.5rem ;
+  font-weight: 500;
+  color: var(--color-10);
+  background-color: var(--color-3);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.3rem 1rem;
+  cursor: pointer;
+}
+
+.class-action-btn{
+  font-family: 'Poppins', sans-serif;
+  font: size 0.5rem  ;
+  font-weight: 500;
+  background: var(--color-9);
+  border: 1.5px solid;
+  border-radius: 8px;
+  padding: 0.3rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--color-5);
+  transition: 0.15s;
+
+}
+.calendar-edit-form{
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.3rem 1.25rem;
+  padding: 0.5rem 1.5rem;
+  background: var(--color-11);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+  
+}
+
+.temas-edit-input{
+  min-width: 450px;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.3rem 1.25rem;
+  padding: 0.5rem 1.5rem;
+  background: var(--color-11);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+}
+
+.semana-edit-input{
+  width:50px;
+  font-family: 'Poppins', sans-serif;
+  padding: 0.5rem 1.5rem;
+  background: var(--color-11);
+  border: 1.5px solid var(--color-6);
+  border-radius: 12px;
+}
+
+.calendar-edit-form input,
+.calendar-edit-form select {
+  width: auto;
+  min-width: 100px;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.8rem;
+  color: var(--color-15);
+  background: var(--color-45);
+  border: 1.5px solid var(--color-6);
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.edit-input {
+  background: var(--color-45);
+  border: 2px solid var(--color-3);
+  border-radius: 6px;
+}
+
+.calendar-form-group {
+  color: var(--color-15);
+  padding: 0.4rem;
+}
+
+.calendar-table { padding: 2rem; }

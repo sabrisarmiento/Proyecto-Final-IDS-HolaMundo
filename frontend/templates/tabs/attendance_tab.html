@@ -1,0 +1,39 @@
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div class="attendance-flash">
+    {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<section class="dash-attendance">
+
+  <div class="dash-chart-card dash-attendance-clase">
+    <h4 class="dash-chart-title">Presentes por clase</h4>
+    <div class="dash-attendance-controls">
+      <select id="dash-asist-clase" class="dash-select"></select>
+      <span id="dash-asist-clase-count" class="dash-attendance-count">—</span>
+    </div>
+    <div class="dash-attendance-filtros">
+      <label><input type="radio" name="asist-clase-filtro" value="all" checked /> Todos</label>
+      <label><input type="radio" name="asist-clase-filtro" value="present" /> Presentes</label>
+      <label><input type="radio" name="asist-clase-filtro" value="absent" /> Ausentes</label>
+    </div>
+    <ul id="dash-asist-clase-lista" class="dash-attendance-lista"></ul>
+  </div>
+
+  <div class="dash-chart-card dash-chart-card--wide">
+    <h4 class="dash-chart-title">Asistencia por alumno</h4>
+    <div class="dash-attendance-controls">
+      <select id="dash-asist-alumno" class="dash-select"></select>
+      <span class="dash-attendance-count">
+        <strong id="dash-asist-alumno-presentes">—</strong> presentes ·
+        <strong id="dash-asist-alumno-pct">—</strong>
+      </span>
+    </div>
+    <div class="dash-chart-wrap" style="height:220px;">
+      <canvas id="chart-asist-alumno"></canvas>
+    </div>
+  </div>
+
+</section>

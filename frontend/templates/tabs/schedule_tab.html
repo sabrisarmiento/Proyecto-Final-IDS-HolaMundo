@@ -1,0 +1,162 @@
+<form class="calendar-form" action="{{ url_for('courses.crear_clase', course_id=course.id_curso) }}"
+  method="POST">
+  <div class="calendar-form-group">
+    <label for="fecha-clase"> Fecha: </label>
+    <input type="date" id="fecha-clase" name="fecha_clase" />
+  </div>
+
+  <div class="calendar-form-group">
+    <label for="semana-clase"> Semana: </label>
+    <input
+      type="number"
+      min="1"
+      id="semana-clase"
+      name="semana"
+      placeholder="Indicar semana..."
+    />
+  </div>
+
+  <div class="calendar-form-group">
+    <label for="temas-clase"> Temas: </label>
+    <input
+      type="text"
+      id="temas-clase"
+      name="temas"
+      placeholder="Escribir temas..."
+    />
+  </div>
+
+  <div class="calendar-form-group">
+    <label for="tipo-clase"> Tipo: </label>
+    <select id="tipo-clase" name="tipo">
+      <option value="Teórica">Teórica</option>
+      <option value="Práctica">Práctica</option>
+    </select>
+  </div>
+
+  <div class="calendar-form-group">
+    <label for="modalidad-clase"> Modalidad: </label>
+    <select id="modalidad-clase" name="modalidad">
+      <option value="Presencial">Presencial</option>
+      <option value="Virtual">Virtual</option>
+    </select>
+  </div>
+  
+  <button type="submit" class="btn-primary">
+    Agregar clase
+  </button>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+</form>
+
+<form class="calendar-filter" method="GET">
+    <input type="hidden" name="tab" value="calendar">
+    <select class="select-modalidad" name="modalidad">
+      <option value="">Todas las modalidades</option>
+      <option value="Presencial" {% if filtro_modalidad == "Presencial" %}selected{% endif %}>Presencial</option>
+      <option value="Virtual" {% if filtro_modalidad == "Virtual" %}selected{% endif %}>Virtual</option>
+    </select>
+    <input type="hidden" name="tab" value="calendar">
+    <select class="select-type" name="tipo">
+      <option value="">Todos los tipos</option>
+      <option value="Teórica" {% if filtro_tipo == "Teórica" %}selected{% endif %}>Teórica</option>
+      <option value="Práctica" {% if filtro_tipo == "Práctica" %}selected{% endif %}>Práctica</option>
+    </select>
+    <button class="class-filter-btn"type="submit">Filtrar</button>
+</form>
+
+{% if clases %}
+<table class="calendar-table">
+  <thead>
+    <tr class="calendar-header">
+      <th>Semana</th>
+      <th>Fecha</th>
+      <th>Temas</th>
+      <th>Tipo</th>
+      <th>Modalidad</th>
+    </tr>
+  </thead>
+
+  <tbody> {% for clase in clases %}
+    <tr class="calendar-columns">
+      {% if id_clase_editar==clase.id_clase %}
+      <form action="{{ url_for('courses.editar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}" method="POST">
+          <td><input class="semana-edit-input" type="number" min="1" name="semana" value="{{ clase.semana }}"></td>
+          <td><input class="calendar-edit-form" type="date" name="fecha_clase" value="{{ clase.fecha }}"></td>
+          <td><input class="temas-edit-input" type="text" name="temas" value="{{ clase.temas }}"></td>
+
+          <td>
+            <div>
+              <select class="calendar-edit-form" name="tipo" value="{{ clase.tipo }}">
+                <option value="Práctica" {% if clase.tipo == 'Práctica' %}selected{% endif %}> Práctica </option>
+                <option value="Teórica" {% if clase.tipo == 'Teórica' %}selected{% endif %}> Teórica </option>
+              </select>
+           </div>
+          </td>
+
+          <td>
+            <div>
+              <select class="calendar-edit-form" name="modalidad">
+              <option value="Presencial" {% if clase.modalidad == 'Presencial' %}selected{% endif %}> Presencial </option>
+              <option value="Virtual" {% if clase.modalidad == 'Virtual' %}selected{% endif %}> Virtual </option>
+             </select>
+             </div>
+        </td>
+
+          <td>
+              <button class="class-action-btn" type="submit">
+                Guardar
+              </button>
+          </td>
+      </form>
+          
+
+          <td>
+            <form method="GET">
+              <input type="hidden" name="tab" value="calendar" >
+              <button class="class-action-btn" type="submit">
+                Cancelar
+              </button>
+            </form>
+          </td>
+
+       {% else %}
+
+          <td>{{ clase.semana }}</td>
+         <td>{{ clase.fecha }}</td>
+          <td>{{ clase.temas }}</td>
+          <td>{{ clase.tipo }}</td>
+          <td>{{ clase.modalidad }}</td>
+      
+          <td>
+           <form action="{{ url_for('courses.eliminar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}" 
+           method="POST" style="display:inline;">
+             <button class="class-action-btn" type="submit">
+              🗑️
+             </button>
+            </form>
+          </td>
+        <td>
+           <form method="GET">
+              <input type="hidden" name="tab" value="calendar" >
+            <input type="hidden" name="editar" value="{{ clase.id_clase }}" >
+              <button class="class-action-btn" type="submit">
+               ✏️
+             </button>
+           </form>
+         </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
