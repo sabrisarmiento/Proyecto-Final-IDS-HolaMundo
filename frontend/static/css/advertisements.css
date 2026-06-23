@@ -1,6 +1,6 @@
 .advertisements-section {
     padding: 3rem 1.5rem;
-    background-color: var(--color-5);
+    background-color: var(--color-bg);
     min-height: 80vh;
 }
 
@@ -16,23 +16,23 @@
 }
 
 .advertisements-title {
-    color: var(--color-9);
+    color: var(--color-secondary);
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 1rem;
 }
 
 .advertisements-subtitle {
-    color: var(--color-8);
+    color: var(--color-text-muted);
     font-size: 1.25rem;
     margin: 0;
 }
 
 .advertisement-empty {
     text-align: center;
-    background-color: var(--color-5);
-    border: 2px dashed var(--color-12);
-    color: var(--color-8);
+    background-color: var(--color-bg);
+    border: 2px dashed var(--color-secondary-accent);
+    color: var(--color-text-muted);
     padding: 3rem;
     border-radius: 12px;
     font-size: 1rem;
@@ -51,34 +51,34 @@
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-color: var(--color-45);
+    background-color: var(--color-surface);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23887672'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.9rem center;
-    border: 1.5px solid var(--color-6);
+    border: 1.5px solid var(--color-border);
     border-radius: 9px;
     padding: 0.6rem 2.25rem 0.6rem 0.9rem;
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--color-9);
+    color: var(--color-secondary);
     cursor: pointer;
     transition: border-color 0.15s;
 }
 
 #select-courses:hover {
-    border-color: var(--color-3);
+    border-color: var(--color-primary);
 }
 
 #select-courses:focus {
     outline: none;
-    border-color: var(--color-3);
-    box-shadow: 0 0 0 3px var(--color-16);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 #msg-select-course {
     margin-top: 0.6rem;
     font-size: 0.85rem;
-    color: var(--color-8);
+    color: var(--color-text-muted);
 }
 
 .ads-header {
@@ -88,13 +88,13 @@
     flex-wrap: wrap;
     margin-bottom: 1.75rem;
     padding-bottom: 1.25rem;
-    border-bottom: 1.5px solid var(--color-6);
+    border-bottom: 1.5px solid var(--color-border);
 }
 
 .ads-header h2 {
     font-size: 1.2rem;
     font-weight: 700;
-    color: var(--color-9);
+    color: var(--color-secondary);
     margin-right: auto;
     letter-spacing: -0.01em;
 }
@@ -106,8 +106,8 @@
 }
 
 .advertisement-card {
-    background: var(--color-45);
-    border: 1.5px solid var(--color-6);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
     border-radius: 14px;
     padding: 1.25rem 1.5rem;
     word-break: break-word;
@@ -128,7 +128,7 @@
     gap: 0.5rem;
     margin-bottom: 0.9rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-6);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .advertisement-card-header span:first-child {
@@ -137,7 +137,7 @@
     font-size: 0.75rem;
     font-weight: 600;
     color: white;
-    background: var(--color-3);
+    background: var(--color-primary);
     padding: 0.3rem 0.65rem;
     border-radius: 999px;
     letter-spacing: 0.01em;
@@ -145,20 +145,20 @@
 
 .advertisement-card-header span:last-child {
     font-size: 0.78rem;
-    color: var(--color-8);
+    color: var(--color-text-muted);
     font-style: italic;
 }
 
 .advertisement-card h3 {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--color-9);
+    color: var(--color-secondary);
     margin: 0 0 0.45rem;
 }
 
 .advertisement-card p {
     font-size: 0.88rem;
-    color: var(--color-15);
+    color: var(--color-text);
     line-height: 1.6;
     margin: 0 0 1rem;
 }
@@ -173,7 +173,7 @@
     gap: 0.6rem;
     margin-top: 1rem;
     padding-top: 0.75rem;
-    border-top: 1px solid var(--color-6);
+    border-top: 1px solid var(--color-border);
 }
 
 .advertisement-actions form {
@@ -198,26 +198,26 @@
 }
 
 .btn-edit-advertisement {
-    color: var(--color-9);
-    border: 1.5px solid var(--color-6);
-    background: var(--color-5);
+    color: var(--color-secondary);
+    border: 1.5px solid var(--color-border);
+    background: var(--color-bg);
     text-decoration: none;
     transition: background 0.15s;
 }
 
 .btn-edit-advertisement:hover {
-    background: var(--color-6);
+    background: var(--color-border);
 }
 
 .btn-delete-advertisement {
     color: white;
     border: none;
-    background: var(--color-3);
+    background: var(--color-primary);
     transition: background 0.15s;
 }
 
 .btn-delete-advertisement:hover {
-    background: var(--color-2);
+    background: var(--color-primary-dark);
 }
 
 .btn-crear {
@@ -236,14 +236,14 @@
 
 .btn-crear:first-of-type,
 a.btn-crear:first-of-type {
-    background: var(--color-3);
+    background: var(--color-primary);
     color: white;
 }
 
 .btn-crear:not(:first-of-type) {
-    background: var(--color-45);
-    color: var(--color-9);
-    border: 1.5px solid var(--color-6);
+    background: var(--color-surface);
+    color: var(--color-secondary);
+    border: 1.5px solid var(--color-border);
 }
 
 .btn-crear:hover {
@@ -252,13 +252,13 @@ a.btn-crear:first-of-type {
 
 button.btn-crear {
     background: transparent;
-    color: var(--color-8);
-    border: 1.5px solid var(--color-6);
+    color: var(--color-text-muted);
+    border: 1.5px solid var(--color-border);
 }
 
 button.btn-crear:hover {
-    background: var(--color-6);
-    color: var(--color-3);
+    background: var(--color-border);
+    color: var(--color-primary);
     opacity: 1;
 }
 
@@ -269,8 +269,8 @@ button.btn-crear:hover {
     max-width: 600px;
     margin: 0 auto;
     padding: 1.6rem 1.75rem;
-    background: var(--color-5);
-    border: 1.5px solid var(--color-6);
+    background: var(--color-bg);
+    border: 1.5px solid var(--color-border);
     border-radius: 12px;
 }
 
@@ -285,7 +285,7 @@ button.btn-crear:hover {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--color-8);
+    color: var(--color-text-muted);
 }
 
 .advertisement-form input,
@@ -295,9 +295,9 @@ button.btn-crear:hover {
     font-family: 'Poppins', sans-serif;
     font-size: 0.9rem;
     padding: 0.65rem 0.85rem;
-    color: var(--color-15);
-    background: var(--color-45);
-    border: 1.5px solid var(--color-6);
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
     border-radius: 0.5rem;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -305,8 +305,8 @@ button.btn-crear:hover {
 
 .advertisement-form input:focus,
 .advertisement-form textarea:focus {
-    border-color: var(--color-3);
-    box-shadow: 0 0 0 3px var(--color-16);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 .advertisement-form textarea {
@@ -322,7 +322,7 @@ button.btn-crear:hover {
 }
 
 .advertisement-form .btn-crear.btn-publicar {
-    background: var(--color-3);
+    background: var(--color-primary);
     color: white;
     padding: 0.6rem 1.4rem;
     font-size: 0.9rem;
@@ -333,25 +333,25 @@ button.btn-crear:hover {
 
 .advertisement-card p {
   margin: 0;
-  color: var(--color-15);
+  color: var(--color-text);
   line-height: 1.5;
 }
 
 .advertisement-form .btn-crear:not(.btn-publicar) {
-    background: var(--color-45);
-    color: var(--color-9);
-    border: 1.5px solid var(--color-6);
+    background: var(--color-surface);
+    color: var(--color-secondary);
+    border: 1.5px solid var(--color-border);
     padding: 0.6rem 1.4rem;
     font-size: 0.9rem;
     font-weight: 600;
     border-radius: 8px;
 }
 .advertisement-card.origen-panel {
-    border-left: 6px solid var(--color-20);
+    border-left: 6px solid var(--color-accent-border);
 }
 
 .advertisement-card.origen-panel-confirmado {
-    border-left: 6px solid var(--color-15);
+    border-left: 6px solid var(--color-text);
 }
 
 .advertisement-card {
@@ -381,7 +381,7 @@ button.btn-crear:hover {
 }
 
 .advertisement-card-title{
-    color:var(--color-19)
+    color:var(--color-text-strong)
 }
 
 .select-source{
@@ -389,16 +389,16 @@ button.btn-crear:hover {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-color: var(--color-45);
+    background-color: var(--color-surface);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23887672'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.9rem center;
-    border: 1.5px solid var(--color-6);
+    border: 1.5px solid var(--color-border);
     border-radius: 9px;
     padding: 0.6rem 2.25rem 0.6rem 0.9rem;
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--color-9);
+    color: var(--color-secondary);
     cursor: pointer;
     transition: border-color 0.15s;
 }

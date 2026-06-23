@@ -37,8 +37,8 @@
       return;
     }
 
-    const colorOk  = CSS("--color-3")  || "#92140C";
-    const colorLow = CSS("--color-4")  || "#C9867E";
+    const colorOk  = CSS("--color-primary")  || "#92140C";
+    const colorLow = CSS("--color-primary-muted")  || "#C9867E";
     const barColors = data.map((v) => (v >= 4 ? colorOk : colorLow));
 
     new Chart(canvas, {
@@ -113,9 +113,9 @@
           {
             data: [regulares, en_riesgo, sin_datos],
             backgroundColor: [
-              CSS("--color-9") || "#111D4A",
-              CSS("--color-4") || "#C9867E",
-              CSS("--color-6") || "#FFE4C5",
+              CSS("--color-secondary") || "#111D4A",
+              CSS("--color-primary-muted") || "#C9867E",
+              CSS("--color-border") || "#FFE4C5",
             ],
             borderWidth: 0,
             hoverOffset: 6,
@@ -169,9 +169,9 @@
             data: [promocionados, van_a_final, recursantes, abandonaron],
             backgroundColor: [
               "#22c55e",
-              CSS("--color-9") || "#111D4A",
-              CSS("--color-3") || "#92140C",
-              CSS("--color-8") || "#887672",
+              CSS("--color-secondary") || "#111D4A",
+              CSS("--color-primary") || "#92140C",
+              CSS("--color-text-muted") || "#887672",
             ],
             borderWidth: 0,
             hoverOffset: 6,
@@ -275,7 +275,7 @@
         return Math.round((acumulado / (i + 1)) * 100);
       });
       const puntos = clases.map((c) =>
-        presentSet.has(idAlumno + "-" + c.id_clase) ? "#16a34a" : CSS("--color-4") || "#C9867E"
+        presentSet.has(idAlumno + "-" + c.id_clase) ? "#16a34a" : CSS("--color-primary-muted") || "#C9867E"
       );
 
       if (chart) chart.destroy();
@@ -287,7 +287,7 @@
             {
               label: "Asistencia acumulada",
               data,
-              borderColor: CSS("--color-9") || "#111D4A",
+              borderColor: CSS("--color-secondary") || "#111D4A",
               backgroundColor: "rgba(17,29,74,0.12)",
               fill: true,
               tension: 0.3,

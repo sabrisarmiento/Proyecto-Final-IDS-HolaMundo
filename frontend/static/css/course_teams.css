@@ -7,15 +7,15 @@
 .team-card {
   display: flex;
   flex-direction: column;
-  background: var(--color-5);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   overflow: hidden;
   transition: .2s;
 }
 
 .team-card:hover {
-  border-color: var(--color-9);
+  border-color: var(--color-secondary);
   box-shadow: 0 4px 12px rgba(0,0,0,.07);
 }
 
@@ -35,21 +35,21 @@
   background: none;
   border: none;
   font: 600 .95rem 'Poppins', sans-serif;
-  color: var(--color-15);
+  color: var(--color-text);
   text-align: left;
   cursor: pointer;
   transition: .2s;
 }
 
 .team-header:hover {
-  background: var(--color-6);
-  color: var(--color-9);
+  background: var(--color-border);
+  color: var(--color-secondary);
 }
 
 .team-header::after {
   content: "▾";
   font-size: .8rem;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   transition: .2s;
 }
 
@@ -67,12 +67,12 @@
 .team-count {
   font-size: .9rem;
   font-weight: 400;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .team-members {
   padding: 1rem 1.1rem;
-  border-top: 1.5px solid var(--color-6);
+  border-top: 1.5px solid var(--color-border);
 }
 
 .team-members:not(.hidden) {
@@ -93,10 +93,10 @@
 .team-members > p {
   margin-top: .75rem;
   padding: .9rem 1rem;
-  background: var(--color-16);
-  border: 1px dashed var(--color-6);
+  background: var(--color-primary-glow);
+  border: 1px dashed var(--color-border);
   border-radius: .75rem;
-  color: var(--color-15);
+  color: var(--color-text);
   font-size: .9rem;
 }
 
@@ -114,13 +114,13 @@
 
 .status-active {
   background: rgba(45, 210, 0, .15);
-  color: var(--color-17);
+  color: var(--color-success);
   border: 1px solid rgba(45, 210, 0, .25);
 }
 
 .status-inactive {
   background: rgba(230, 11, 11, .12);
-  color: var(--color-18);
+  color: var(--color-error);
   border: 1px solid rgba(230, 11, 11, .2);
 }
 
@@ -133,10 +133,10 @@
 .delete-warning {
   margin: .75rem 0 1rem;
   padding: .9rem 1rem;
-  background: var(--color-6);
-  border-left: 4px solid var(--color-3);
+  background: var(--color-border);
+  border-left: 4px solid var(--color-primary);
   border-radius: .75rem;
-  color: var(--color-12);
+  color: var(--color-secondary-accent);
   font-size: .9rem;
   font-weight: 500;
   line-height: 1.4;
@@ -155,9 +155,9 @@
 .modal-delete-content p {
   margin-bottom: 1.5rem;
   padding: .9rem;
-  background: var(--color-16);
+  background: var(--color-primary-glow);
   border-radius: .75rem;
-  color: var(--color-15);
+  color: var(--color-text);
   font-size: .95rem;
   line-height: 1.4;
 }
@@ -173,21 +173,21 @@
 }
 
 .btn-danger {
-  background: var(--color-3);
-  color: var(--color-10);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .btn-danger:hover {
-  background: var(--color-2);
+  background: var(--color-primary-dark);
 }
 
 .btn-secondary {
-  background: var(--color-6);
-  color: var(--color-15);
+  background: var(--color-border);
+  color: var(--color-text);
 }
 
 .btn-secondary:hover {
-  background: var(--color-7)
+  background: var(--color-border-focus)
 }
 
 .team-checkbox {
@@ -195,7 +195,7 @@
   height: 18px;
   margin-left: 1rem;
   transform: scale(1.2);
-  accent-color: var(--color-3);
+  accent-color: var(--color-primary);
   cursor: pointer;
 }
 
@@ -212,17 +212,17 @@
   width: 100%;
   height: 38px;
   padding: 0 12px;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: .75rem;
-  background: var(--color-45);
+  background: var(--color-surface);
   font: .9rem 'Poppins', sans-serif;
   transition: .2s;
 }
 
 .team-search:focus {
   outline: none;
-  border-color: var(--color-3);
-  box-shadow: 0 0 0 3px var(--color-16);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 .team-add-row {
@@ -247,7 +247,7 @@
   width: 100%;
   height: 34px;
   padding: 0 12px;
-  border: 1px solid var(--color-45);
+  border: 1px solid var(--color-surface);
   border-radius: 6px;
   box-sizing: border-box;
   font: .85rem 'Poppins', sans-serif;
@@ -258,8 +258,8 @@
   padding: 0 16px;
   border: none;
   border-radius: 6px;
-  background: var(--color-3);
-  color: var(--color-10);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   font: 500 .85rem 'Poppins', sans-serif;
   cursor: pointer;
   flex-shrink: 0;
@@ -267,16 +267,16 @@
 }
 
 .team-add-form .btn-add-student:hover {
-  background: var(--color-2);
+  background: var(--color-primary-dark);
 }
 
 .btn-remove-student {
   width: 30px;
   height: 30px;
-  border: 1px solid var(--color-6);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-45);
-  color: var(--color-3);
+  background: var(--color-surface);
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,9 +286,9 @@
 }
 
 .btn-remove-student:hover {
-  background: var(--color-3);
-  color: var(--color-10);
-  border-color: var(--color-3);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
 }
 
 .student-preview {
@@ -325,7 +325,7 @@
 
 .flash-error {
   background: rgba(146, 20, 12, .08);
-  color: var(--color-3);
+  color: var(--color-primary);
 }
 .flash-error::before {
   content: "⚠";
@@ -342,8 +342,8 @@
 
 .flash-warning {
   background: rgba(255, 207, 153, .35);
-  border-color: var(--color-7);
-  color: var(--color-85);
+  border-color: var(--color-border-focus);
+  color: var(--color-text-subtle);
 }
 .flash-warning::before {
   content: "!";
@@ -358,23 +358,23 @@
   width: 100%;
   max-width: 400px;
   padding: 10px 12px;
-  border: 1px solid var(--color-4);
+  border: 1px solid var(--color-primary-muted);
   border-radius: 8px;
   margin-bottom: 20px;
   font-size: 14px;
-  background: var(--color-10);
-  color: var(--color-1);
+  background: var(--color-text-inverse);
+  color: var(--color-text-heading);
 }
 
 .team-search:focus {
   outline: none;
-  border-color: var(--color-3);
+  border-color: var(--color-primary);
 }
 
 .team-card {
-  border: 1px solid var(--color-6);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: var(--color-10);
+  background: var(--color-text-inverse);
   margin-bottom: 16px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -384,7 +384,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--color-5);
+  background: var(--color-bg);
   padding: 12px 16px;
 }
 
@@ -394,13 +394,13 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  color: var(--color-9);
+  color: var(--color-secondary);
 }
 
 .team-delete-btn {
   border: none;
-  background: var(--color-3);
-  color: var(--color-10);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   width: 34px;
   height: 34px;
   border-radius: 6px;
@@ -409,7 +409,7 @@
 }
 
 .team-delete-btn:hover {
-  background: var(--color-25);
+  background: var(--color-primary-mid);
 }
 
 .team-members {
@@ -427,20 +427,20 @@
 .team-add-form input {
   width: 180px;
   padding: 8px;
-  border: 1px solid var(--color-4);
+  border: 1px solid var(--color-primary-muted);
   border-radius: 6px;
-  background: var(--color-10);
-  color: var(--color-1);
+  background: var(--color-text-inverse);
+  color: var(--color-text-heading);
 }
 
 .team-add-form input:focus {
   outline: none;
-  border-color: var(--color-3);
+  border-color: var(--color-primary);
 }
 
 .team-add-form button {
-  background: var(--color-9);
-  color: var(--color-10);
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
   border: none;
   border-radius: 6px;
   padding: 8px 14px;
@@ -452,8 +452,8 @@
 }
 
 .team-warning {
-  background: var(--color-13);
-  border: 1px solid var(--color-7);
+  background: var(--color-text-on-primary);
+  border: 1px solid var(--color-border-focus);
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 20px;
@@ -461,7 +461,7 @@
 
 .team-warning p {
   margin: 0;
-  color: var(--color-2);
+  color: var(--color-primary-dark);
   font-weight: 500;
 }
 
@@ -479,13 +479,13 @@
 }
 
 .team-warning-actions button:first-child {
-  background: var(--color-3);
-  color: var(--color-10);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .team-warning-actions button:last-child {
-  background: var(--color-8);
-  color: var(--color-10);
+  background: var(--color-text-muted);
+  color: var(--color-text-inverse);
 }
 
 .team-warning-actions button:hover {
@@ -505,13 +505,13 @@
 
 .student-found p {
   margin: 0;
-  color: var(--color-15);
+  color: var(--color-text);
   font-size: .9rem;
   line-height: 1.4;
 }
 
 .student-found strong {
-  color: var(--color-9);
+  color: var(--color-secondary);
   font-weight: 600;
 }
 
@@ -521,7 +521,7 @@
   background: rgba(230, 11, 11, .06);
   border: 1px solid rgba(230, 11, 11, .15);
   border-radius: .85rem;
-  color: var(--color-3);
+  color: var(--color-primary);
   font-size: .9rem;
   font-weight: 500;
 }
@@ -549,18 +549,18 @@
   width: 220px;
   height: 38px;
   padding: 0 12px;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: .75rem;
-  background: var(--color-45);
-  color: var(--color-15);
+  background: var(--color-surface);
+  color: var(--color-text);
   font: .9rem 'Poppins', sans-serif;
   transition: .2s;
 }
 
 .team-add-form input[type="number"]:focus {
   outline: none;
-  border-color: var(--color-3);
-  box-shadow: 0 0 0 3px var(--color-16);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 .team-add-form .btn-primary,
@@ -575,8 +575,8 @@
 }
 
 .team-add-form .btn-primary {
-  background: var(--color-9);
-  color: var(--color-10);
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
 }
 
 .team-add-form .btn-primary:hover {
@@ -584,12 +584,12 @@
 }
 
 .team-add-form .btn-add-student {
-  background: var(--color-3);
-  color: var(--color-10);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .team-add-form .btn-add-student:hover {
-  background: var(--color-2);
+  background: var(--color-primary-dark);
 }
 
 .student-found form {
@@ -601,15 +601,15 @@
   padding: 0 16px;
   border: none;
   border-radius: .75rem;
-  background: var(--color-3);
-  color: var(--color-10);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   font: 500 .9rem 'Poppins', sans-serif;
   cursor: pointer;
   transition: .2s;
 }
 
 .student-found .btn-add-student:hover {
-  background: var(--color-2);
+  background: var(--color-primary-dark);
 }
 
 .btn-edit-team {
@@ -617,14 +617,14 @@
   height: 34px;
   border: none;
   border-radius: 8px;
-  background: var(--color-6);
-  color: var(--color-9);
+  background: var(--color-border);
+  color: var(--color-secondary);
   cursor: pointer;
   transition: .2s;
   flex-shrink: 0;
 }
 
 .btn-edit-team:hover {
-  background: var(--color-9);
-  color: var(--color-10);
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
 }

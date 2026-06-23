@@ -7,8 +7,8 @@
   align-items: center;
   justify-content: center;
   padding: 2.5rem 0;
-  color: var(--color-9);
-  background: linear-gradient(180deg, var(--color-6) 0%, var(--color-65) 100%);
+  color: var(--color-secondary);
+  background: linear-gradient(180deg, var(--color-border) 0%, var(--color-border-strong) 100%);
 }
 
 .hero h2 {
@@ -26,18 +26,18 @@
 
 /* ===== SLACK ===== */
 .slack-banner {
-  color: var(--color-4);
+  color: var(--color-primary-muted);
   text-decoration: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 3rem;
-  background-color: var(--color-2);
+  background-color: var(--color-primary-dark);
   transition: all 0.25s ease;
 }
 
 .slack-banner:hover {
-  color: var(--color-45);
+  color: var(--color-surface);
 }
 
 .slack-left {
@@ -63,13 +63,13 @@
   width: 80dvw;
   display: flex;
   justify-content: space-between; 
-  color: var(--color-45);
+  color: var(--color-surface);
   padding: .5rem 0 1.5rem 0;
   margin: auto;
 }
 
 .info-panel h3 {
-  color: var(--color-9);
+  color: var(--color-secondary);
   margin: 0;
   margin-bottom: 1.5rem;
   width: fit-content;
@@ -124,7 +124,7 @@
 .class-row {
   width: 100%;
   min-height: 100px;
-  background: var(--color-45);
+  background: var(--color-surface);
   display: flex;
   border-radius: 12px;
   overflow: hidden;
@@ -138,7 +138,7 @@
 
 .class-number {
   width: 110px;
-  background: var(--color-25);
+  background: var(--color-primary-mid);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -148,7 +148,7 @@
 
 .class-number strong {
   font-size: 1.8rem;
-  color: var(--color-9);
+  color: var(--color-secondary);
 }
 
 .class-info {
@@ -161,12 +161,12 @@
 
 .class-info h4 {
   margin: 0 0 .5rem 0;
-  color: var(--color-9);
+  color: var(--color-secondary);
 }
 
 .class-info p {
   margin: 0;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
   
 .week-title {
@@ -176,7 +176,7 @@
 }
 
 .week-title i {
-  color: var(--color-9);
+  color: var(--color-secondary);
 }
 
 /* ============ REGIMEN DE APROBACION ========== */
@@ -188,11 +188,11 @@
 
 .regimen-dropdown > button {
   width: 100%;
-  background: var(--color-45);
+  background: var(--color-surface);
   border: none;
   padding: 1rem 1.5rem;
   border-radius: 10px;
-  color: var(--color-9);
+  color: var(--color-secondary);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
@@ -205,16 +205,16 @@
 }
 
 .regimen-dropdown > button:hover {
-  background: var(--color-6);
+  background: var(--color-border);
 }
 
 .regimen-content {
   display: none;
   padding: 1rem 1.5rem;
-  background: var(--color-45);
+  background: var(--color-surface);
   border-radius: 0 0 10px 10px;
-  border-top: 1px solid var(--color-6);
-  color: var(--color-8);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
   font-size: 0.95rem;
   line-height: 1.6;
 }
@@ -224,11 +224,11 @@
 /* ===== CALENDER BUTTON ===== */
 .classes-container button {
   width: fit-content;
-  background: var(--color-6);
+  background: var(--color-border);
   border: none;
   padding: 0.8rem 3rem; 
   border-radius: 50px;
-  color: var(--color-9);
+  color: var(--color-secondary);
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
@@ -237,7 +237,7 @@
 }
 
 .classes-container button:hover {
-  background: var(--color-65);
+  background: var(--color-border-strong);
   transform: translateY(-2px);
 }
 
@@ -250,8 +250,8 @@
   height: 65px;
   border: none;
   border-radius: 50%;
-  background-color: var(--color-3);
-  color: var(--color-45);
+  background-color: var(--color-primary);
+  color: var(--color-surface);
   font-size: 1.4rem;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(0,0,0,0.25);
@@ -264,7 +264,7 @@
 }
 
 .modal-aviso {
-  background: var(--color-6);
+  background: var(--color-border);
   padding: 1rem;
   border-radius: 0.8rem;
   margin-bottom: 1rem;
@@ -272,7 +272,7 @@
 
 .modal-aviso h4 {
   margin: 0;
-  color: var(--color-9);
+  color: var(--color-secondary);
 }
 
 /* ===== YOUTUBE ===== */
@@ -282,7 +282,7 @@
 }
 
 .youtube-card {
-  background: var(--color-45);
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 2rem;
   width: 100%;
@@ -297,8 +297,8 @@
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: var(--color-3);
-  color: var(--color-45);
+  background: var(--color-primary);
+  color: var(--color-surface);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -317,19 +317,19 @@
 
 .youtube-content h3 {
   margin: 0 0 0.5rem 0;
-  color: var(--color-9);
+  color: var(--color-secondary);
 }
 
 .youtube-content p {
   margin: 0 0 0.5rem 0;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .youtube-btn {
   display: inline-block;
   text-decoration: none;
-  background: var(--color-3);
-  color: var(--color-45);
+  background: var(--color-primary);
+  color: var(--color-surface);
   padding: 0.8rem 1.5rem;
   border-radius: 999px;
   font-weight: 600;
@@ -337,7 +337,7 @@
 }
 
 .youtube-btn:hover {
-  background: var(--color-2);
+  background: var(--color-primary-dark);
 }
 
 /* ===== TOPICS ===== */
@@ -348,7 +348,7 @@
 }
 
 .topics-section h2 {
-  color: var(--color-9);
+  color: var(--color-secondary);
   margin-bottom: 2rem;
 }
 
@@ -359,7 +359,7 @@
 }
 
 .topic-card {
-  background: var(--color-45);
+  background: var(--color-surface);
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -376,11 +376,11 @@
 
 .topic-card i {
   font-size: 2rem;
-  color: var(--color-3);
+  color: var(--color-primary);
 }
 
 .topic-card span {
-  color: var(--color-9);
+  color: var(--color-secondary);
   font-weight: 600;
   text-align: center;
 }
@@ -393,7 +393,7 @@
 }
 
 .teachers-section h2 {
-  color: var(--color-9);
+  color: var(--color-secondary);
   margin-bottom: 2rem;
 }
 
@@ -407,7 +407,7 @@
 
 .teacher-card {
   width: 260px;
-  background: var(--color-45);
+  background: var(--color-surface);
   padding: 2rem 1.5rem;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -423,7 +423,7 @@
   height: 80px;
   margin: 0 auto 1rem;
   border-radius: 50%;
-  background: var(--color-6);
+  background: var(--color-border);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -431,22 +431,22 @@
 
 .teacher-avatar i {
   font-size: 2rem;
-  color: var(--color-3);
+  color: var(--color-primary);
 }
 
 .teacher-card h3 {
   margin: 0.5rem 0;
-  color: var(--color-9);
+  color: var(--color-secondary);
 }
 
 .teacher-card p {
   margin: 0;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 /* Cátedra selector */
 .catedra-title {
   font-size: 1.1rem;
-  color: var(--color-9);
+  color: var(--color-secondary);
   margin: 1.5rem 0 1rem 0;
   font-weight: 600;
 }
@@ -464,32 +464,32 @@
   flex-direction: column;
   gap: 0.4rem;
   padding: 1.25rem 1.5rem;
-  border: 1px solid var(--color-6);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: var(--color-2);
+  background: var(--color-primary-dark);
   text-decoration: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   min-width: 180px;
 }
 
 .catedra-card:hover {
-  border-color: var(--color-3);
+  border-color: var(--color-primary);
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .catedra-nombre {
   font-weight: 600;
   font-size: 1rem;
-  color: var(--color-7);
+  color: var(--color-border-focus);
 }
 
 .catedra-meta {
   font-size: 0.85rem;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .catedra-empty {
-  color: var(--color-8);
+  color: var(--color-text-muted);
   font-size: 1rem;
   margin-top: 1rem;
 }

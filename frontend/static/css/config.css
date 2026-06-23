@@ -15,7 +15,7 @@
 .config-msg--error {
     background: #fee2e2;
     color: #991b1b;
-    border-left: 4px solid var(--color-3);
+    border-left: 4px solid var(--color-primary);
 }
 
 .config-header {
@@ -25,13 +25,13 @@
 .config-title {
     font-size: 1.3rem;
     font-weight: 800;
-    color: var(--color-9);
+    color: var(--color-secondary);
     margin: 0 0 0.35rem;
 }
 
 .config-subtitle {
     font-size: 0.88rem;
-    color: var(--color-8);
+    color: var(--color-text-muted);
     margin: 0;
 }
 
@@ -48,8 +48,8 @@
 }
 
 .config-section {
-    background: var(--color-5);
-    border: 1.5px solid var(--color-6);
+    background: var(--color-bg);
+    border: 1.5px solid var(--color-border);
     border-radius: 12px;
     padding: 1.5rem;
     display: flex;
@@ -63,10 +63,10 @@
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-3);
+    color: var(--color-primary);
     margin: 0 0 0.25rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-6);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .config-row {
@@ -86,15 +86,15 @@
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: var(--color-8);
+    color: var(--color-text-muted);
     display: flex;
     align-items: center;
     gap: 0.4rem;
 }
 
 .config-label-icon {
-    background: var(--color-6);
-    color: var(--color-9);
+    background: var(--color-border);
+    color: var(--color-secondary);
     font-size: 0.6rem;
     font-weight: 800;
     letter-spacing: 0.04em;
@@ -107,21 +107,21 @@
     font-family: 'Poppins', sans-serif;
     font-size: 0.9rem;
     padding: 0.6rem 0.85rem;
-    border: 1.5px solid var(--color-6);
+    border: 1.5px solid var(--color-border);
     border-radius: 8px;
-    background: var(--color-45);
-    color: var(--color-1);
+    background: var(--color-surface);
+    color: var(--color-text-heading);
     outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .config-input:focus {
-    border-color: var(--color-3);
-    box-shadow: 0 0 0 3px var(--color-16);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 .config-input::placeholder {
-    color: var(--color-4);
+    color: var(--color-primary-muted);
     font-size: 0.85rem;
 }
 
@@ -135,8 +135,8 @@
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.04em;
-    background: var(--color-3);
-    color: var(--color-45);
+    background: var(--color-primary);
+    color: var(--color-surface);
     border: none;
     border-radius: 8px;
     padding: 0.7rem 1.75rem;
@@ -145,7 +145,7 @@
 }
 
 .config-btn-save:hover {
-    background: var(--color-2);
+    background: var(--color-primary-dark);
 }
 
 .config-btn-save:active {
@@ -191,8 +191,8 @@ textarea.config-input {
 .form-message--error { color: #c0392b; }
 .config-btn-add {
   background: none;
-  border: 1px dashed var(--color-3);
-  color: var(--color-3);
+  border: 1px dashed var(--color-primary);
+  color: var(--color-primary);
   padding: 0.5rem 1rem;
   border-radius: 6px;
   cursor: pointer;
@@ -201,14 +201,14 @@ textarea.config-input {
   transition: background 0.15s;
 }
 .config-btn-add:hover {
-  background: var(--color-16);
+  background: var(--color-primary-glow);
 }
 
 .config-btn-remove {
   align-self: flex-end;
   background: none;
   border: none;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.4rem 0.6rem;
@@ -217,7 +217,7 @@ textarea.config-input {
   margin-bottom: 0.25rem;
 }
 .config-btn-remove:hover {
-  color: var(--color-25);
+  color: var(--color-primary-mid);
 }
 
 .tema-row {
@@ -241,12 +241,12 @@ textarea.config-input {
 .icon-picker-btn {
   width: 42px;
   height: 42px;
-  border: 1px solid var(--color-6);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: var(--color-45);
+  background: var(--color-surface);
   cursor: pointer;
   font-size: 1.1rem;
-  color: var(--color-9);
+  color: var(--color-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,7 +254,7 @@ textarea.config-input {
 }
 
 .icon-picker-btn:hover {
-  border-color: var(--color-3);
+  border-color: var(--color-primary);
 }
 
 .icon-picker-dropdown {
@@ -263,8 +263,8 @@ textarea.config-input {
   top: calc(100% + 6px);
   right: 0;
   z-index: 100;
-  background: var(--color-45);
-  border: 1px solid var(--color-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
@@ -285,7 +285,7 @@ textarea.config-input {
   background: none;
   cursor: pointer;
   font-size: 1rem;
-  color: var(--color-9);
+  color: var(--color-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,8 +293,8 @@ textarea.config-input {
 }
 
 .icon-option:hover {
-  background: var(--color-6);
-  border-color: var(--color-3);
+  background: var(--color-border);
+  border-color: var(--color-primary);
 }
 
 .config-temas {

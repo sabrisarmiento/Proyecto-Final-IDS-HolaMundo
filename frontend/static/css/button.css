@@ -3,8 +3,8 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.55rem 1.1rem;
-  background-color: var(--color-3);
-  color: var(--color-10);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
   border: none;
   border-radius: 0.5rem;
   font-family: inherit;
@@ -16,7 +16,7 @@
 }
 
 .btn-action:hover {
-  background-color: var(--color-2);
+  background-color: var(--color-primary-dark);
 }
 
 .btn-action:active {

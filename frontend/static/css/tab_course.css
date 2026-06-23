@@ -14,12 +14,12 @@
     font-weight: 600;
     transition: 0.2s;
     margin-bottom: 15px;
-    background: var(--color-3);
-    color: var(--color-10);
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
 }
 
 .btn-create-student:hover {
-    background: var(--color-25);
+    background: var(--color-primary-mid);
 }
 
 .tab-table{
@@ -33,13 +33,13 @@
 
 .tab-table a{
     text-decoration: none;
-    color: var(--color-45);
+    color: var(--color-surface);
 }
 
 .tab-table tbody{}
 
 .tab-table tbody tr:hover {
-    background: var(--color-6);
+    background: var(--color-border);
 }
 
 .tab-table tr{}
@@ -50,15 +50,15 @@
     padding: 0.75rem 1rem;
     letter-spacing: 0.05em;
     font-size: 0.7rem;
-    background: var(--color-9);
-    color: var(--color-5);
+    background: var(--color-secondary);
+    color: var(--color-bg);
 }
 
 .tab-table td{
     padding: 0.5rem 1rem;
-    border-bottom: 1px solid var(--color-6);
+    border-bottom: 1px solid var(--color-border);
     font-size: 0.8rem;
-    color: var(--color-15);
+    color: var(--color-text);
 }
 
 /* SWITCH DEL ESTADO ALUMNO */
@@ -110,11 +110,11 @@
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    border: 1.5px dashed var(--color-6);
+    border: 1.5px dashed var(--color-border);
     border-radius: 10px;
     padding: 0.85rem 1.2rem;
     margin: 1.5rem 0;
     font-size: 0.95rem;
-    background: var(--color-45);
-    color: var(--color-8);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
 }
