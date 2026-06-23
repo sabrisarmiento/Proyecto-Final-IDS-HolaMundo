@@ -97,6 +97,11 @@
   padding: 2rem;
 }
 
+.calendar-table td{
+  color:var(--color-text);
+
+}
+
 .flash-message{
   color: var(--color-text-heading);
 }
@@ -126,11 +131,11 @@
   cursor: pointer;
 }
 
-.class-action-btn{
+.class-edit-btn{
   font-family: 'Poppins', sans-serif;
   font: size 0.5rem  ;
   font-weight: 500;
-  background: var(--color-secondary);
+  background: var(--color-class-btn);
   border: 1.5px solid;
   border-radius: 8px;
   padding: 0.3rem 1rem;
@@ -140,6 +145,22 @@
   transition: 0.15s;
 
 }
+
+.class-trash-btn{
+  font-family: 'Poppins', sans-serif;
+  font: size 0.5rem  ;
+  font-weight: 500;
+  background: var(--color-class-btn);
+  border: 1.5px solid;
+  border-radius: 8px;
+  padding: 0.3rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--color-bg);
+  transition: 0.15s;
+
+}
+
 .calendar-edit-form{
   font-family: 'Poppins', sans-serif;
   display: flex;

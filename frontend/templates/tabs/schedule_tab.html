@@ -157,7 +157,7 @@
           <td>
            <form action="{{ url_for('courses.eliminar_clase',course_id=course.id_curso,id_clase=clase.id_clase) }}"
            method="POST" style="display:inline;">
-             <button class="class-action-btn" type="submit">
+             <button class="class-trash-btn" type="submit">
               🗑️
              </button>
             </form>
@@ -166,7 +166,7 @@
            <form method="GET">
               <input type="hidden" name="tab" value="calendar" >
             <input type="hidden" name="editar" value="{{ clase.id_clase }}" >
-              <button class="class-action-btn" type="submit">
+              <button class="class-edit-btn" type="submit">
                ✏️
              </button>
            </form>

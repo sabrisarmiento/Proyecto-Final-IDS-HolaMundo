@@ -19,7 +19,7 @@ block extra_styles %}
   {% if cursos_catedra %}
   <h3 class="catedra-title">Seleccioná tu cátedra</h3>
   <div class="catedra-grid">
-    {% for curso in cursos_catedra %}
+    {% for curso in cursos_catedra if curso.estado %}
     <a href="?subject={{ selected_subject }}&curso={{ curso.id_curso }}" class="catedra-card">
       <span class="catedra-nombre">{{ curso.catedra }}</span>
       <span class="catedra-meta">{{ curso.anio }} · {{ curso.cuatrimestre }}</span>

@@ -18,6 +18,8 @@
   --color-border-strong: #BFDBFE;
   --color-border-focus: #93C5FD;
 
+  --color-class-btn:#1E3A8A;
+
   --color-text: #0F172A;
   --color-text-heading: #1E3A8A;
   --color-text-muted: #64748B;
@@ -50,6 +52,8 @@
   --color-border: #2E2E4A;
   --color-border-strong: #3A3A5C;
   --color-border-focus: #4F4F7A;
+
+  --color-class-btn:#224cbf;
 
   --color-text: #F1F5F9;
   --color-text-heading: #93C5FD;

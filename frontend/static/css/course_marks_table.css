@@ -89,8 +89,8 @@
 }
 
 .planilla-table thead tr {
-  background: var(--color-secondary);
-  color: var(--color-bg);
+  background: var(--color-class-btn);
+  color: #e3f0ff;
 }
 
 .planilla-table th {
@@ -233,4 +233,16 @@
   background: #fdecea;
   color: #991b1b;
   border: 1px solid #f5c2c2;
+}
+
+.corrector-name{
+  color:var(--color-text);
+}
+
+.corrector-icon{
+  color:var(--color-text);
+}
+
+.qg-subtitle{
+  color:var(--color-text);
 }
