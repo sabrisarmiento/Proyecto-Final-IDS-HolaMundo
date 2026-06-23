@@ -228,3 +228,9 @@
   background: #fee2e2;
   color: #991b1b;
 }
+
+.nota-cell--mal {
+  background: #fdecea;
+  color: #991b1b;
+  border: 1px solid #f5c2c2;
+}
