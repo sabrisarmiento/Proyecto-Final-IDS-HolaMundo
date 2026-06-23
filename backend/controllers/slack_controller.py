@@ -2,6 +2,16 @@ import requests
 from datetime import datetime
 from database.db import modify_db, query_db
 from helpers.crypto import encrypt_value, decrypt_value
+from helpers.constants import NIVEL_SUPERADMIN
+
+
+def user_can_manage_course(id_curso, user):
+    if (user.get("nivel") or 0) >= NIVEL_SUPERADMIN:
+        return True
+    course = query_db("SELECT id_profesor FROM cursos WHERE id_curso = %s", (id_curso,))
+    if not course or course[0].get("id_profesor") is None:
+        return False
+    return course[0]["id_profesor"] == user.get("id_usuario")
 
 def get_slack_user_name(token, user_id):
     url = "https://slack.com/api/users.info"
@@ -99,8 +109,15 @@ def send_advertisement_to_slack(id_curso, title, message, user_mail):
             "description": str(e)
         }
     
-def disconnect_slack_course(id_curso):
+def disconnect_slack_course(id_curso, user):
     try:
+        if not user_can_manage_course(id_curso, user):
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permiso sobre este curso"
+            }
         sql = """
             DELETE FROM curso_slack_config
             WHERE id_curso = %s
@@ -123,8 +140,16 @@ def disconnect_slack_course(id_curso):
     
 
 
-def configure_slack_course(id_curso, data, id_usuario):
+def configure_slack_course(id_curso, data, user):
     try:
+        if not user_can_manage_course(id_curso, user):
+            return {
+                "ok": False,
+                "code": 403,
+                "message": "Forbidden",
+                "description": "No tenés permiso sobre este curso"
+            }
+        id_usuario = user["id_usuario"]
         slack_bot_token = data.get("slack_bot_token")
         slack_channel_id = data.get("slack_channel_id")
         slack_channel_name = data.get("slack_channel_name")
