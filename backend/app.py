@@ -32,4 +32,4 @@ app.register_blueprint(dashboard_general_bp)
 app.register_blueprint(reports_bp)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)), debug=True)
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)), debug=os.getenv("FLASK_DEBUG", "0") == "1")
