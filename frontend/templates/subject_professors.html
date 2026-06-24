@@ -60,10 +60,10 @@
 
   <h3>Agregar profesor</h3>
 
-  <form method="POST">
+  <form class="course-config-form" method="POST">
     <label for="id_profesor">Profesor</label>
 
-    <select id="id_profesor" name="id_profesor" required>
+    <select class="select-prof" id="id_profesor" name="id_profesor" required>
       <option value="">Seleccioná un profesor</option>
 
       {% for professor in professors %}
