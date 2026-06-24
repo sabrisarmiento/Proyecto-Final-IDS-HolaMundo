@@ -121,7 +121,7 @@
 }
 
 .config-input::placeholder {
-    color: var(--color-primary-muted);
+    color: #bfdbfe86;
     font-size: 0.85rem;
 }
 
