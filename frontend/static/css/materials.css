@@ -328,6 +328,20 @@
   margin-bottom: 1.5rem;
 }
 
+.material-form select{
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.8rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+}
+
 .material-form input {
   flex: 1 1 200px;
   padding: 0.55rem 0.8rem;
