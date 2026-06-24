@@ -3,6 +3,7 @@
 
 {% block extra_styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_general.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 {% endblock %}
 
@@ -283,9 +284,11 @@
   </div>
 </div>
 
-<a href="{{ url_for('logs.descargar_logs') }}" class="dashboard-button">
-  Descargar Logs de Actividad
-</a>
+<div class="dg-logs-wrap">
+  <a href="{{ url_for('logs.descargar_logs') }}" class="btn-action">
+    Descargar Logs de Actividad
+  </a>
+</div>
 
 <script src="{{ url_for('static', filename='js/dashboard_general.js') }}"></script>
 {% endblock %}

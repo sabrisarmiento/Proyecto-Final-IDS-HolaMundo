@@ -440,3 +440,9 @@ td.dg-datatxt-correo {
   background: var(--color-primary-dark);
   color:white;
 }
+
+.dg-logs-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
