@@ -3,7 +3,7 @@ from flask import Blueprint, request
 from services.team_service import teams_service, team_service, create_team_service, patch_team_service, delete_team_service
 
 from middleware.auth_middleware import require_auth, require_min_admin_level
-from helpers.constants import NIVEL_PROFESOR
+from helpers.constants import NIVEL_AYUDANTE
 
 teams_bp = Blueprint("teams", __name__)
 
@@ -26,22 +26,22 @@ def get_team(id_team):
 
 @teams_bp.route("/equipos", methods=["POST"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def create_team():
     data = request.get_json()
-    return create_team_service(data)
+    return create_team_service(data, request.user)
 
 
 @teams_bp.route("/equipos/<int:id_team>", methods=["PATCH"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def update_team(id_team):
     data = request.get_json()
-    return patch_team_service(id_team, data)
+    return patch_team_service(id_team, data, request.user)
 
 
 @teams_bp.route("/equipos/<int:id_team>", methods=["DELETE"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def delete_team(id_team):
-    return delete_team_service(id_team)
+    return delete_team_service(id_team, request.user)

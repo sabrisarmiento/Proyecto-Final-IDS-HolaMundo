@@ -11,7 +11,7 @@ from services.exam_service import (
     save_promocion_config_service,
 )
 from middleware.auth_middleware import require_auth, require_min_admin_level
-from helpers.constants import NIVEL_PROFESOR
+from helpers.constants import NIVEL_AYUDANTE
 
 exam_bp = Blueprint('exam', __name__)
 
@@ -28,7 +28,7 @@ def obtain_exams_params():
  
 @exam_bp.route("/evaluaciones", methods=["POST"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def add_exam():
     data = request.get_json()
     return create_exam_service(data, request.user)
@@ -41,7 +41,7 @@ def obtain_exam_id(id):
  
 @exam_bp.route("/evaluaciones/<int:id>", methods=["PATCH"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def modify_exam(id):
     data = request.get_json()
     return patch_exam_service(id, data, request.user)
@@ -49,7 +49,7 @@ def modify_exam(id):
  
 @exam_bp.route("/evaluaciones/<int:id>", methods=["DELETE"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def delete_exam(id):
     return delete_exam_service(id, request.user)
  
@@ -92,6 +92,6 @@ def get_promocion_config(id_curso):
 
 @exam_bp.route("/cursos/<int:id_curso>/promocion", methods=["POST"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def save_promocion_config(id_curso):
     return save_promocion_config_service(id_curso, request.get_json(silent=True), request.user)
