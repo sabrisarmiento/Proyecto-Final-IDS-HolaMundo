@@ -1,10 +1,6 @@
 from database.db import query_db
 from datetime import datetime
 
-
-from database.db import query_db
-from datetime import datetime
-
 def get_general_dashboard():
     try:
         total_usuarios = query_db("SELECT COUNT(*) AS total FROM usuarios")[0]["total"]

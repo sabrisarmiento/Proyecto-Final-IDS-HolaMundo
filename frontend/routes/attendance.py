@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from services.attendance_frontend_service import attendance_get_all, send_attendance_link, mark_attendance, get_class
 from services.subjects_service import get_my_subjects
 from services.courses_service import get_my_courses
