@@ -13,7 +13,7 @@ def login():
   if result['ok']:
     session['token'] = result['token']
     session['user'] = result['user']
-    return redirect(url_for('dashboard.dashboard'))
+    return redirect(url_for('courses.courses'))
 
   return redirect(url_for('landing.landing') + f'?error={result["description"]}')
 

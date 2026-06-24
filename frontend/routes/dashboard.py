@@ -14,11 +14,20 @@ def dashboard():
     token = session.get('token')
     if not token:
         return redirect(url_for('landing.landing') + '?error=Debés iniciar sesión')
+    
+    user = session.get('user', {})
+    nivel = int(user.get('nivel', 0))
+    if nivel < 2:
+        return redirect(url_for('courses.courses'))
 
     headers = {'Authorization': f'Bearer {token}'}
 
     try:
         res = requests.get(f'{API}/dashboard/general', headers=headers)
+        print("=== DASHBOARD DEBUG ===")
+        print("STATUS:", res.status_code)
+        print("BODY:", res.text[:500])
+        print("======================")
         data = res.json() if res.ok else {}
     except Exception:
         data = {}
