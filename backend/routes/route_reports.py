@@ -6,7 +6,7 @@ reports_bp = Blueprint('reports', __name__)
 
 
 def bool_arg(name):
-    return request.args.get(name) in {"true", "True"}
+    return request.args.get(name) in {"true", "True", "1"}
 
 @reports_bp.route("/reportes/exportar", methods=["GET"])
 @require_auth
