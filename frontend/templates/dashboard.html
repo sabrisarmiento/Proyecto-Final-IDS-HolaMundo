@@ -11,7 +11,7 @@
 
   <header class="dg-header">
     <div>
-      <h1 class="dg-title">Dashboard General</h1>
+      <h1 class="dg-title">Dashboard</h1>
       <p class="dg-subtitle">Vista global de la plataforma</p>
     </div>
   </header>
@@ -137,8 +137,11 @@
           <h2 class="dg-card-title">Roles del sistema</h2>
           <p class="dg-card-sub">Control de acceso | Nivel 3 = Superadmin | Nivel 2 = Profesor | Nivel 1 = Ayudante</p>
         </div>
+        {% if session.get("user", {}).get("nivel", 0) > 2 %}
         <button class="dg-btn dg-btn--primary" id="btn-abrir-crear-rol">+ Nuevo rol</button>
+        {% endif %}
       </div>
+      {% if session.get("user", {}).get("nivel", 0) > 2 %}
       {% if data.roles %}
       <div class="dg-roles-list" id="lista-roles">
         {% for r in data.roles %}
@@ -163,6 +166,7 @@
       </div>
       {% else %}
       <p class="dg-empty">No hay roles definidos</p>
+      {% endif %}
       {% endif %}
     </section>
 
