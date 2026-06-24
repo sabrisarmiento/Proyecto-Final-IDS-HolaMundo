@@ -21,7 +21,7 @@
                 {% if courses and courses|length > 0 %}
                     <select title="select-course" id="select-courses">
                         <option value="" selected>Seleccione una cátedra</option>
-                        {% for course in courses %}
+                        {% for course in courses if course.estado %}
                         <option 
                             value="{{ course.id_curso }}"
                             {% if selected_course == course.id_curso %}selected{% endif %}
