@@ -1,4 +1,5 @@
 from helpers.responses import error_response, success_response
+from helpers.user_belongs import user_can_manage_course, user_can_manage_evaluacion
 from controllers.exam_controller import (
     get_all_exams,
     create_exam,
@@ -17,7 +18,12 @@ def exams_service(filters):
         return error_response(result)
     return success_response({"evaluaciones": result['data']})
 
-def create_exam_service(data):
+def create_exam_service(data, user):
+    if not user_can_manage_course((data or {}).get("id_curso"), user):
+        return error_response({
+            "ok": False, "code": 403,
+            "message": "Forbidden", "description": "No tenés permisos sobre este curso"
+        })
     result = create_exam(data)
     if not result["ok"]:
         return error_response(result)
@@ -29,13 +35,23 @@ def exam_service(id_exam):
         return error_response(result)
     return success_response({"exams": result['data']})
 
-def patch_exam_service(id_exam, data):
+def patch_exam_service(id_exam, data, user):
+    if not user_can_manage_evaluacion(id_exam, user):
+        return error_response({
+            "ok": False, "code": 403,
+            "message": "Forbidden", "description": "No tenés permisos sobre esta evaluación"
+        })
     result = patch_exam_by_id(id_exam, data)
     if not result["ok"]:
         return error_response(result)
     return success_response({"message": result["message"]})
 
-def delete_exam_service(id_exam):
+def delete_exam_service(id_exam, user):
+    if not user_can_manage_evaluacion(id_exam, user):
+        return error_response({
+            "ok": False, "code": 403,
+            "message": "Forbidden", "description": "No tenés permisos sobre esta evaluación"
+        })
     result = delete_exam_by_id(id_exam)
     if not result["ok"]:
         return error_response(result)
@@ -105,7 +121,12 @@ def get_promocion_config_service(id_curso):
     return success_response({"config": result["data"]})
 
 
-def save_promocion_config_service(id_curso, data):
+def save_promocion_config_service(id_curso, data, user):
+    if not user_can_manage_course(id_curso, user):
+        return error_response({
+            "ok": False, "code": 403,
+            "message": "Forbidden", "description": "No tenés permisos sobre este curso"
+        })
     if not id_curso or not data:
         return error_response({
             "ok": False, "code": 400,

@@ -1,5 +1,6 @@
 import requests
-from config import BASE_URL, get_headers
+from config import BASE_URL, get_headers, get_user
+from helpers.logger import log_action
 
 
 def material_get_all():
@@ -24,23 +25,47 @@ def get_materials_by_course(id_curso):
 
 
 def create_material(data):
+    user=get_user()
     try:
         response = requests.post(f"{BASE_URL}/materials", json=data, headers=get_headers())
+        log_action(
+            method='POST',
+            description=f'Se creo el material {data["titulo"]} para el curso {data["id_curso"]}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=response.status_code
+        )
         return response.json(), response.status_code
     except Exception as e:
         return {"errors": [{"description": str(e)}]}, 502
 
 def update_material(id_material, data):
+    user=get_user()
     try:
         response = requests.patch(f"{BASE_URL}/materials/{id_material}", json=data, headers=get_headers())
+        log_action(
+            method='PATCH',
+            description=f'Se actualizo el material {data["titulo"]}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=response.status_code
+        )
         return response.json(), response.status_code
     except Exception as e:
         return {"errors": [{"description": str(e)}]}, 502
 
 
 def delete_material(id_material):
+    user=get_user()
     try:
         response = requests.delete(f"{BASE_URL}/materials/{id_material}", headers=get_headers())
+        log_action(
+            method='DELETE',
+            description=f'Se elimino el material de id {id_material}',
+            user_id=user.get('id_usuario', 'desconocido'),
+            user_email=user.get('correo', 'desconocido'),
+            status_code=response.status_code
+        )
         return response.json(), response.status_code
     except Exception as e:
         return {"errors": [{"description": str(e)}]}, 502

@@ -5,8 +5,8 @@
 .mgmt-card {
   display: flex;
   gap: 1.5rem;
-  background: var(--color-5);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 1.5rem;
   flex-wrap: wrap;
@@ -18,7 +18,7 @@
 }
 
 .mgmt-box--right {
-  border-left: 2px solid var(--color-6);
+  border-left: 2px solid var(--color-border);
   padding-left: 1.5rem;
 }
 
@@ -27,14 +27,14 @@
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: var(--color-3);
+  color: var(--color-primary);
   text-transform: uppercase;
   margin-bottom: 0.4rem;
 }
 
 .mgmt-hint {
   font-size: 0.88rem;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   margin: 0 0 0.85rem;
 }
 
@@ -47,10 +47,10 @@
 .eval-select {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-45);
-  color: var(--color-15);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: 0.9rem;
   cursor: pointer;
   outline: none;
@@ -58,15 +58,15 @@
 }
 
 .eval-select:focus {
-  border-color: var(--color-7);
+  border-color: var(--color-border-focus);
 }
 
 .eval-select-tipo {
   padding: 0.5rem 0.75rem;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-45);
-  color: var(--color-15);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -76,22 +76,22 @@
 }
 
 .eval-select-tipo:focus {
-  border-color: var(--color-7);
+  border-color: var(--color-border-focus);
 }
 
 .btn-del-eval {
   background: none;
-  border: 1.5px solid var(--color-4);
+  border: 1.5px solid var(--color-primary-muted);
   border-radius: 8px;
   padding: 0.45rem 0.65rem;
   cursor: pointer;
   font-size: 1rem;
-  color: var(--color-3);
+  color: var(--color-primary);
   transition: 0.15s;
 }
 
 .btn-del-eval:hover {
-  background: var(--color-4);
+  background: var(--color-primary-muted);
 }
 
 .create-form {
@@ -102,22 +102,22 @@
 .create-form input[type="text"] {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
   font-size: 0.9rem;
-  color: var(--color-15);
-  background: var(--color-45);
+  color: var(--color-text);
+  background: var(--color-surface);
   outline: none;
   transition: border-color 0.15s;
 }
 
 .create-form input[type="text"]:focus {
-  border-color: var(--color-3);
+  border-color: var(--color-primary);
 }
 
 .btn-crear {
-  background: var(--color-3);
-  color: var(--color-10);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   border: none;
   border-radius: 8px;
   padding: 0.5rem 1.1rem;
@@ -129,7 +129,7 @@
 }
 
 .btn-crear:hover {
-  background: var(--color-2);
+  background: var(--color-primary-dark);
 }
 
 .eval-tipo-pill-wrapper {
@@ -167,8 +167,8 @@
 
 /* ===== CARGA DE NOTAS (sección general) ===== */
 .quick-grade-section {
-  background: var(--color-5);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -187,13 +187,13 @@
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  color: var(--color-15);
+  color: var(--color-text);
   text-transform: uppercase;
   margin: 0 0 0.3rem;
 }
 
 .highlight-eval {
-  color: var(--color-3);
+  color: var(--color-primary);
 }
 
 .qg-subtitle {
@@ -239,8 +239,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--color-9);
-  color: var(--color-5);
+  background: var(--color-secondary);
+  color: var(--color-bg);
   border-radius: 10px;
   padding: 0.5rem 1rem;
   min-width: 110px;
@@ -270,16 +270,16 @@
 
 .filter-select {
   padding: 0.4rem 0.65rem;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-45);
-  color: var(--color-15);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: 0.85rem;
   cursor: pointer;
   outline: none;
 }
 
-.filter-select:focus { border-color: var(--color-7); }
+.filter-select:focus { border-color: var(--color-border-focus); }
 
 /* ===== TARJETAS DE CARGA INDIVIDUAL ===== */
 .grade-grid {
@@ -293,8 +293,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--color-45);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: 10px;
   padding: 0.75rem 1rem;
   gap: 1rem;
@@ -302,7 +302,7 @@
 }
 
 .grade-card:hover {
-  border-color: var(--color-7);
+  border-color: var(--color-border-focus);
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
@@ -311,7 +311,7 @@
 .card-name {
   display: block;
   font-size: 0.9rem;
-  color: var(--color-15);
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -320,7 +320,7 @@
 .card-meta {
   display: block;
   font-size: 0.75rem;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   margin-top: 0.15rem;
 }
 
@@ -340,13 +340,13 @@
 .nota-input {
   width: 64px;
   padding: 0.4rem 0.5rem;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 700;
   text-align: center;
-  color: var(--color-15);
-  background: var(--color-5);
+  color: var(--color-text);
+  background: var(--color-bg);
   outline: none;
   transition: border-color 0.15s;
 }
@@ -356,7 +356,7 @@
   -webkit-appearance: none;
 }
 
-.nota-input:focus { border-color: var(--color-9); }
+.nota-input:focus { border-color: var(--color-secondary); }
 
 .nota-aprobado {
   background: #e8f5e9 !important;
@@ -366,8 +366,8 @@
 
 .nota-reprobado {
   background: #fdecea !important;
-  border-color: var(--color-4) !important;
-  color: var(--color-3) !important;
+  border-color: var(--color-primary-muted) !important;
+  color: var(--color-primary) !important;
 }
 
 .nota-dot {
@@ -380,27 +380,27 @@
 }
 
 .dot-verde { background: #4caf50; }
-.dot-rojo  { background: var(--color-3); }
+.dot-rojo  { background: var(--color-primary); }
 
 .corrector-input {
   width: 110px;
   padding: 0.4rem 0.6rem;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
   font-size: 0.8rem;
-  color: var(--color-15);
-  background: var(--color-5);
+  color: var(--color-text);
+  background: var(--color-bg);
   outline: none;
   transition: border-color 0.15s;
 }
 
-.corrector-input:focus { border-color: var(--color-3); }
+.corrector-input:focus { border-color: var(--color-primary); }
 
 .floating-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--color-5);
+  background: var(--color-bg);
   border-radius: 10px;
   padding: 0.75rem 1.25rem;
   margin-top: 1rem;
@@ -410,13 +410,13 @@
 
 .autosave-hint {
   font-size: 0.8rem;
-  color: var(--color-7);
+  color: var(--color-border-focus);
   opacity: 0.85;
 }
 
 .btn-guardar {
-  background: var(--color-3);
-  color: var(--color-45);
+  background: var(--color-primary);
+  color: var(--color-surface);
   border: none;
   border-radius: 8px;
   padding: 0.6rem 1.4rem;
@@ -427,7 +427,7 @@
   transition: 0.15s;
 }
 
-.btn-guardar:hover { background: var(--color-2); }
+.btn-guardar:hover { background: var(--color-primary-dark); }
 
 .grupal-equipos-grid {
   display: flex;
@@ -441,16 +441,16 @@
   flex-direction: row;
   align-items: center;
   gap: 1rem;
-  background: var(--color-45);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: 10px;
   padding: 0.85rem 1.1rem;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .grupal-equipo-card:hover {
-  border-color: var(--color-7);
-  box-shadow: 0 2px 8px var(--color-45);
+  border-color: var(--color-border-focus);
+  box-shadow: 0 2px 8px var(--color-surface);
 }
 
 .grupal-equipo-avatar {
@@ -476,13 +476,13 @@
 .grupal-equipo-nombre {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--color-15);
+  color: var(--color-text);
   display: block;
 }
 
 .grupal-equipo-integrantes {
   font-size: 0.78rem;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -504,20 +504,30 @@
 .grupal-corrector-inline {
   width: 130px;
   padding: 0.4rem 0.6rem;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
   font-size: 0.8rem;
   font-family: 'Poppins', sans-serif;
-  color: var(--color-15);
-  background: var(--color-5);
+  color: var(--color-text);
+  background: var(--color-bg);
   outline: none;
   transition: border-color 0.15s;
 }
 
 .grupal-corrector-inline:focus {
-  border-color: var(--color-7);
+  border-color: var(--color-border-focus);
 }
 
 .grupal-corrector-row {
   display: none !important;
+}
+
+.nota-reprobado {
+  background: #fdecea !important;
+  border-color: #f5c2c2 !important;
+  color: #991b1b !important;
+}
+
+.dot-rojo { 
+  background: #991b1b; 
 }

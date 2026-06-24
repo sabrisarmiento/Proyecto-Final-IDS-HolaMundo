@@ -6,8 +6,8 @@
   align-items: flex-end;
   gap: 1rem 1.25rem;
   padding: 1.4rem 1.5rem;
-  background: var(--color-5);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
 }
 
@@ -25,7 +25,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .calendar-form input,
@@ -35,22 +35,22 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
   padding: 0.6rem 0.8rem;
-  color: var(--color-15);
-  background: var(--color-45);
-  border: 1.5px solid var(--color-6);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: 0.5rem;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .calendar-form input::placeholder {
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .calendar-form input:focus,
 .calendar-form select:focus {
-  border-color: var(--color-3);
-  box-shadow: 0 0 0 3px var(--color-16);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 .calendar-form select {
@@ -69,10 +69,10 @@
 }
 
 .select-modalidad{
-  border: 1.5px solid var(--color-65);
+  border: 1.5px solid var(--color-border-strong);
   border-radius: 8px;
-  background: var(--color-45);
-  color: var(--color-15);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: 0.85rem;
   cursor: pointer;
   outline: none;
@@ -80,10 +80,10 @@
 }
 
 .select-type{
-  border: 1.5px solid var(--color-65);
+  border: 1.5px solid var(--color-border-strong);
   border-radius: 8px;
-  background: var(--color-45);
-  color: var(--color-15);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-size: 0.85rem;
   cursor: pointer;
   outline: none;
@@ -91,87 +91,127 @@
 }
 
 .calendar-table{
-  background: var(--color-5);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 2rem;
 }
 
+.calendar-table td{
+  color:var(--color-text);
+
+}
+
 .flash-message{
-  color: var(--color-1);
+  color: var(--color-text-heading);
 }
 .flash-message.success{
-  color:var(--color-17);
+  color:var(--color-success);
 }
 .flash-message.error{
-  color:var(--color-18);
+  color:var(--color-error);
 }
 
 .calendar-header{
-  color:var(--color-2);
+  color:var(--color-primary-dark);
 }
 .calendar-columns{
-  color:var(--color-2);
+  color:var(--color-primary-dark);
 }
 
 .class-filter-btn {
   font-family: 'Poppins', sans-serif;
   font: size 0.5rem ;
   font-weight: 500;
-  color: var(--color-10);
-  background-color: var(--color-3);
+  color: var(--color-text-inverse);
+  background-color: var(--color-primary);
   border: none;
   border-radius: 0.5rem;
   padding: 0.3rem 1rem;
   cursor: pointer;
 }
 
-.class-action-btn{
+.class-edit-btn{
   font-family: 'Poppins', sans-serif;
   font: size 0.5rem  ;
   font-weight: 500;
-  background: var(--color-9);
+  background: var(--color-class-btn);
   border: 1.5px solid;
   border-radius: 8px;
   padding: 0.3rem 1rem;
   cursor: pointer;
   font-size: 1rem;
-  color: var(--color-5);
+  color: var(--color-bg);
   transition: 0.15s;
 
 }
+
+.class-trash-btn{
+  font-family: 'Poppins', sans-serif;
+  font: size 0.5rem  ;
+  font-weight: 500;
+  background: var(--color-class-btn);
+  border: 1.5px solid;
+  border-radius: 8px;
+  padding: 0.3rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--color-bg);
+  transition: 0.15s;
+
+}
+
 .calendar-edit-form{
   font-family: 'Poppins', sans-serif;
   display: flex;
+  color:var(--color-text);
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 0.3rem 1.25rem;
   padding: 0.5rem 1.5rem;
-  background: var(--color-11);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-surface-modal);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   
+}
+
+.class-action-btn{
+  background: none;
+  color:var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.class-action-btn:hover {
+  background: var(--color-primary-dark);
+  color:white;
 }
 
 .temas-edit-input{
   min-width: 450px;
   font-family: 'Poppins', sans-serif;
   display: flex;
+  color:var(--color-text);
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 0.3rem 1.25rem;
   padding: 0.5rem 1.5rem;
-  background: var(--color-11);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-surface-modal);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
 }
 
 .semana-edit-input{
   width:50px;
+  color:var(--color-text);
   font-family: 'Poppins', sans-serif;
   padding: 0.5rem 1.5rem;
-  background: var(--color-11);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-surface-modal);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
 }
 
@@ -183,22 +223,22 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
   padding: 0.6rem 0.8rem;
-  color: var(--color-15);
-  background: var(--color-45);
-  border: 1.5px solid var(--color-6);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: 0.5rem;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .edit-input {
-  background: var(--color-45);
-  border: 2px solid var(--color-3);
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
   border-radius: 6px;
 }
 
 .calendar-form-group {
-  color: var(--color-15);
+  color: var(--color-text);
   padding: 0.4rem;
 }
 

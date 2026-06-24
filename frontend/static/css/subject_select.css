@@ -9,8 +9,8 @@
 
 .subject-select-container select {
   appearance: none;
-  background: var(--color-45);
-  color: var(--color-8);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
   border: none;
   outline: none;
   padding: 0.55rem 2.2rem 0.55rem 1rem;
@@ -23,7 +23,7 @@
 }
 
 .subject-select-container select:hover {
-  color: var(--color-9);
+  color: var(--color-secondary);
   transform: translateY(-1px);
 }
 
@@ -37,6 +37,6 @@
   position: absolute;
   right: 14px;
   pointer-events: none;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   font-size: 0.8rem;
 }

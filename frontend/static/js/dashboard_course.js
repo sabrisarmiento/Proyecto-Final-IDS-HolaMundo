@@ -1,3 +1,8 @@
+let barChart;
+let asistenciaChart;
+let estadoChart;
+let asistenciaAlumnoChart;
+
 (function () {
   "use strict";
 
@@ -37,11 +42,11 @@
       return;
     }
 
-    const colorOk  = CSS("--color-3")  || "#92140C";
-    const colorLow = CSS("--color-4")  || "#C9867E";
+    const colorOk  = CSS("--color-primary")  || "#92140C";
+    const colorLow = CSS("--color-primary-muted")  || "#C9867E";
     const barColors = data.map((v) => (v >= 4 ? colorOk : colorLow));
 
-    new Chart(canvas, {
+    barChart = new Chart(canvas, {
       type: "bar",
       data: {
         labels,
@@ -60,6 +65,7 @@
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
+          labels: { color: CSS("--color-chart") },
           tooltip: {
             callbacks: {
               label: (ctx) => ` Promedio: ${ctx.parsed.y.toFixed(1)}`,
@@ -70,10 +76,11 @@
           y: {
             min: 0,
             max: 10,
-            ticks: { stepSize: 2 },
-            grid: { color: "rgba(0,0,0,0.06)" },
+            ticks: { stepSize: 2 , color: CSS("--color-chart")},
+            grid: { color: CSS("--color-chart-border") },
+            
           },
-          x: { grid: { display: false } },
+          x: { grid: { display: false }, ticks: { color: CSS("--color-chart") } },
         },
       },
     });
@@ -86,6 +93,7 @@
 
     const { regulares = 0, en_riesgo = 0, sin_datos = 0, umbral = 75 } = asistencia;
     const total = regulares + en_riesgo + sin_datos;
+
 
     if (total === 0) {
       canvas.closest(".dash-chart-card").querySelector(".dash-chart-empty")
@@ -105,7 +113,7 @@
       umbralEl.textContent = `Umbral: ${umbral}% de asistencia`;
     }
 
-    new Chart(canvas, {
+    asistenciaChart = new Chart(canvas, {
       type: "doughnut",
       data: {
         labels: [`Regular (≥${umbral}%)`, `En riesgo (<${umbral}%)`, "Sin datos"],
@@ -113,9 +121,9 @@
           {
             data: [regulares, en_riesgo, sin_datos],
             backgroundColor: [
-              CSS("--color-9") || "#111D4A",
-              CSS("--color-4") || "#C9867E",
-              CSS("--color-6") || "#FFE4C5",
+              CSS("--color-secondary"),
+              CSS("--color-chart-riesgo"),
+              CSS("--color-chart-empty"),
             ],
             borderWidth: 0,
             hoverOffset: 6,
@@ -129,7 +137,7 @@
         plugins: {
           legend: {
             position: "bottom",
-            labels: { padding: 16, font: { size: 12 } },
+            labels: { padding: 16, font: { size: 12 }, color: CSS("--color-chart") },
           },
           tooltip: {
             callbacks: {
@@ -160,7 +168,7 @@
       ? ["Promociona", "Van a final", "Recursantes", "Abandonaron"]
       : ["Aprobados", "Van a final", "Recursantes", "Abandonaron"];
 
-    new Chart(canvas, {
+    estadoChart = new Chart(canvas, {
       type: "doughnut",
       data: {
         labels,
@@ -169,9 +177,9 @@
             data: [promocionados, van_a_final, recursantes, abandonaron],
             backgroundColor: [
               "#22c55e",
-              CSS("--color-9") || "#111D4A",
-              CSS("--color-3") || "#92140C",
-              CSS("--color-8") || "#887672",
+              CSS("--color-secondary") || "#111D4A",
+              CSS("--color-primary") || "#92140C",
+              CSS("--color-chart-abandonan") || "#887672",
             ],
             borderWidth: 0,
             hoverOffset: 6,
@@ -185,7 +193,7 @@
         plugins: {
           legend: {
             position: "bottom",
-            labels: { padding: 16, font: { size: 12 } },
+            labels: { padding: 16, font: { size: 12 }, color: CSS("--color-chart")},
           },
         },
       },
@@ -260,7 +268,6 @@
       .map((a) => `<option value="${a.id_alumno}">${a.apellido}, ${a.nombre}</option>`)
       .join("");
 
-    let chart = null;
 
     function render() {
       const idAlumno = parseInt(select.value, 10);
@@ -275,11 +282,11 @@
         return Math.round((acumulado / (i + 1)) * 100);
       });
       const puntos = clases.map((c) =>
-        presentSet.has(idAlumno + "-" + c.id_clase) ? "#16a34a" : CSS("--color-4") || "#C9867E"
+        presentSet.has(idAlumno + "-" + c.id_clase) ? "#16a34a" : CSS("--color-primary-muted") || "#C9867E"
       );
 
-      if (chart) chart.destroy();
-      chart = new Chart(canvas, {
+      if (asistenciaAlumnoChart) asistenciaAlumnoChart.destroy();
+      asistenciaAlumnoChart = new Chart(canvas, {
         type: "line",
         data: {
           labels,
@@ -287,7 +294,7 @@
             {
               label: "Asistencia acumulada",
               data,
-              borderColor: CSS("--color-9") || "#111D4A",
+              borderColor: CSS("--color-secondary") || "#111D4A",
               backgroundColor: "rgba(17,29,74,0.12)",
               fill: true,
               tension: 0.3,
@@ -307,10 +314,11 @@
             y: {
               min: 0,
               max: 100,
-              ticks: { stepSize: 25, callback: (v) => v + "%" },
-              grid: { color: "rgba(0,0,0,0.06)" },
+              ticks: { stepSize: 25, color: CSS("--color-chart"), callback: (v) => v + "%" },
+              grid: { color: CSS("--color-chart-border")},
             },
-            x: { grid: { display: false } },
+            x: { grid: { display: false } , ticks: { color: CSS("--color-chart") } 
+            }
           },
         },
       });
@@ -321,6 +329,39 @@
   }
 
   window.addEventListener("DOMContentLoaded", function () {
+
+  const dataEl = document.getElementById("dash-curso-data");
+  if (!dataEl) return;
+
+  let d;
+
+  try {
+    d = JSON.parse(dataEl.textContent);
+  } catch (e) {
+    console.error("Error al leer dash-curso-data:", e);
+    return;
+  }
+
+  renderStats(d);
+  renderBarChart(d.evaluaciones);
+  renderAsistenciaChart(d.asistencia);
+  renderEstadoChart(d.clasificacion, d.es_promocionable);
+  renderAsistenciaClase(d);
+  renderAsistenciaAlumno(d);
+
+  const loading = document.getElementById("dash-curso-loading");
+  const content = document.getElementById("dash-curso-content");
+
+  if (loading) loading.style.display = "none";
+  if (content) content.classList.remove("hidden");
+  });
+
+  window.addEventListener("themeChanged", function () {
+
+  if (barChart) barChart.destroy();
+  if (asistenciaChart) asistenciaChart.destroy();
+  if (estadoChart) estadoChart.destroy();
+  if (asistenciaAlumnoChart) asistenciaAlumnoChart.destroy();
     const dataEl = document.getElementById("dash-curso-data");
     if (!dataEl) return;
 

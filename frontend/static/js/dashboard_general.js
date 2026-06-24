@@ -3,6 +3,9 @@
 
   const CSS = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
+  let barChart;
+  let lineChart;
+
   function cerrarModal(id) {
     document.getElementById(id)?.classList.add("hidden");
   }
@@ -66,22 +69,24 @@
     const activos = cursos.map(function (c) { return c.activos  || 0; });
     const abandono = cursos.map(function (c) { return c.abandono || 0; });
 
-    new Chart(canvas, {
+    barChart = new Chart(canvas, {
       type: "bar",
       data: {
         labels: labels,
         datasets: [
-          { label: "Activos",  data: activos,  backgroundColor: CSS("--color-9") || "#111D4A", borderRadius: 6, borderSkipped: false },
-          { label: "Abandono", data: abandono, backgroundColor: CSS("--color-3") || "#92140C", borderRadius: 6, borderSkipped: false },
+          { label: "Activos",  data: activos,  backgroundColor: CSS("--color-secondary") || "#111D4A", borderRadius: 6, borderSkipped: false },
+          { label: "Abandono", data: abandono, backgroundColor: CSS("--color-primary") || "#92140C", borderRadius: 6, borderSkipped: false },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom" } },
+        plugins: { legend: { position: "bottom",
+          labels: { color: CSS("--color-chart") }
+         } },
         scales: {
-          y: { beginAtZero: true, ticks: { stepSize: 1 } },
-          x: { grid: { display: false } },
+          y: { beginAtZero: true, ticks: { stepSize: 1, color: CSS("--color-chart") } },
+          x: { grid: { display: false }, ticks: { color: CSS("--color-chart") } },
         },
       },
     });
@@ -95,14 +100,14 @@
     catch (_) { return; }
     if (!historico.length) return;
 
-    new Chart(canvas, {
+    lineChart = new Chart(canvas, {
       type: "line",
       data: {
         labels: historico.map(function (h) { return h.anio; }),
         datasets: [{
           label: "Promedio general",
           data: historico.map(function (h) { return h.promedio_notas; }),
-          borderColor: CSS("--color-3") || "#92140C",
+          borderColor: CSS("--color-primary") || "#92140C",
           backgroundColor: "rgba(146,20,12,0.1)",
           tension: 0.35,
           pointRadius: 5,
@@ -119,16 +124,24 @@
           tooltip: { callbacks: { label: function (ctx) { return " Promedio: " + ctx.parsed.y.toFixed(2); } } },
         },
         scales: {
-          y: { min: 0, max: 10, ticks: { stepSize: 2 }, grid: { color: "rgba(0,0,0,0.06)" } },
-          x: { grid: { display: false } },
+          y: { min: 0, max: 10, ticks: { stepSize: 2, color: CSS("--color-chart") }, grid: { color: CSS("--color-chart-border")} },
+          x: { grid: { display: false }, ticks: { color: CSS("--color-chart") } },
         },
       },
     });
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
+  window.addEventListener("load", function () {
+  renderBarCursos();
+  renderLineHistorico();
+  });
+
+  window.addEventListener("themeChanged", function () {
+    if (barChart) barChart.destroy();
+    if (lineChart) lineChart.destroy();
+
     renderBarCursos();
     renderLineHistorico();
-  });
+});
 
 })();

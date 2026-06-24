@@ -56,13 +56,28 @@ def proximity_fiuba(user_lat, user_lon):
     FACULTAD_LON = -58.36825700810214
     RADIO_PERMITIDO_METROS = 300
 
-    dlat = math.radians(user_lat - FACULTAD_LAT)
-    dlon = math.radians(user_lon - FACULTAD_LON)
-    a = math.sin(dlat/2)**2 + math.cos(math.radians(FACULTAD_LAT)) * math.cos(math.radians(user_lat)) * math.sin(dlon/2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    distancia = 6371 * c * 1000
+    try:
+        u_lat = float(user_lat)
+        u_lon = float(user_lon)
+         
+        lat1 = math.radians(FACULTAD_LAT)
+        lon1 = math.radians(FACULTAD_LON)
+        lat2 = math.radians(u_lat)
+        lon2 = math.radians(u_lon)
+ 
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
 
-    return distancia <= RADIO_PERMITIDO_METROS
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        
+        distancia = 6371000 * c 
+        
+        return distancia <= RADIO_PERMITIDO_METROS
+
+    except Exception as e:
+        print(f"ERROR GPS, no se pudo calcular la distancia debido a un error de tipado: {e}")
+        return False
 
 def create_attendance(data):
     try:

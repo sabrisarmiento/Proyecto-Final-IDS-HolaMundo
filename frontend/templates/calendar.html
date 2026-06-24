@@ -16,13 +16,17 @@
         <p id="msg-select-course" class="msg-notice">Por favor, seleccione una materia para comenzar.</p>
     {% elif not selected_course %}
         <p id="msg-select-course" class="msg-notice">Por favor, seleccione una cátedra para ver su cronograma.</p>
-    {% endif %}   
+    {% endif %}  
     <div class="schedule-controls">
         {% if selected_subject %}
         <select id="select-courses">
             <option value="">Seleccione una cátedra</option>
             {% for c in courses %}
-                <option value="{{ c.id_curso }}" {% if selected_course == c.id_curso %}selected{% endif %}>{{ c.catedra }}</option>
+                {% if c.estado %}
+                    <option value="{{ c.id_curso }}" {% if selected_course == c.id_curso %}selected{% endif %}>
+                        {{ c.catedra }}
+                    </option>
+                {% endif %}
             {% endfor %}
         </select>
         {% endif %}

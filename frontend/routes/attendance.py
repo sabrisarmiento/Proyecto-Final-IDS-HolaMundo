@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from services.attendance_frontend_service import attendance_get_all, send_attendance_link, mark_attendance, get_class
 from services.subjects_service import get_my_subjects
 from services.courses_service import get_my_courses
@@ -46,10 +46,6 @@ def send_attendance_link_view():
     class_id = request.form.get('id_clase')
     horas = request.form.get('horas')
     minutos = request.form.get('minutos')
-    import os
-
-    print("EMAIL_USER:", os.getenv("EMAIL_USER"))
-    print("EMAIL_PASS:", os.getenv("EMAIL_PASS"))
     result = send_attendance_link(class_id, horas, minutos)
     flash(result.get("message", "No se pudo enviar el link de asistencia."))
 

@@ -4,14 +4,14 @@
   align-items: center;
   gap: 0.75rem;
   padding: 3rem 0;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .dash-spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid var(--color-6);
-  border-top-color: var(--color-3);
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -33,7 +33,7 @@
   gap: 2rem;
   flex-wrap: wrap;
   padding: 0.5rem 0 1.25rem;
-  border-bottom: 1px solid var(--color-6);
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 1.5rem;
 }
 
@@ -48,13 +48,13 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .dash-info-value {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--color-15);
+  color: var(--color-text);
 }
 
 .dash-stats-grid {
@@ -65,8 +65,8 @@
 }
 
 .dash-stat-card {
-  background: var(--color-5);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem 1.1rem;
   display: flex;
@@ -80,18 +80,18 @@
 }
 
 .dash-stat--primary {
-  border-color: var(--color-9);
-  background: var(--color-45);
+  border-color: var(--color-secondary);
+  background: var(--color-surface);
 }
 
 .dash-stat--accent {
-  border-color: var(--color-3);
-  background: var(--color-45);
+  border-color: var(--color-primary);
+  background: var(--color-surface);
 }
 
 .dash-stat--warn {
-  border-color: var(--color-4);
-  background: var(--color-45);
+  border-color: var(--color-primary-muted);
+  background: var(--color-surface);
 }
 
 .dash-stat-label {
@@ -99,13 +99,13 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .dash-stat-num {
   font-size: 2.4rem;
   font-weight: 800;
-  color: var(--color-9);
+  color: var(--color-secondary);
   line-height: 1.1;
 }
 
@@ -113,7 +113,7 @@
 
 .dash-stat-sub {
   font-size: 0.8rem;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   margin-top: 0.1rem;
 }
 
@@ -130,8 +130,8 @@
 }
 
 .dash-chart-card {
-  background: var(--color-45);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 1.25rem;
 }
@@ -144,13 +144,13 @@
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--color-15);
+  color: var(--color-text);
   margin: 0 0 0.15rem;
 }
 
 .dash-chart-subtitle {
   font-size: 0.84rem;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   margin: 0 0 0.85rem;
 }
 
@@ -160,10 +160,14 @@
 
 .dash-chart-empty {
   text-align: center;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   font-size: 0.85rem;
   padding: 1.5rem 0;
   font-style: italic;
+}
+
+#data-cursos{
+  color:var(--color-primary-light);
 }
 
 .dash-asist-badges {
@@ -191,8 +195,8 @@
 }
 
 .dash-stat-card {
-  background: var(--color-45);
-  border: 1.5px solid var(--color-6);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem 1.1rem;
   display: flex;
@@ -204,8 +208,8 @@
 .dash-stat--primary,
 .dash-stat--accent,
 .dash-stat--warn {
-  border-color: var(--color-6);
-  background: var(--color-45);
+  border-color: var(--color-border);
+  background: var(--color-surface);
 }
 
 .dash-table-wrap {
@@ -220,11 +224,11 @@
 }
 
 .dash-table thead tr {
-  background: var(--color-9);
+  background: var(--color-secondary);
 }
 
 .dash-table thead th {
-  color: var(--color-45);
+  color: var(--color-surface);
   padding: 0.65rem 0.9rem;
   text-align: left;
   font-size: 0.78rem;
@@ -233,13 +237,13 @@
 }
 
 .dash-table tbody tr:hover {
-  background: var(--color-5);
+  background: var(--color-bg);
 }
 
 .dash-table td {
   padding: 0.65rem 0.9rem;
-  border-bottom: 1px solid var(--color-6);
-  color: var(--color-1);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-heading);
   vertical-align: middle;
 }
 
@@ -261,10 +265,10 @@
 .dash-select {
   flex: 1 1 200px;
   padding: 0.5rem 0.7rem;
-  border: 1.5px solid var(--color-6);
+  border: 1.5px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-45);
-  color: var(--color-15);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-family: inherit;
   font-size: 0.88rem;
   outline: none;
@@ -273,7 +277,7 @@
 .dash-attendance-count {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   white-space: nowrap;
 }
 
@@ -283,7 +287,7 @@
   flex-wrap: wrap;
   margin-bottom: 0.85rem;
   font-size: 0.82rem;
-  color: var(--color-8);
+  color: var(--color-text-muted);
 }
 
 .dash-attendance-filtros label {
@@ -309,16 +313,16 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-6);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-5);
+  background: var(--color-bg);
   font-size: 0.9rem;
-  color: var(--color-15);
+  color: var(--color-text);
 }
 
 .dash-attendance-empty {
   text-align: center;
-  color: var(--color-8);
+  color: var(--color-text-muted);
   font-size: 0.85rem;
   padding: 1rem 0;
   font-style: italic;

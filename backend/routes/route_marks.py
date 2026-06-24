@@ -6,7 +6,8 @@ from services.mark_service import (
     patch_mark_service,
     delete_mark_service
 )
-from middleware.auth_middleware import require_auth
+from middleware.auth_middleware import require_auth, require_min_admin_level
+from helpers.constants import NIVEL_PROFESOR
 
 marks_bp = Blueprint('marks', __name__)
 
@@ -30,19 +31,22 @@ def get_mark(id_mark):
 
 @marks_bp.route('/marks', methods=['POST'])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def create_mark():
     data = request.get_json()
-    return create_mark_service(data)
+    return create_mark_service(data, request.user)
 
 
 @marks_bp.route('/marks/<int:id_mark>', methods=['PATCH'])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def patch_mark(id_mark):
     data = request.get_json()
-    return patch_mark_service(id_mark, data)
+    return patch_mark_service(id_mark, data, request.user)
 
 
 @marks_bp.route('/marks/<int:id_mark>', methods=['DELETE'])
 @require_auth
+@require_min_admin_level(NIVEL_PROFESOR)
 def delete_mark(id_mark):
-    return delete_mark_service(id_mark)
+    return delete_mark_service(id_mark, request.user)

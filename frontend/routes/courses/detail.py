@@ -69,14 +69,6 @@ def course_detail(course_id):
         id_rol = int(id_rol)
     except (TypeError, ValueError):
         return redirect(url_for("landing.landing") + "?error=No se pudo validar el permiso")
-    
-    print("USER SESSION:", user)
-    print("id_user:", id_user)
-    print("nivel:", nivel)
-    print("id_rol:", id_rol)
-    print("COURSE:", course)
-    print("profesor_id del curso:", course.get("profesor_id"))
-    print("ayudantes del curso:", course.get("ayudantes", []))
 
     es_superadmin = id_rol == 1
 
@@ -149,10 +141,6 @@ def course_detail(course_id):
         assistants_data = assistants_res.json() if assistants_res.ok else {}
         assistants = assistants_data.get("assistants") or assistants_data.get("data") or []
 
-        print("STATUS ASSISTANTS:", assistants_res.status_code)
-        print("JSON ASSISTANTS:", assistants_data)
-        print("ASSISTANTS:", assistants)
-
     except Exception as e:
         print(f"Error cargando ayudantes del curso: {e}")
         assistants = []
@@ -167,10 +155,6 @@ def course_detail(course_id):
         available_assistants_data = available_assistants_res.json() if available_assistants_res.ok else {}
         available_assistants = available_assistants_data.get("users") or available_assistants_data.get("data") or []
 
-        print("STATUS AVAILABLE ASSISTANTS:", available_assistants_res.status_code)
-        print("JSON AVAILABLE ASSISTANTS:", available_assistants_data)
-        print("AVAILABLE ASSISTANTS:", available_assistants)
-
     except Exception as e:
         print(f"Error cargando ayudantes disponibles: {e}")
         available_assistants = []
@@ -180,12 +164,13 @@ def course_detail(course_id):
     except Exception:
         evaluaciones = []
 
-    try:
-        tipos_res      = requests.get(f'{BACKEND_URL}/tipos-evaluacion')
-        tipos_evaluacion = tipos_res.json().get("exam_types", [])
-    except Exception as e:
-        print(f"Error loading tipos de evaluacion: {e}")
-        tipos_evaluacion = []
+    seen_tipos = set()
+    tipos_evaluacion = []
+    for e in evaluaciones:
+        nombre = e.get('nombre')
+        if nombre and nombre not in seen_tipos:
+            seen_tipos.add(nombre)
+            tipos_evaluacion.append({'nombre': nombre})
 
     try:
         params = {'id_curso': course_id, 'page': page, 'per_page': per_page}
@@ -414,6 +399,7 @@ def course_detail(course_id):
         assistants=assistants,
         available_assistants=available_assistants,
         temas=temas,
+        nivel=nivel,
     )
 
 @courses_bp.route("/cursos/<int:course_id>/ayudantes/agregar", methods=["POST"])
