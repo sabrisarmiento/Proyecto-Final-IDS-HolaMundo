@@ -75,10 +75,11 @@ CREATE TABLE alumnos (
     id_alumno INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
-    padron INT UNIQUE NOT NULL,
+    padron INT NOT NULL,
     correo VARCHAR(255) NOT NULL,
     estado_alumno BOOLEAN DEFAULT TRUE,
     id_curso INT NOT NULL,
+    UNIQUE (id_curso, padron),
     FOREIGN KEY (id_curso) REFERENCES cursos(id_curso) ON DELETE CASCADE
 );
 
