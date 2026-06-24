@@ -9,6 +9,7 @@ from services.courses_service import get_course_by_id
 from services.students_services import post_student
 from services.exams_service import get_exams_by_course_id
 from services.material_frontend_service import get_materials_by_course
+from services.classes_service import get_classes_by_course
 
 
 @courses_bp.route('/cursos/<int:course_id>', methods=['GET', 'POST'])
@@ -191,9 +192,8 @@ def course_detail(course_id):
     filtro_tipo=request.args.get("tipo")
     id_clase_editar = request.args.get("editar", type=int)
     try:
-        clases_res  = requests.get(f'{BASE_URL}/clases?id_curso={course_id}')
-        clases_json = clases_res.json()
-        clases      = clases_json.get("classes", [])
+        clases_res  = get_classes_by_course(course_id)
+        clases = clases_res['data'] if clases_res['ok'] else []
         if filtro_modalidad:
             clases=[c for c in clases if c.get('modalidad')==filtro_modalidad]
         if filtro_tipo:
