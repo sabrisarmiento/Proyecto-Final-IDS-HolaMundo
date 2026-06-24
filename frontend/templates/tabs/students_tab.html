@@ -4,7 +4,6 @@
     <div class="flash-message flash-{{ category }}">{{ message }}</div>
   {% endfor %}
 {% endwith %}
-{% if nivel >= 2 %}
 <section>
     <button
     type="button"
@@ -52,7 +51,6 @@
     </form>
     {% endcall %}
 </section>
-{% endif %}
 
 {% if students %} {% set current_order_by = request.args.get('order_by', '') %}
 {% set current_order = request.args.get('order', '') %} {% set students_base_url
@@ -77,30 +75,25 @@
         <td>{{ student.padron }}</td>
         <td>{{ student.correo }}</td>
         <td>
-            {% if nivel >= 2 %}
-            <form
-                action="{{ url_for('courses.edit_student', course_id=course['id_curso'], student_id=student.id_alumno) }}"
+            <form 
+                action="{{ url_for('courses.edit_student', course_id=course['id_curso'], student_id=student.id_alumno) }}" 
                 method="POST"
             >
                 <input type="hidden" name="form_type" value="estado">
                 <input type="hidden" name="estado_alumno" value="0">
                 <label class="switch-container">
-                    <input
-                        type="checkbox"
-                        name="estado_alumno"
-                        value="1"
+                    <input 
+                        type="checkbox" 
+                        name="estado_alumno" 
+                        value="1" 
                         {% if student.estado_alumno %}checked{% endif %}
                         onchange="this.form.submit()"
                     />
                     <span class="slider"></span>
                 </label>
             </form>
-            {% else %}
-            <span>{{ 'Activo' if student.estado_alumno else 'No activo' }}</span>
-            {% endif %}
         </td>
         <td>
-            {% if nivel >= 2 %}
             <button type="button" class="btn-edit-student"
                 onclick="openModal('edit-student-{{ student.id_alumno }}')">
                 Editar
@@ -118,7 +111,6 @@
                     <button type="submit" value="{{course["id_curso"]}}">Guardar cambios</button>
                 </form>
             {% endcall %}
-            {% endif %}
         </td>
     </tr>
     {% endfor %}

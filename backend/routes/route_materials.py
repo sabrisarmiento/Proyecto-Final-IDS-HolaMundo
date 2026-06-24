@@ -7,7 +7,7 @@ from services.material_service import (
 )
 
 from middleware.auth_middleware import require_auth, require_min_admin_level
-from helpers.constants import NIVEL_PROFESOR
+from helpers.constants import NIVEL_AYUDANTE
 
 materials_bp = Blueprint('materials', __name__)
 
@@ -24,21 +24,21 @@ def get_materials_route():
 
 @materials_bp.route('/materials', methods=['POST'])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def create_material_route():
     data = request.get_json()
-    return create_material_service(data)
+    return create_material_service(data, request.user)
 
 
 @materials_bp.route('/materials/<int:id_material>', methods=['DELETE'])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def delete_material_route(id_material):
-    return delete_material_service(id_material)
+    return delete_material_service(id_material, request.user)
 
 @materials_bp.route('/materials/<int:id_material>', methods=['PATCH'])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def update_material_route(id_material):
     data = request.get_json()
-    return update_material_service(id_material, data)
+    return update_material_service(id_material, data, request.user)

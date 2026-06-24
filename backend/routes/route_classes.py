@@ -8,7 +8,7 @@ from services.class_service import (
     classes_by_subject_service
 )
 from middleware.auth_middleware import require_auth, require_min_admin_level
-from helpers.constants import NIVEL_PROFESOR
+from helpers.constants import NIVEL_AYUDANTE
 
 classes_bp = Blueprint('classes', __name__)
 
@@ -31,14 +31,14 @@ def get_classes_by_subject_route(id_subject):
 
 @classes_bp.route('/clases', methods=['POST'])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def create_class_route():
     data = request.get_json()
     return create_class_service(data, request.user)
 
 @classes_bp.route('/clases/<int:id_clase>', methods=['PATCH'])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def update_class_route(id_clase):
     data = request.get_json()
     return update_class_service(id_clase, data, request.user)
@@ -46,7 +46,7 @@ def update_class_route(id_clase):
 
 @classes_bp.route('/clases/<int:id_clase>', methods=['DELETE'])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def delete_class_route(id_clase):
     return delete_class_service(id_clase, request.user)
 

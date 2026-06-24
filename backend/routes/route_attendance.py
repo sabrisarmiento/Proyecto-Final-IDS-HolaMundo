@@ -7,7 +7,7 @@ from services.attendance_service import (
     send_attendance_link_service, 
 )
 from middleware.auth_middleware import require_auth, require_min_admin_level
-from helpers.constants import NIVEL_PROFESOR
+from helpers.constants import NIVEL_AYUDANTE
 
 attendance_bp = Blueprint('attendance', __name__)
 
@@ -24,7 +24,7 @@ def post_attendance():
 
 @attendance_bp.route("/asistencia/enviar-link", methods=["POST"])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def post_send_attendance_link():
     data = request.get_json()
     return send_attendance_link_service(data.get("id_clase"), data.get("horas"), data.get("minutos"), request.user)
