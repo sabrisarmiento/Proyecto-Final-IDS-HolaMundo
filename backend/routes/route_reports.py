@@ -1,30 +1,28 @@
 from flask import Blueprint, request
-from services.report_service import (
-    report_combined_service,
-)
+from services.report_service import report_combined_service
 from middleware.auth_middleware import require_auth
 
 reports_bp = Blueprint('reports', __name__)
 
-_TRUTHY = {"1", "true", "True", "on", "yes"}
 
+def bool_arg(name):
+    return request.args.get(name) in {"true", "True"}
 
 @reports_bp.route("/reportes/exportar", methods=["GET"])
 @require_auth
 def reporte_exportar():
-    curso_id = request.args.get("curso_id", type=int)
-    evaluaciones = request.args.getlist("evaluaciones[]") or request.args.getlist("evaluaciones")
-    return report_combined_service(
-        curso_id,
-        request.args.get("alumnos") in _TRUTHY,
-        request.args.get("equipos") in _TRUTHY,
-        request.args.get("notas") in _TRUTHY,
-        evaluaciones,
-        request.args.get("asistencia") in _TRUTHY,
-        request.args.get("mostrar_corrector") in _TRUTHY,
-        request.args.get("incluir_estado_final") in _TRUTHY,
-        request.args.get("materia"),
-        request.args.get("catedra"),
-        request.args.get("cuatrimestre"),
-        request.args.get("anio"),
-    )
+    opciones = {
+        "id_curso":             request.args.get("curso_id", type=int),
+        "incluir_alumnos":      bool_arg("alumnos"),
+        "incluir_equipos":      bool_arg("equipos"),
+        "incluir_notas":        bool_arg("notas"),
+        "evaluaciones":         request.args.getlist("evaluaciones[]") or request.args.getlist("evaluaciones"),
+        "incluir_asistencia":   bool_arg("asistencia"),
+        "mostrar_corrector":    bool_arg("mostrar_corrector"),
+        "incluir_estado_final": bool_arg("incluir_estado_final"),
+        "materia":              request.args.get("materia"),
+        "catedra":              request.args.get("catedra"),
+        "cuatrimestre":         request.args.get("cuatrimestre"),
+        "anio":                 request.args.get("anio"),
+    }
+    return report_combined_service(opciones)
