@@ -78,12 +78,15 @@ def create_student(data):
                     "description": f"Faltan campos: {missing}"}
 
         exists = query_db(
-            "SELECT id_alumno FROM alumnos WHERE correo = %s OR padron = %s",
-            (data["correo"], data["padron"]),
+            """SELECT a.id_alumno FROM alumnos a
+            JOIN cursos c ON a.id_curso = c.id_curso
+            WHERE (a.correo = %s OR a.padron = %s)
+            AND c.id_materia = (SELECT id_materia FROM cursos WHERE id_curso = %s)""",
+            (data["correo"], data["padron"], data["id_curso"]),
         )
         if exists:
             return {"ok": False, "code": 409, "message": "Conflict",
-                    "description": "El alumno ya existe (correo o padrón duplicado)"}
+                    "description": "El alumno ya existe en esta materia (correo o padrón duplicado)"}
 
         new_id = insert_db(
             """INSERT INTO alumnos (nombre, apellido, padron, correo, id_curso)
@@ -196,7 +199,7 @@ def update_student(student_id, data):
             }
 
         exists = query_db(
-            "SELECT id_alumno FROM alumnos WHERE id_alumno = %s",
+            "SELECT id_alumno, id_curso FROM alumnos WHERE id_alumno = %s",
             (student_id,)
         )
         if not exists:
@@ -210,9 +213,14 @@ def update_student(student_id, data):
         if "correo" in data or "padron" in data:
             correo = data.get("correo")
             padron = data.get("padron")
+            id_curso = data.get("id_curso") or exists[0]["id_curso"]
             dup = query_db(
-                "SELECT id_alumno FROM alumnos WHERE (correo = %s OR padron = %s) AND id_alumno <> %s",
-                (correo, padron, student_id)
+                """SELECT a.id_alumno FROM alumnos a
+                JOIN cursos c ON a.id_curso = c.id_curso
+                WHERE (a.correo = %s OR a.padron = %s)
+                AND c.id_materia = (SELECT id_materia FROM cursos WHERE id_curso = %s)
+                AND a.id_alumno <> %s""",
+                (correo, padron, id_curso, student_id)
             )
             if dup:
                 return {

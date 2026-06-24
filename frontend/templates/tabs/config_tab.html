@@ -11,7 +11,6 @@
   <p class="config-subtitle">Editá los datos generales del curso, los cambios se van a reflejar de inmediato en la plataforma</p>
 </div>
 
-{% if nivel >= 2 %}
 <form
   action="{{ url_for('courses.update_course_config', course_id=course['id_curso']) }}"
   method="POST"
@@ -123,9 +122,7 @@
 </div>
 
 </form>
-{% endif %}
 
-{% if nivel >= 2 %}
 <div class="config-section config-temas">
   <h3 class="config-section-title">Temas de la materia</h3>
   <p class="config-subtitle">Estos temas se muestran en la página pública de la materia</p>
@@ -182,7 +179,6 @@
     </div>
   </form>
 </div>
-{% endif %}
 
 
 <div class="config-section">
@@ -246,9 +242,7 @@
   {% endif %}
 </div>
 
-{% if nivel >= 2 %}
 </form>
-{% endif %}
 
 {% if nivel >= 2 %}
 <div class="config-section">

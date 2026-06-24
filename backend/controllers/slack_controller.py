@@ -3,15 +3,7 @@ from datetime import datetime
 from database.db import modify_db, query_db
 from helpers.crypto import encrypt_value, decrypt_value
 from helpers.constants import NIVEL_SUPERADMIN
-
-
-def user_can_manage_course(id_curso, user):
-    if (user.get("nivel") or 0) >= NIVEL_SUPERADMIN:
-        return True
-    course = query_db("SELECT id_profesor FROM cursos WHERE id_curso = %s", (id_curso,))
-    if not course or course[0].get("id_profesor") is None:
-        return False
-    return course[0]["id_profesor"] == user.get("id_usuario")
+from helpers.user_belongs import user_can_manage_course
 
 def get_slack_user_name(token, user_id):
     url = "https://slack.com/api/users.info"

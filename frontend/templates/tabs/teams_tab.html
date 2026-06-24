@@ -7,7 +7,6 @@
         {% endif %}
     {% endwith %}
     <section>
-        {% if nivel >= 2 %}
         <div class="teams-actions">
             <button type="button" class="btn-primary" onclick="openModal('create-team-modal')">Crear equipo</button>
             <button type="button" class="btn-danger" onclick="toggleDeleteMode()">Eliminar equipos</button>
@@ -42,9 +41,8 @@
                 </div>
             </div>
         {% endcall %}
-        {% endif %}
     </section>
-    {% if pending_team_change and nivel >= 2 %}
+    {% if pending_team_change %}
     <div class="modal-container active">
         <div class="modal">
             <form method="POST" action="{{ url_for('courses.cancel_team_change', course_id=course_id) }}">
@@ -74,18 +72,14 @@
         {% for team in teams %}
         <div class="team-card searchable-team" data-team-name="{{ team.nombre_equipo|lower }}">
             <div class="team-header-row">
-                {% if nivel >= 2 %}
                 <input type="checkbox" class="team-checkbox hidden" value="{{ team.id_equipo }}">
-                {% endif %}
                 <button type="button" class="team-header" onclick="toggleTeam({{ team.id_equipo }})">
                     <div class="team-title">
-                        <span class="team-name">{{ team.nombre_equipo }}</span>
+                        <span class="team-name">{{ team.nombre_equipo }}</span> 
                         <span class="team-count">({{ team.alumnos|length }} integrantes)</span>
                     </div>
                 </button>
-                {% if nivel >= 2 %}
                 <button type="button" class="btn-edit-team" onclick="openModal('edit-team-{{ team.id_equipo }}')">✎</button>
-                {% endif %}
             </div>    
             <div id="team-{{ team.id_equipo }}" class="team-members {% if searched_team_id|int != team.id_equipo %}hidden{% endif %}">
                 {% if team.alumnos %}
@@ -97,9 +91,7 @@
                             <th>Padrón</th>
                             <th>Correo</th>
                             <th>Estado</th>
-                            {% if nivel >= 2 %}
                             <th>Eliminar</th>
-                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -114,7 +106,6 @@
                                     {{ 'Activo' if alumno.estado_alumno else 'No activo' }}
                                 </span>
                             </td>
-                            {% if nivel >= 2 %}
                             <td>
                                 <form action="{{ url_for('courses.remove_student_from_team', course_id=course.id_curso) }}" method="POST">
                                     <input type="hidden" name="id_equipo" value="{{ team.id_equipo }}">
@@ -122,7 +113,6 @@
                                     <button type="button" class="btn-remove-student" onclick="openRemoveStudentModal(this.form)">✕</button>
                                 </form>
                             </td>
-                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -130,7 +120,6 @@
                 {% else %}
                     <p>Este equipo no tiene integrantes.</p>
                 {% endif %}
-                {% if nivel >= 2 %}
                 <form class="team-add-form" method="GET" action="{{ url_for('courses.course_detail', course_id=course.id_curso) }}">
                     <input type="hidden" name="tab" value="teams">
                     <input type="hidden" name="team_id" value="{{ team.id_equipo }}">
@@ -141,8 +130,7 @@
                         <button type="submit" class="btn-primary">Buscar</button>
                     </div>
                 </form>
-                {% endif %}
-                {% if nivel >= 2 and searched_team_id|int == team.id_equipo %}
+                {% if searched_team_id|int == team.id_equipo %}
                     {% if student_found %}
                         <div class="student-found">
                             <p>Alumno encontrado: <strong>{{ student_found.nombre }} {{ student_found.apellido }}</strong></p>
@@ -159,7 +147,6 @@
                 {% endif %}
             </div>
         </div>
-        {% if nivel >= 2 %}
         {% call modal("edit-team-" ~ team.id_equipo, "Editar equipo") %}
         <form method="POST" action="{{ url_for('courses.edit_team', course_id=course.id_curso, team_id=team.id_equipo) }}">
             <label>Nombre del equipo</label>
@@ -167,7 +154,6 @@
             <button type="submit" class="btn-primary">Guardar cambios</button>
         </form>
         {% endcall %}
-        {% endif %}
         {% endfor %}
     {% else %}
         <p class="tab-empty">No hay equipos registrados.</p>

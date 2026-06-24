@@ -11,7 +11,7 @@ from services.courses_service import (
     remove_assistant_from_course_service
 )
 from middleware.auth_middleware import require_auth, require_min_admin_level
-from helpers.constants import NIVEL_PROFESOR
+from helpers.constants import NIVEL_PROFESOR, NIVEL_AYUDANTE
 
 courses_bp = Blueprint('courses', __name__)
 
@@ -50,7 +50,7 @@ def create_course_route():
 
 @courses_bp.route('/courses/<int:id_course>', methods=['PATCH'])
 @require_auth
-@require_min_admin_level(NIVEL_PROFESOR)
+@require_min_admin_level(NIVEL_AYUDANTE)
 def patch_course_route(id_course):
     data = request.get_json()
     return patch_course_service(id_course, data, request.user)
