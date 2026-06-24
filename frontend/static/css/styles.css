@@ -33,6 +33,10 @@
   --color-chart: #1a1c21;
   --color-chart-border:#0000000f;
 
+  --color-chart-riesgo:#111D4A;
+  --color-chart-abandonan:#737f90;
+  --color-chart-empty:#DBEAFE;
+
   --color-success: #16a34a;
   --color-error: #DC2626;
   --color-error-bg: #FEE2E2;
@@ -70,6 +74,10 @@
 
   --color-chart: #e2f0fe;
   --color-chart-border:#e9f3f80f;
+
+  --color-chart-riesgo:#1a328b;
+  --color-chart-abandonan:#737f90;
+  --color-chart-empty:#5e6c80;
 
   --color-success: #4ADE80;
   --color-error: #F87171;

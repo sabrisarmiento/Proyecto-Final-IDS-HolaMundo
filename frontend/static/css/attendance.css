@@ -35,6 +35,20 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
+.attendance-actions form{
+    color:var(--color-text);
+}
+
+.attendance-actions input{
+    width:50px;
+    color:var(--color-text);
+    font-family: 'Poppins', sans-serif;
+    padding: 0.5rem 1.5rem;
+    background: var(--color-surface-modal);
+    border: 1.5px solid var(--color-border);
+    border-radius: 12px;
+}
+
 .field {
     display: flex;
     flex-direction: column;

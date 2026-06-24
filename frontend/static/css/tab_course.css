@@ -1,4 +1,18 @@
-.tab-panel{}
+.tab-panel label{
+    color:var(--color-text);
+}
+
+#select-source-dashboard{
+    font-family: 'Poppins', sans-serif;
+    color:var(--color-text);
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.3rem 1.25rem;
+    padding: 0.5rem 1.5rem;
+    background: var(--color-surface-modal);
+    border: 1.5px solid var(--color-border);
+    border-radius: 12px;
+}
 
 .hidden{
     display: none;

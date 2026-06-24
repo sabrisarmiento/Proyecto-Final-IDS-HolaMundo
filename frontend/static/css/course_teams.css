@@ -71,6 +71,7 @@
 }
 
 .team-members {
+  background: var(--color-surface-modal);
   padding: 1rem 1.1rem;
   border-top: 1.5px solid var(--color-border);
 }
