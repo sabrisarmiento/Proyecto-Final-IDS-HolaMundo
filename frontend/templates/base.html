@@ -36,7 +36,7 @@
     class="{% if active_page == 'calendar' %}is-active{% endif %}">Cronograma</a>
 
   {% if session.get('user') %}
-    <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('courses.courses') }}">Dashboard</a>
   {% endif %}
 
   {% include "components/subject_select.html" %}
