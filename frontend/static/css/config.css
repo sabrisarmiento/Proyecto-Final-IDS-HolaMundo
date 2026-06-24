@@ -58,6 +58,10 @@
     margin-top: 1.5rem;
 }
 
+.config-section p{
+  color:var(--color-text);
+}
+
 .config-section-title {
     font-size: 0.75rem;
     font-weight: 800;
@@ -121,7 +125,7 @@
 }
 
 .config-input::placeholder {
-    color: var(--color-primary-muted);
+    color: #bfdbfe86;
     font-size: 0.85rem;
 }
 
