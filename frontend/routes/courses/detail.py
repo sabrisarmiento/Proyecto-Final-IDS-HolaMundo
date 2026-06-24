@@ -164,12 +164,13 @@ def course_detail(course_id):
     except Exception:
         evaluaciones = []
 
-    try:
-        tipos_res      = requests.get(f'{BACKEND_URL}/tipos-evaluacion')
-        tipos_evaluacion = tipos_res.json().get("exam_types", [])
-    except Exception as e:
-        print(f"Error loading tipos de evaluacion: {e}")
-        tipos_evaluacion = []
+    seen_tipos = set()
+    tipos_evaluacion = []
+    for e in evaluaciones:
+        nombre = e.get('nombre')
+        if nombre and nombre not in seen_tipos:
+            seen_tipos.add(nombre)
+            tipos_evaluacion.append({'nombre': nombre})
 
     try:
         params = {'id_curso': course_id, 'page': page, 'per_page': per_page}

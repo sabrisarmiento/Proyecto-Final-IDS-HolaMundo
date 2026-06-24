@@ -103,3 +103,14 @@ function filesFromList(file) {
   dt.items.add(file);
   return dt.files;
 }
+
+function showMessage(el, text, isError = false) {
+  el.textContent = text;
+  el.classList.toggle("form-message--error", isError);
+  el.hidden = false;
+}
+
+function hideMessage(el) {
+  el.hidden = true;
+  el.textContent = "";
+}
